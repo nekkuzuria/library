@@ -1,0 +1,2 @@
+org.springframework.test.context.ContextCustomizerFactory = com.xtramile.\
+    library2024.config.SqlTestContainersSpringContextCustomizerFactory
