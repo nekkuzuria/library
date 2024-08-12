@@ -165,6 +165,8 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:testcontainers"
     // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 task cleanResources(type: Delete) {
