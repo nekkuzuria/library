@@ -1,0 +1,29 @@
+{
+  "annotations": {
+    "changelogDate": "20240812040207"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dateOfBirth",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "name": "Librarian",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}
