@@ -3,19 +3,21 @@ import dayjs from 'dayjs/esm';
 import { ILibrarian, NewLibrarian } from './librarian.model';
 
 export const sampleWithRequiredData: ILibrarian = {
-  id: 6277,
+  id: 8528,
 };
 
 export const sampleWithPartialData: ILibrarian = {
-  id: 25519,
-  email: 'Carlos87@yahoo.com',
+  id: 15025,
+  name: 'which',
+  email: 'Gladyce_Kreiger44@gmail.com',
+  phoneNumber: 'suddenly',
 };
 
 export const sampleWithFullData: ILibrarian = {
-  id: 7859,
-  name: 'ick',
-  email: 'Olen.Keebler@yahoo.com',
-  phoneNumber: 'what',
+  id: 9782,
+  name: 'terrible bird-watcher',
+  email: 'Rosalyn.Leannon@gmail.com',
+  phoneNumber: 'since between giddy',
   dateOfBirth: dayjs('2024-08-11'),
 };
 

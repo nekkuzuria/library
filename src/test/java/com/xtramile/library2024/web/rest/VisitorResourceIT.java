@@ -311,7 +311,7 @@ class VisitorResourceIT {
         Visitor partialUpdatedVisitor = new Visitor();
         partialUpdatedVisitor.setId(visitor.getId());
 
-        partialUpdatedVisitor.membershipStatus(UPDATED_MEMBERSHIP_STATUS);
+        partialUpdatedVisitor.email(UPDATED_EMAIL).dateOfBirth(UPDATED_DATE_OF_BIRTH);
 
         restVisitorMockMvc
             .perform(

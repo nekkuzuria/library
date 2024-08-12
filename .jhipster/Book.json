@@ -1,0 +1,30 @@
+{
+  "annotations": {
+    "changelogDate": "20240812065714"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "BookType",
+      "fieldValues": "HARDCOVER,PAPERBACK,EBOOK,AUDIOBOOK,MAGAZINE,JOURNAL,COMIC,NEWSPAPER"
+    },
+    {
+      "fieldName": "genre",
+      "fieldType": "Genre",
+      "fieldValues": "FICTION,NONFICTION,SCIENCE_FICTION,FANTASY,BIOGRAPHY,MYSTERY,THRILLER,ROMANCE,HORROR,HISTORY,POETRY,DRAMA,ADVENTURE,CHILDRENS,YOUNG_ADULT,SELF_HELP,RELIGION,COOKING,ART,TRAVEL"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "Book",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
