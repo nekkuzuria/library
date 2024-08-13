@@ -24,7 +24,16 @@
   "name": "Book",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "bookStorage",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "bookStorage",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no",
   "service": "serviceClass"
 }

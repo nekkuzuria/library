@@ -21,6 +21,7 @@ type BookFormGroupContent = {
   title: FormControl<IBook['title']>;
   type: FormControl<IBook['type']>;
   genre: FormControl<IBook['genre']>;
+  bookStorage: FormControl<IBook['bookStorage']>;
 };
 
 export type BookFormGroup = FormGroup<BookFormGroupContent>;
@@ -45,6 +46,7 @@ export class BookFormService {
       }),
       type: new FormControl(bookRawValue.type),
       genre: new FormControl(bookRawValue.genre),
+      bookStorage: new FormControl(bookRawValue.bookStorage),
     });
   }
 

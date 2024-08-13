@@ -1,7 +1,10 @@
 package com.xtramile.library2024.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,6 +27,15 @@ public class BookStorage implements Serializable {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bookStorage")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "bookStorage", "visitorBookStorage" }, allowSetters = true)
+    private Set<Book> books = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "bookStorages" }, allowSetters = true)
+    private Library library;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -51,6 +63,50 @@ public class BookStorage implements Serializable {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Set<Book> getBooks() {
+        return this.books;
+    }
+
+    public void setBooks(Set<Book> books) {
+        if (this.books != null) {
+            this.books.forEach(i -> i.setBookStorage(null));
+        }
+        if (books != null) {
+            books.forEach(i -> i.setBookStorage(this));
+        }
+        this.books = books;
+    }
+
+    public BookStorage books(Set<Book> books) {
+        this.setBooks(books);
+        return this;
+    }
+
+    public BookStorage addBook(Book book) {
+        this.books.add(book);
+        book.setBookStorage(this);
+        return this;
+    }
+
+    public BookStorage removeBook(Book book) {
+        this.books.remove(book);
+        book.setBookStorage(null);
+        return this;
+    }
+
+    public Library getLibrary() {
+        return this.library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
+
+    public BookStorage library(Library library) {
+        this.setLibrary(library);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

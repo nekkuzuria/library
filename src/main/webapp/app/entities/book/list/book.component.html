@@ -63,6 +63,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="bookStorage.id">
+              <div class="d-flex">
+                <span>Book Storage</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -114,6 +120,13 @@
                     TRAVEL: 'TRAVEL',
                   }[book.genre ?? 'null']
                 }}
+              </td>
+              <td>
+                @if (book.bookStorage) {
+                  <div>
+                    <a [routerLink]="['/book-storage', book.bookStorage.id, 'view']">{{ book.bookStorage.id }}</a>
+                  </div>
+                }
               </td>
               <td class="text-end">
                 <div class="btn-group">

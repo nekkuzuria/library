@@ -49,6 +49,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="library.id">
+              <div class="d-flex">
+                <span>Library</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -59,6 +65,13 @@
                 <a [routerLink]="['/book-storage', bookStorage.id, 'view']">{{ bookStorage.id }}</a>
               </td>
               <td>{{ bookStorage.quantity }}</td>
+              <td>
+                @if (bookStorage.library) {
+                  <div>
+                    <a [routerLink]="['/library', bookStorage.library.id, 'view']">{{ bookStorage.library.id }}</a>
+                  </div>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/book-storage', bookStorage.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

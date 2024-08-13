@@ -23,6 +23,7 @@ describe('Book Form Service', () => {
             title: expect.any(Object),
             type: expect.any(Object),
             genre: expect.any(Object),
+            bookStorage: expect.any(Object),
           }),
         );
       });
@@ -36,6 +37,7 @@ describe('Book Form Service', () => {
             title: expect.any(Object),
             type: expect.any(Object),
             genre: expect.any(Object),
+            bookStorage: expect.any(Object),
           }),
         );
       });

@@ -1,5 +1,6 @@
 package com.xtramile.library2024.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xtramile.library2024.domain.enumeration.BookType;
 import com.xtramile.library2024.domain.enumeration.Genre;
 import jakarta.persistence.*;
@@ -36,6 +37,14 @@ public class Book implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "genre")
     private Genre genre;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "books", "library" }, allowSetters = true)
+    private BookStorage bookStorage;
+
+    @JsonIgnoreProperties(value = { "visitor", "book" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "book")
+    private VisitorBookStorage visitorBookStorage;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -89,6 +98,38 @@ public class Book implements Serializable {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public BookStorage getBookStorage() {
+        return this.bookStorage;
+    }
+
+    public void setBookStorage(BookStorage bookStorage) {
+        this.bookStorage = bookStorage;
+    }
+
+    public Book bookStorage(BookStorage bookStorage) {
+        this.setBookStorage(bookStorage);
+        return this;
+    }
+
+    public VisitorBookStorage getVisitorBookStorage() {
+        return this.visitorBookStorage;
+    }
+
+    public void setVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        if (this.visitorBookStorage != null) {
+            this.visitorBookStorage.setBook(null);
+        }
+        if (visitorBookStorage != null) {
+            visitorBookStorage.setBook(this);
+        }
+        this.visitorBookStorage = visitorBookStorage;
+    }
+
+    public Book visitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        this.setVisitorBookStorage(visitorBookStorage);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -13,7 +13,24 @@
   "name": "BookStorage",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "book",
+      "otherEntityRelationshipName": "bookStorage",
+      "relationshipName": "book",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "library",
+      "otherEntityRelationshipName": "bookStorage",
+      "relationshipName": "library",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no",
   "service": "serviceClass"
 }

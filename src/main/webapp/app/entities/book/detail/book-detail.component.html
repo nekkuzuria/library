@@ -63,6 +63,14 @@
               }[book()!.genre ?? 'null']
             }}</span>
           </dd>
+          <dt><span>Book Storage</span></dt>
+          <dd>
+            @if (book()!.bookStorage) {
+              <div>
+                <a [routerLink]="['/book-storage', book()!.bookStorage?.id, 'view']">{{ book()!.bookStorage?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

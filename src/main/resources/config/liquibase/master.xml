@@ -21,6 +21,8 @@
     <include file="config/liquibase/changelog/20240813025332_added_entity_Visit.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20240813004912_added_entity_constraints_VisitorBookStorage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240812070619_added_entity_constraints_BookStorage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240812065714_added_entity_constraints_Book.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

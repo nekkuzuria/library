@@ -13,6 +13,8 @@ public class BookStorageDTO implements Serializable {
 
     private Integer quantity;
 
+    private LibraryDTO library;
+
     public Long getId() {
         return id;
     }
@@ -27,6 +29,14 @@ public class BookStorageDTO implements Serializable {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public LibraryDTO getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(LibraryDTO library) {
+        this.library = library;
     }
 
     @Override
@@ -56,6 +66,7 @@ public class BookStorageDTO implements Serializable {
         return "BookStorageDTO{" +
             "id=" + getId() +
             ", quantity=" + getQuantity() +
+            ", library=" + getLibrary() +
             "}";
     }
 }

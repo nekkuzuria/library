@@ -4,6 +4,8 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
+import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
+import { BookStorageService } from 'app/entities/book-storage/service/book-storage.service';
 import { BookService } from '../service/book.service';
 import { IBook } from '../book.model';
 import { BookFormService } from './book-form.service';
@@ -16,6 +18,7 @@ describe('Book Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let bookFormService: BookFormService;
   let bookService: BookService;
+  let bookStorageService: BookStorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,17 +41,43 @@ describe('Book Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     bookFormService = TestBed.inject(BookFormService);
     bookService = TestBed.inject(BookService);
+    bookStorageService = TestBed.inject(BookStorageService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
-    it('Should update editForm', () => {
+    it('Should call BookStorage query and add missing value', () => {
       const book: IBook = { id: 456 };
+      const bookStorage: IBookStorage = { id: 1225 };
+      book.bookStorage = bookStorage;
+
+      const bookStorageCollection: IBookStorage[] = [{ id: 10017 }];
+      jest.spyOn(bookStorageService, 'query').mockReturnValue(of(new HttpResponse({ body: bookStorageCollection })));
+      const additionalBookStorages = [bookStorage];
+      const expectedCollection: IBookStorage[] = [...additionalBookStorages, ...bookStorageCollection];
+      jest.spyOn(bookStorageService, 'addBookStorageToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ book });
       comp.ngOnInit();
 
+      expect(bookStorageService.query).toHaveBeenCalled();
+      expect(bookStorageService.addBookStorageToCollectionIfMissing).toHaveBeenCalledWith(
+        bookStorageCollection,
+        ...additionalBookStorages.map(expect.objectContaining),
+      );
+      expect(comp.bookStoragesSharedCollection).toEqual(expectedCollection);
+    });
+
+    it('Should update editForm', () => {
+      const book: IBook = { id: 456 };
+      const bookStorage: IBookStorage = { id: 15932 };
+      book.bookStorage = bookStorage;
+
+      activatedRoute.data = of({ book });
+      comp.ngOnInit();
+
+      expect(comp.bookStoragesSharedCollection).toContain(bookStorage);
       expect(comp.book).toEqual(book);
     });
   });
@@ -118,6 +147,18 @@ describe('Book Management Update Component', () => {
       expect(bookService.update).toHaveBeenCalled();
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Compare relationships', () => {
+    describe('compareBookStorage', () => {
+      it('Should forward to bookStorageService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(bookStorageService, 'compareBookStorage');
+        comp.compareBookStorage(entity, entity2);
+        expect(bookStorageService.compareBookStorage).toHaveBeenCalledWith(entity, entity2);
+      });
     });
   });
 });

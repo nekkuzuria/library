@@ -19,6 +19,7 @@ type BookStorageFormDefaults = Pick<NewBookStorage, 'id'>;
 type BookStorageFormGroupContent = {
   id: FormControl<IBookStorage['id'] | NewBookStorage['id']>;
   quantity: FormControl<IBookStorage['quantity']>;
+  library: FormControl<IBookStorage['library']>;
 };
 
 export type BookStorageFormGroup = FormGroup<BookStorageFormGroupContent>;
@@ -39,6 +40,7 @@ export class BookStorageFormService {
         },
       ),
       quantity: new FormControl(bookStorageRawValue.quantity),
+      library: new FormControl(bookStorageRawValue.library),
     });
   }
 

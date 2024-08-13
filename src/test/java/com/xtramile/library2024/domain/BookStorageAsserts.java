@@ -56,5 +56,9 @@ public class BookStorageAsserts {
      * @param expected the expected entity
      * @param actual the actual entity
      */
-    public static void assertBookStorageUpdatableRelationshipsEquals(BookStorage expected, BookStorage actual) {}
+    public static void assertBookStorageUpdatableRelationshipsEquals(BookStorage expected, BookStorage actual) {
+        assertThat(expected)
+            .as("Verify BookStorage relationships")
+            .satisfies(e -> assertThat(e.getLibrary()).as("check library").isEqualTo(actual.getLibrary()));
+    }
 }

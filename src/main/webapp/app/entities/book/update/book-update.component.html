@@ -84,6 +84,23 @@
             }
           </select>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_bookStorage">Book Storage</label>
+          <select
+            class="form-control"
+            id="field_bookStorage"
+            data-cy="bookStorage"
+            name="bookStorage"
+            formControlName="bookStorage"
+            [compareWith]="compareBookStorage"
+          >
+            <option [ngValue]="null"></option>
+            @for (bookStorageOption of bookStoragesSharedCollection; track $index) {
+              <option [ngValue]="bookStorageOption">{{ bookStorageOption.id }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div>

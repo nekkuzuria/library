@@ -4,7 +4,11 @@ import com.xtramile.library2024.domain.Book;
 import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.mapper.BookMapper;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -86,6 +90,19 @@ public class BookService {
     public Page<BookDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Books");
         return bookRepository.findAll(pageable).map(bookMapper::toDto);
+    }
+
+    /**
+     *  Get all the books where VisitorBookStorage is {@code null}.
+     *  @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public List<BookDTO> findAllWhereVisitorBookStorageIsNull() {
+        log.debug("Request to get all books where VisitorBookStorage is null");
+        return StreamSupport.stream(bookRepository.findAll().spliterator(), false)
+            .filter(book -> book.getVisitorBookStorage() == null)
+            .map(bookMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     /**

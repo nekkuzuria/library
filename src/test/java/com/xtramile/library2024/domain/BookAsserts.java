@@ -58,5 +58,9 @@ public class BookAsserts {
      * @param expected the expected entity
      * @param actual the actual entity
      */
-    public static void assertBookUpdatableRelationshipsEquals(Book expected, Book actual) {}
+    public static void assertBookUpdatableRelationshipsEquals(Book expected, Book actual) {
+        assertThat(expected)
+            .as("Verify Book relationships")
+            .satisfies(e -> assertThat(e.getBookStorage()).as("check bookStorage").isEqualTo(actual.getBookStorage()));
+    }
 }

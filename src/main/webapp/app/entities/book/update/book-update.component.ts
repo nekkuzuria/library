@@ -2,15 +2,17 @@ import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
+import { BookStorageService } from 'app/entities/book-storage/service/book-storage.service';
 import { BookType } from 'app/entities/enumerations/book-type.model';
 import { Genre } from 'app/entities/enumerations/genre.model';
-import { IBook } from '../book.model';
 import { BookService } from '../service/book.service';
+import { IBook } from '../book.model';
 import { BookFormService, BookFormGroup } from './book-form.service';
 
 @Component({
@@ -25,12 +27,17 @@ export class BookUpdateComponent implements OnInit {
   bookTypeValues = Object.keys(BookType);
   genreValues = Object.keys(Genre);
 
+  bookStoragesSharedCollection: IBookStorage[] = [];
+
   protected bookService = inject(BookService);
   protected bookFormService = inject(BookFormService);
+  protected bookStorageService = inject(BookStorageService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: BookFormGroup = this.bookFormService.createBookFormGroup();
+
+  compareBookStorage = (o1: IBookStorage | null, o2: IBookStorage | null): boolean => this.bookStorageService.compareBookStorage(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ book }) => {
@@ -38,6 +45,8 @@ export class BookUpdateComponent implements OnInit {
       if (book) {
         this.updateForm(book);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -77,5 +86,22 @@ export class BookUpdateComponent implements OnInit {
   protected updateForm(book: IBook): void {
     this.book = book;
     this.bookFormService.resetForm(this.editForm, book);
+
+    this.bookStoragesSharedCollection = this.bookStorageService.addBookStorageToCollectionIfMissing<IBookStorage>(
+      this.bookStoragesSharedCollection,
+      book.bookStorage,
+    );
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.bookStorageService
+      .query()
+      .pipe(map((res: HttpResponse<IBookStorage[]>) => res.body ?? []))
+      .pipe(
+        map((bookStorages: IBookStorage[]) =>
+          this.bookStorageService.addBookStorageToCollectionIfMissing<IBookStorage>(bookStorages, this.book?.bookStorage),
+        ),
+      )
+      .subscribe((bookStorages: IBookStorage[]) => (this.bookStoragesSharedCollection = bookStorages));
   }
 }

@@ -21,6 +21,7 @@ describe('BookStorage Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             quantity: expect.any(Object),
+            library: expect.any(Object),
           }),
         );
       });
@@ -32,6 +33,7 @@ describe('BookStorage Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             quantity: expect.any(Object),
+            library: expect.any(Object),
           }),
         );
       });

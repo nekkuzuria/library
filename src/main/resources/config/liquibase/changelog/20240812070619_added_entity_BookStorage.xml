@@ -9,12 +9,15 @@
     <!--
         Added the entity BookStorage.
     -->
-    <changeSet id="20240812070619-1" author="aminhnh">
+    <changeSet id="20240812070619-1" author="jhipster">
         <createTable tableName="book_storage">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="quantity" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="library_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
@@ -31,7 +34,7 @@
           This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
           Spring Boot configuration key.
     -->
-    <changeSet id="20240812070619-1-data" author="aminhnh" context="faker">
+    <changeSet id="20240812070619-1-data" author="jhipster" context="faker">
         <loadData
                   file="config/liquibase/fake-data/book_storage.csv"
                   separator=";"

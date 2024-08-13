@@ -21,6 +21,8 @@ public class BookDTO implements Serializable {
 
     private Genre genre;
 
+    private BookStorageDTO bookStorage;
+
     public Long getId() {
         return id;
     }
@@ -53,6 +55,14 @@ public class BookDTO implements Serializable {
         this.genre = genre;
     }
 
+    public BookStorageDTO getBookStorage() {
+        return bookStorage;
+    }
+
+    public void setBookStorage(BookStorageDTO bookStorage) {
+        this.bookStorage = bookStorage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -82,6 +92,7 @@ public class BookDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", type='" + getType() + "'" +
             ", genre='" + getGenre() + "'" +
+            ", bookStorage=" + getBookStorage() +
             "}";
     }
 }

@@ -19,6 +19,14 @@
           <dd>
             <span>{{ bookStorage()!.quantity }}</span>
           </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (bookStorage()!.library) {
+              <div>
+                <a [routerLink]="['/library', bookStorage()!.library?.id, 'view']">{{ bookStorage()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
