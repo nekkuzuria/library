@@ -1,8 +1,11 @@
 package com.xtramile.library2024.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -37,6 +40,11 @@ public class Visitor implements Serializable {
 
     @Column(name = "membership_status")
     private Boolean membershipStatus;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "visitor")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "visitor", "book" }, allowSetters = true)
+    private Set<VisitorBookStorage> visitorBookStorages = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -116,6 +124,37 @@ public class Visitor implements Serializable {
 
     public void setMembershipStatus(Boolean membershipStatus) {
         this.membershipStatus = membershipStatus;
+    }
+
+    public Set<VisitorBookStorage> getVisitorBookStorages() {
+        return this.visitorBookStorages;
+    }
+
+    public void setVisitorBookStorages(Set<VisitorBookStorage> visitorBookStorages) {
+        if (this.visitorBookStorages != null) {
+            this.visitorBookStorages.forEach(i -> i.setVisitor(null));
+        }
+        if (visitorBookStorages != null) {
+            visitorBookStorages.forEach(i -> i.setVisitor(this));
+        }
+        this.visitorBookStorages = visitorBookStorages;
+    }
+
+    public Visitor visitorBookStorages(Set<VisitorBookStorage> visitorBookStorages) {
+        this.setVisitorBookStorages(visitorBookStorages);
+        return this;
+    }
+
+    public Visitor addVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        this.visitorBookStorages.add(visitorBookStorage);
+        visitorBookStorage.setVisitor(this);
+        return this;
+    }
+
+    public Visitor removeVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        this.visitorBookStorages.remove(visitorBookStorage);
+        visitorBookStorage.setVisitor(null);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -3,23 +3,22 @@ import dayjs from 'dayjs/esm';
 import { IVisitor, NewVisitor } from './visitor.model';
 
 export const sampleWithRequiredData: IVisitor = {
-  id: 26304,
+  id: 27196,
 };
 
 export const sampleWithPartialData: IVisitor = {
-  id: 13844,
-  name: 'quickly',
-  phoneNumber: 'bah if energetically',
-  membershipStatus: true,
+  id: 16081,
+  phoneNumber: 'handful arid',
+  dateOfBirth: dayjs('2024-08-11'),
 };
 
 export const sampleWithFullData: IVisitor = {
-  id: 6185,
-  name: 'salvage',
-  email: 'Lesley_Kovacek@gmail.com',
-  phoneNumber: 'brr gifted lest',
+  id: 18640,
+  name: 'front',
+  email: 'Winnifred_Witting35@gmail.com',
+  phoneNumber: 'including',
   dateOfBirth: dayjs('2024-08-11'),
-  membershipStatus: true,
+  membershipStatus: false,
 };
 
 export const sampleWithNewData: NewVisitor = {

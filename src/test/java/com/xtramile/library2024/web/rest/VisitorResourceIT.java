@@ -311,7 +311,11 @@ class VisitorResourceIT {
         Visitor partialUpdatedVisitor = new Visitor();
         partialUpdatedVisitor.setId(visitor.getId());
 
-        partialUpdatedVisitor.email(UPDATED_EMAIL).dateOfBirth(UPDATED_DATE_OF_BIRTH);
+        partialUpdatedVisitor
+            .name(UPDATED_NAME)
+            .email(UPDATED_EMAIL)
+            .phoneNumber(UPDATED_PHONE_NUMBER)
+            .membershipStatus(UPDATED_MEMBERSHIP_STATUS);
 
         restVisitorMockMvc
             .perform(

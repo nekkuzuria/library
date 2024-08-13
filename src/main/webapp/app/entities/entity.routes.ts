@@ -36,6 +36,11 @@ const routes: Routes = [
     data: { pageTitle: 'BookStorages' },
     loadChildren: () => import('./book-storage/book-storage.routes'),
   },
+  {
+    path: 'visitor-book-storage',
+    data: { pageTitle: 'VisitorBookStorages' },
+    loadChildren: () => import('./visitor-book-storage/visitor-book-storage.routes'),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

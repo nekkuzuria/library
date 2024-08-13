@@ -27,7 +27,16 @@
     }
   ],
   "name": "Visitor",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "visitorBookStorage",
+      "otherEntityRelationshipName": "visitor",
+      "relationshipName": "visitorBookStorage",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "searchEngine": "no",
   "service": "serviceImpl"
 }
