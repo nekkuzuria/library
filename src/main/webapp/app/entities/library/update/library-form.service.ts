@@ -20,6 +20,7 @@ type LibraryFormGroupContent = {
   id: FormControl<ILibrary['id'] | NewLibrary['id']>;
   name: FormControl<ILibrary['name']>;
   establishedDate: FormControl<ILibrary['establishedDate']>;
+  location: FormControl<ILibrary['location']>;
 };
 
 export type LibraryFormGroup = FormGroup<LibraryFormGroupContent>;
@@ -41,6 +42,7 @@ export class LibraryFormService {
       ),
       name: new FormControl(libraryRawValue.name),
       establishedDate: new FormControl(libraryRawValue.establishedDate),
+      location: new FormControl(libraryRawValue.location),
     });
   }
 

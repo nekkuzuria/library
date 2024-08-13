@@ -16,6 +16,8 @@ public class LibraryDTO implements Serializable {
 
     private LocalDate establishedDate;
 
+    private LocationDTO location;
+
     public Long getId() {
         return id;
     }
@@ -38,6 +40,14 @@ public class LibraryDTO implements Serializable {
 
     public void setEstablishedDate(LocalDate establishedDate) {
         this.establishedDate = establishedDate;
+    }
+
+    public LocationDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationDTO location) {
+        this.location = location;
     }
 
     @Override
@@ -68,6 +78,7 @@ public class LibraryDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", establishedDate='" + getEstablishedDate() + "'" +
+            ", location=" + getLocation() +
             "}";
     }
 }

@@ -22,6 +22,7 @@ describe('Library Form Service', () => {
             id: expect.any(Object),
             name: expect.any(Object),
             establishedDate: expect.any(Object),
+            location: expect.any(Object),
           }),
         );
       });
@@ -34,6 +35,7 @@ describe('Library Form Service', () => {
             id: expect.any(Object),
             name: expect.any(Object),
             establishedDate: expect.any(Object),
+            location: expect.any(Object),
           }),
         );
       });

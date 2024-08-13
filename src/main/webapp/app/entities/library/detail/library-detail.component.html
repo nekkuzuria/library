@@ -23,6 +23,14 @@
           <dd>
             <span>{{ library()!.establishedDate | formatMediumDate }}</span>
           </dd>
+          <dt><span>Location</span></dt>
+          <dd>
+            @if (library()!.location) {
+              <div>
+                <a [routerLink]="['/location', library()!.location?.id, 'view']">{{ library()!.location?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

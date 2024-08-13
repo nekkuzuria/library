@@ -56,6 +56,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="location.id">
+              <div class="d-flex">
+                <span>Location</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -67,6 +73,13 @@
               </td>
               <td>{{ library.name }}</td>
               <td>{{ library.establishedDate | formatMediumDate }}</td>
+              <td>
+                @if (library.location) {
+                  <div>
+                    <a [routerLink]="['/location', library.location.id, 'view']">{{ library.location.id }}</a>
+                  </div>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/library', library.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

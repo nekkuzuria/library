@@ -3,18 +3,19 @@ import dayjs from 'dayjs/esm';
 import { ILibrary, NewLibrary } from './library.model';
 
 export const sampleWithRequiredData: ILibrary = {
-  id: 29431,
+  id: 32082,
 };
 
 export const sampleWithPartialData: ILibrary = {
-  id: 30713,
-  name: 'upwardly',
+  id: 32497,
+  name: 'er fluid',
+  establishedDate: dayjs('2024-08-11'),
 };
 
 export const sampleWithFullData: ILibrary = {
-  id: 29470,
-  name: 'pluralise',
-  establishedDate: dayjs('2024-08-11'),
+  id: 23837,
+  name: 'preside for',
+  establishedDate: dayjs('2024-08-12'),
 };
 
 export const sampleWithNewData: NewLibrary = {

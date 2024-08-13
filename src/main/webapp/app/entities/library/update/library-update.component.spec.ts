@@ -4,6 +4,8 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { of, Subject, from } from 'rxjs';
 
+import { ILocation } from 'app/entities/location/location.model';
+import { LocationService } from 'app/entities/location/service/location.service';
 import { LibraryService } from '../service/library.service';
 import { ILibrary } from '../library.model';
 import { LibraryFormService } from './library-form.service';
@@ -16,6 +18,7 @@ describe('Library Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let libraryFormService: LibraryFormService;
   let libraryService: LibraryService;
+  let locationService: LocationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,17 +41,39 @@ describe('Library Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     libraryFormService = TestBed.inject(LibraryFormService);
     libraryService = TestBed.inject(LibraryService);
+    locationService = TestBed.inject(LocationService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
-    it('Should update editForm', () => {
+    it('Should call location query and add missing value', () => {
       const library: ILibrary = { id: 456 };
+      const location: ILocation = { id: 23263 };
+      library.location = location;
+
+      const locationCollection: ILocation[] = [{ id: 16352 }];
+      jest.spyOn(locationService, 'query').mockReturnValue(of(new HttpResponse({ body: locationCollection })));
+      const expectedCollection: ILocation[] = [location, ...locationCollection];
+      jest.spyOn(locationService, 'addLocationToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ library });
       comp.ngOnInit();
 
+      expect(locationService.query).toHaveBeenCalled();
+      expect(locationService.addLocationToCollectionIfMissing).toHaveBeenCalledWith(locationCollection, location);
+      expect(comp.locationsCollection).toEqual(expectedCollection);
+    });
+
+    it('Should update editForm', () => {
+      const library: ILibrary = { id: 456 };
+      const location: ILocation = { id: 1144 };
+      library.location = location;
+
+      activatedRoute.data = of({ library });
+      comp.ngOnInit();
+
+      expect(comp.locationsCollection).toContain(location);
       expect(comp.library).toEqual(library);
     });
   });
@@ -118,6 +143,18 @@ describe('Library Management Update Component', () => {
       expect(libraryService.update).toHaveBeenCalled();
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Compare relationships', () => {
+    describe('compareLocation', () => {
+      it('Should forward to locationService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(locationService, 'compareLocation');
+        comp.compareLocation(entity, entity2);
+        expect(locationService.compareLocation).toHaveBeenCalledWith(entity, entity2);
+      });
     });
   });
 });

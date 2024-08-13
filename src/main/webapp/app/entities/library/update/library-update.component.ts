@@ -2,11 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ILocation } from 'app/entities/location/location.model';
+import { LocationService } from 'app/entities/location/service/location.service';
 import { ILibrary } from '../library.model';
 import { LibraryService } from '../service/library.service';
 import { LibraryFormService, LibraryFormGroup } from './library-form.service';
@@ -21,12 +23,17 @@ export class LibraryUpdateComponent implements OnInit {
   isSaving = false;
   library: ILibrary | null = null;
 
+  locationsCollection: ILocation[] = [];
+
   protected libraryService = inject(LibraryService);
   protected libraryFormService = inject(LibraryFormService);
+  protected locationService = inject(LocationService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: LibraryFormGroup = this.libraryFormService.createLibraryFormGroup();
+
+  compareLocation = (o1: ILocation | null, o2: ILocation | null): boolean => this.locationService.compareLocation(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ library }) => {
@@ -34,6 +41,8 @@ export class LibraryUpdateComponent implements OnInit {
       if (library) {
         this.updateForm(library);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -73,5 +82,19 @@ export class LibraryUpdateComponent implements OnInit {
   protected updateForm(library: ILibrary): void {
     this.library = library;
     this.libraryFormService.resetForm(this.editForm, library);
+
+    this.locationsCollection = this.locationService.addLocationToCollectionIfMissing<ILocation>(this.locationsCollection, library.location);
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.locationService
+      .query({ filter: 'library-is-null' })
+      .pipe(map((res: HttpResponse<ILocation[]>) => res.body ?? []))
+      .pipe(
+        map((locations: ILocation[]) =>
+          this.locationService.addLocationToCollectionIfMissing<ILocation>(locations, this.library?.location),
+        ),
+      )
+      .subscribe((locations: ILocation[]) => (this.locationsCollection = locations));
   }
 }
