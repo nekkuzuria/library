@@ -14,6 +14,12 @@ public class VisitDTO implements Serializable {
 
     private LocalDate date;
 
+    private LibraryDTO library;
+
+    private LibrarianDTO librarian;
+
+    private VisitorDTO visitor;
+
     public Long getId() {
         return id;
     }
@@ -28,6 +34,30 @@ public class VisitDTO implements Serializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LibraryDTO getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(LibraryDTO library) {
+        this.library = library;
+    }
+
+    public LibrarianDTO getLibrarian() {
+        return librarian;
+    }
+
+    public void setLibrarian(LibrarianDTO librarian) {
+        this.librarian = librarian;
+    }
+
+    public VisitorDTO getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(VisitorDTO visitor) {
+        this.visitor = visitor;
     }
 
     @Override
@@ -57,6 +87,9 @@ public class VisitDTO implements Serializable {
         return "VisitDTO{" +
             "id=" + getId() +
             ", date='" + getDate() + "'" +
+            ", library=" + getLibrary() +
+            ", librarian=" + getLibrarian() +
+            ", visitor=" + getVisitor() +
             "}";
     }
 }

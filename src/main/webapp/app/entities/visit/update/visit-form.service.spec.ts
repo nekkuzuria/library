@@ -21,6 +21,9 @@ describe('Visit Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             date: expect.any(Object),
+            library: expect.any(Object),
+            librarian: expect.any(Object),
+            visitor: expect.any(Object),
           }),
         );
       });
@@ -32,6 +35,9 @@ describe('Visit Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             date: expect.any(Object),
+            library: expect.any(Object),
+            librarian: expect.any(Object),
+            visitor: expect.any(Object),
           }),
         );
       });

@@ -19,6 +19,30 @@
           <dd>
             <span>{{ visit()!.date | formatMediumDate }}</span>
           </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (visit()!.library) {
+              <div>
+                <a [routerLink]="['/library', visit()!.library?.id, 'view']">{{ visit()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Librarian</span></dt>
+          <dd>
+            @if (visit()!.librarian) {
+              <div>
+                <a [routerLink]="['/librarian', visit()!.librarian?.id, 'view']">{{ visit()!.librarian?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Visitor</span></dt>
+          <dd>
+            @if (visit()!.visitor) {
+              <div>
+                <a [routerLink]="['/visitor', visit()!.visitor?.id, 'view']">{{ visit()!.visitor?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

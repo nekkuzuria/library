@@ -49,6 +49,24 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="library.id">
+              <div class="d-flex">
+                <span>Library</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="librarian.id">
+              <div class="d-flex">
+                <span>Librarian</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="visitor.id">
+              <div class="d-flex">
+                <span>Visitor</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -59,6 +77,27 @@
                 <a [routerLink]="['/visit', visit.id, 'view']">{{ visit.id }}</a>
               </td>
               <td>{{ visit.date | formatMediumDate }}</td>
+              <td>
+                @if (visit.library) {
+                  <div>
+                    <a [routerLink]="['/library', visit.library.id, 'view']">{{ visit.library.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (visit.librarian) {
+                  <div>
+                    <a [routerLink]="['/librarian', visit.librarian.id, 'view']">{{ visit.librarian.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (visit.visitor) {
+                  <div>
+                    <a [routerLink]="['/visitor', visit.visitor.id, 'view']">{{ visit.visitor.id }}</a>
+                  </div>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/visit', visit.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

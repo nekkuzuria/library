@@ -19,6 +19,9 @@ type VisitFormDefaults = Pick<NewVisit, 'id'>;
 type VisitFormGroupContent = {
   id: FormControl<IVisit['id'] | NewVisit['id']>;
   date: FormControl<IVisit['date']>;
+  library: FormControl<IVisit['library']>;
+  librarian: FormControl<IVisit['librarian']>;
+  visitor: FormControl<IVisit['visitor']>;
 };
 
 export type VisitFormGroup = FormGroup<VisitFormGroupContent>;
@@ -39,6 +42,9 @@ export class VisitFormService {
         },
       ),
       date: new FormControl(visitRawValue.date),
+      library: new FormControl(visitRawValue.library),
+      librarian: new FormControl(visitRawValue.librarian),
+      visitor: new FormControl(visitRawValue.visitor),
     });
   }
 
