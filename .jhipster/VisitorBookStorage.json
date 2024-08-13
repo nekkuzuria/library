@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20240813004912"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "borrowDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "returnDate",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "VisitorBookStorage",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "visitor",
+      "otherEntityRelationshipName": "visitorBookStorage",
+      "relationshipName": "visitor",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "id": false,
+      "otherEntityField": "id",
+      "otherEntityName": "book",
+      "otherEntityRelationshipName": "visitorBookStorage",
+      "relationshipName": "book",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
