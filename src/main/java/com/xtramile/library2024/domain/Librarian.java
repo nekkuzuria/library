@@ -1,8 +1,11 @@
 package com.xtramile.library2024.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -34,6 +37,20 @@ public class Librarian implements Serializable {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "librarians", "bookStorages", "visits" }, allowSetters = true)
+    private Library library;
+
+    @JsonIgnoreProperties(value = { "librarian" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Location location;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "librarian")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "library", "librarian", "visitor" }, allowSetters = true)
+    private Set<Visit> visits = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -100,6 +117,63 @@ public class Librarian implements Serializable {
 
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public Library getLibrary() {
+        return this.library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
+
+    public Librarian library(Library library) {
+        this.setLibrary(library);
+        return this;
+    }
+
+    public Location getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Librarian location(Location location) {
+        this.setLocation(location);
+        return this;
+    }
+
+    public Set<Visit> getVisits() {
+        return this.visits;
+    }
+
+    public void setVisits(Set<Visit> visits) {
+        if (this.visits != null) {
+            this.visits.forEach(i -> i.setLibrarian(null));
+        }
+        if (visits != null) {
+            visits.forEach(i -> i.setLibrarian(this));
+        }
+        this.visits = visits;
+    }
+
+    public Librarian visits(Set<Visit> visits) {
+        this.setVisits(visits);
+        return this;
+    }
+
+    public Librarian addVisit(Visit visit) {
+        this.visits.add(visit);
+        visit.setLibrarian(this);
+        return this;
+    }
+
+    public Librarian removeVisit(Visit visit) {
+        this.visits.remove(visit);
+        visit.setLibrarian(null);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

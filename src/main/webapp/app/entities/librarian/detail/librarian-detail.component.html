@@ -31,6 +31,22 @@
           <dd>
             <span>{{ librarian()!.dateOfBirth | formatMediumDate }}</span>
           </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (librarian()!.library) {
+              <div>
+                <a [routerLink]="['/library', librarian()!.library?.id, 'view']">{{ librarian()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Location</span></dt>
+          <dd>
+            @if (librarian()!.location) {
+              <div>
+                <a [routerLink]="['/location', librarian()!.location?.id, 'view']">{{ librarian()!.location?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

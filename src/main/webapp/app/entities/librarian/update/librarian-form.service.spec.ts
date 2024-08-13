@@ -24,6 +24,8 @@ describe('Librarian Form Service', () => {
             email: expect.any(Object),
             phoneNumber: expect.any(Object),
             dateOfBirth: expect.any(Object),
+            library: expect.any(Object),
+            location: expect.any(Object),
           }),
         );
       });
@@ -38,6 +40,8 @@ describe('Librarian Form Service', () => {
             email: expect.any(Object),
             phoneNumber: expect.any(Object),
             dateOfBirth: expect.any(Object),
+            library: expect.any(Object),
+            location: expect.any(Object),
           }),
         );
       });

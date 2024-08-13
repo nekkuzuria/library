@@ -59,5 +59,10 @@ public class LibrarianAsserts {
      * @param expected the expected entity
      * @param actual the actual entity
      */
-    public static void assertLibrarianUpdatableRelationshipsEquals(Librarian expected, Librarian actual) {}
+    public static void assertLibrarianUpdatableRelationshipsEquals(Librarian expected, Librarian actual) {
+        assertThat(expected)
+            .as("Verify Librarian relationships")
+            .satisfies(e -> assertThat(e.getLibrary()).as("check library").isEqualTo(actual.getLibrary()))
+            .satisfies(e -> assertThat(e.getLocation()).as("check location").isEqualTo(actual.getLocation()));
+    }
 }

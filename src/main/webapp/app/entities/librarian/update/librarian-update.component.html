@@ -53,6 +53,40 @@
             </button>
           </div>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_library">Library</label>
+          <select
+            class="form-control"
+            id="field_library"
+            data-cy="library"
+            name="library"
+            formControlName="library"
+            [compareWith]="compareLibrary"
+          >
+            <option [ngValue]="null"></option>
+            @for (libraryOption of librariesSharedCollection; track $index) {
+              <option [ngValue]="libraryOption">{{ libraryOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_location">Location</label>
+          <select
+            class="form-control"
+            id="field_location"
+            data-cy="location"
+            name="location"
+            formControlName="location"
+            [compareWith]="compareLocation"
+          >
+            <option [ngValue]="null"></option>
+            @for (locationOption of locationsCollection; track $index) {
+              <option [ngValue]="locationOption">{{ locationOption.id }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div>

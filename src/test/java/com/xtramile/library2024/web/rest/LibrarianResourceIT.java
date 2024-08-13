@@ -303,8 +303,6 @@ class LibrarianResourceIT {
         Librarian partialUpdatedLibrarian = new Librarian();
         partialUpdatedLibrarian.setId(librarian.getId());
 
-        partialUpdatedLibrarian.name(UPDATED_NAME).email(UPDATED_EMAIL).phoneNumber(UPDATED_PHONE_NUMBER);
-
         restLibrarianMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedLibrarian.getId())

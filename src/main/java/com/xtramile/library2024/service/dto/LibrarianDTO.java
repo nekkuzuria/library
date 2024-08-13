@@ -20,6 +20,10 @@ public class LibrarianDTO implements Serializable {
 
     private LocalDate dateOfBirth;
 
+    private LibraryDTO library;
+
+    private LocationDTO location;
+
     public Long getId() {
         return id;
     }
@@ -60,6 +64,22 @@ public class LibrarianDTO implements Serializable {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public LibraryDTO getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(LibraryDTO library) {
+        this.library = library;
+    }
+
+    public LocationDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationDTO location) {
+        this.location = location;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,6 +110,8 @@ public class LibrarianDTO implements Serializable {
             ", email='" + getEmail() + "'" +
             ", phoneNumber='" + getPhoneNumber() + "'" +
             ", dateOfBirth='" + getDateOfBirth() + "'" +
+            ", library=" + getLibrary() +
+            ", location=" + getLocation() +
             "}";
     }
 }
