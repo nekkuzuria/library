@@ -1,5 +1,6 @@
 package com.xtramile.library2024.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -25,6 +26,18 @@ public class Visit implements Serializable {
 
     @Column(name = "date")
     private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visits" }, allowSetters = true)
+    private Library library;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visits" }, allowSetters = true)
+    private Librarian librarian;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visitorBookStorages", "visits" }, allowSetters = true)
+    private Visitor visitor;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -52,6 +65,45 @@ public class Visit implements Serializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Library getLibrary() {
+        return this.library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
+
+    public Visit library(Library library) {
+        this.setLibrary(library);
+        return this;
+    }
+
+    public Librarian getLibrarian() {
+        return this.librarian;
+    }
+
+    public void setLibrarian(Librarian librarian) {
+        this.librarian = librarian;
+    }
+
+    public Visit librarian(Librarian librarian) {
+        this.setLibrarian(librarian);
+        return this;
+    }
+
+    public Visitor getVisitor() {
+        return this.visitor;
+    }
+
+    public void setVisitor(Visitor visitor) {
+        this.visitor = visitor;
+    }
+
+    public Visit visitor(Visitor visitor) {
+        this.setVisitor(visitor);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

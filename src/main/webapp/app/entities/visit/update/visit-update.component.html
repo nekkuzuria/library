@@ -29,6 +29,57 @@
             <button type="button" class="btn btn-secondary" (click)="dateDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
           </div>
         </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_library">Library</label>
+          <select
+            class="form-control"
+            id="field_library"
+            data-cy="library"
+            name="library"
+            formControlName="library"
+            [compareWith]="compareLibrary"
+          >
+            <option [ngValue]="null"></option>
+            @for (libraryOption of librariesSharedCollection; track $index) {
+              <option [ngValue]="libraryOption">{{ libraryOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_librarian">Librarian</label>
+          <select
+            class="form-control"
+            id="field_librarian"
+            data-cy="librarian"
+            name="librarian"
+            formControlName="librarian"
+            [compareWith]="compareLibrarian"
+          >
+            <option [ngValue]="null"></option>
+            @for (librarianOption of librariansSharedCollection; track $index) {
+              <option [ngValue]="librarianOption">{{ librarianOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_visitor">Visitor</label>
+          <select
+            class="form-control"
+            id="field_visitor"
+            data-cy="visitor"
+            name="visitor"
+            formControlName="visitor"
+            [compareWith]="compareVisitor"
+          >
+            <option [ngValue]="null"></option>
+            @for (visitorOption of visitorsSharedCollection; track $index) {
+              <option [ngValue]="visitorOption">{{ visitorOption.id }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div>
