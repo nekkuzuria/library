@@ -25,6 +25,8 @@ describe('Visitor Form Service', () => {
             phoneNumber: expect.any(Object),
             dateOfBirth: expect.any(Object),
             membershipStatus: expect.any(Object),
+            address: expect.any(Object),
+            library: expect.any(Object),
           }),
         );
       });
@@ -40,6 +42,8 @@ describe('Visitor Form Service', () => {
             phoneNumber: expect.any(Object),
             dateOfBirth: expect.any(Object),
             membershipStatus: expect.any(Object),
+            address: expect.any(Object),
+            library: expect.any(Object),
           }),
         );
       });

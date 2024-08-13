@@ -77,6 +77,18 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="address.id">
+              <div class="d-flex">
+                <span>Address</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="library.id">
+              <div class="d-flex">
+                <span>Library</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -91,6 +103,20 @@
               <td>{{ visitor.phoneNumber }}</td>
               <td>{{ visitor.dateOfBirth | formatMediumDate }}</td>
               <td>{{ visitor.membershipStatus }}</td>
+              <td>
+                @if (visitor.address) {
+                  <div>
+                    <a [routerLink]="['/location', visitor.address.id, 'view']">{{ visitor.address.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (visitor.library) {
+                  <div>
+                    <a [routerLink]="['/library', visitor.library.id, 'view']">{{ visitor.library.id }}</a>
+                  </div>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/visitor', visitor.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

@@ -60,5 +60,10 @@ public class VisitorAsserts {
      * @param expected the expected entity
      * @param actual the actual entity
      */
-    public static void assertVisitorUpdatableRelationshipsEquals(Visitor expected, Visitor actual) {}
+    public static void assertVisitorUpdatableRelationshipsEquals(Visitor expected, Visitor actual) {
+        assertThat(expected)
+            .as("Verify Visitor relationships")
+            .satisfies(e -> assertThat(e.getAddress()).as("check address").isEqualTo(actual.getAddress()))
+            .satisfies(e -> assertThat(e.getLibrary()).as("check library").isEqualTo(actual.getLibrary()));
+    }
 }

@@ -46,6 +46,20 @@ public class Visitor implements Serializable {
     @JsonIgnoreProperties(value = { "visitor", "book" }, allowSetters = true)
     private Set<VisitorBookStorage> visitorBookStorages = new HashSet<>();
 
+    @JsonIgnoreProperties(value = { "visitor", "librarian", "library" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Location address;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "location", "visitors", "librarians", "bookStorages", "visits" }, allowSetters = true)
+    private Library library;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "visitor")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "library", "librarian", "visitor" }, allowSetters = true)
+    private Set<Visit> visits = new HashSet<>();
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -154,6 +168,63 @@ public class Visitor implements Serializable {
     public Visitor removeVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
         this.visitorBookStorages.remove(visitorBookStorage);
         visitorBookStorage.setVisitor(null);
+        return this;
+    }
+
+    public Location getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(Location location) {
+        this.address = location;
+    }
+
+    public Visitor address(Location location) {
+        this.setAddress(location);
+        return this;
+    }
+
+    public Library getLibrary() {
+        return this.library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
+
+    public Visitor library(Library library) {
+        this.setLibrary(library);
+        return this;
+    }
+
+    public Set<Visit> getVisits() {
+        return this.visits;
+    }
+
+    public void setVisits(Set<Visit> visits) {
+        if (this.visits != null) {
+            this.visits.forEach(i -> i.setVisitor(null));
+        }
+        if (visits != null) {
+            visits.forEach(i -> i.setVisitor(this));
+        }
+        this.visits = visits;
+    }
+
+    public Visitor visits(Set<Visit> visits) {
+        this.setVisits(visits);
+        return this;
+    }
+
+    public Visitor addVisit(Visit visit) {
+        this.visits.add(visit);
+        visit.setVisitor(this);
+        return this;
+    }
+
+    public Visitor removeVisit(Visit visit) {
+        this.visits.remove(visit);
+        visit.setVisitor(null);
         return this;
     }
 

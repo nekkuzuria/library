@@ -2,13 +2,17 @@ import { Component, inject, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { IVisitor } from '../visitor.model';
+import { ILocation } from 'app/entities/location/location.model';
+import { LocationService } from 'app/entities/location/service/location.service';
+import { ILibrary } from 'app/entities/library/library.model';
+import { LibraryService } from 'app/entities/library/service/library.service';
 import { VisitorService } from '../service/visitor.service';
+import { IVisitor } from '../visitor.model';
 import { VisitorFormService, VisitorFormGroup } from './visitor-form.service';
 
 @Component({
@@ -21,12 +25,21 @@ export class VisitorUpdateComponent implements OnInit {
   isSaving = false;
   visitor: IVisitor | null = null;
 
+  addressesCollection: ILocation[] = [];
+  librariesSharedCollection: ILibrary[] = [];
+
   protected visitorService = inject(VisitorService);
   protected visitorFormService = inject(VisitorFormService);
+  protected locationService = inject(LocationService);
+  protected libraryService = inject(LibraryService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: VisitorFormGroup = this.visitorFormService.createVisitorFormGroup();
+
+  compareLocation = (o1: ILocation | null, o2: ILocation | null): boolean => this.locationService.compareLocation(o1, o2);
+
+  compareLibrary = (o1: ILibrary | null, o2: ILibrary | null): boolean => this.libraryService.compareLibrary(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ visitor }) => {
@@ -34,6 +47,8 @@ export class VisitorUpdateComponent implements OnInit {
       if (visitor) {
         this.updateForm(visitor);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -73,5 +88,27 @@ export class VisitorUpdateComponent implements OnInit {
   protected updateForm(visitor: IVisitor): void {
     this.visitor = visitor;
     this.visitorFormService.resetForm(this.editForm, visitor);
+
+    this.addressesCollection = this.locationService.addLocationToCollectionIfMissing<ILocation>(this.addressesCollection, visitor.address);
+    this.librariesSharedCollection = this.libraryService.addLibraryToCollectionIfMissing<ILibrary>(
+      this.librariesSharedCollection,
+      visitor.library,
+    );
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.locationService
+      .query({ filter: 'visitor-is-null' })
+      .pipe(map((res: HttpResponse<ILocation[]>) => res.body ?? []))
+      .pipe(
+        map((locations: ILocation[]) => this.locationService.addLocationToCollectionIfMissing<ILocation>(locations, this.visitor?.address)),
+      )
+      .subscribe((locations: ILocation[]) => (this.addressesCollection = locations));
+
+    this.libraryService
+      .query()
+      .pipe(map((res: HttpResponse<ILibrary[]>) => res.body ?? []))
+      .pipe(map((libraries: ILibrary[]) => this.libraryService.addLibraryToCollectionIfMissing<ILibrary>(libraries, this.visitor?.library)))
+      .subscribe((libraries: ILibrary[]) => (this.librariesSharedCollection = libraries));
   }
 }

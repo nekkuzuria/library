@@ -35,6 +35,23 @@
       "relationshipName": "visitorBookStorage",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
+    },
+    {
+      "id": false,
+      "otherEntityField": "id",
+      "otherEntityName": "location",
+      "otherEntityRelationshipName": "visitor",
+      "relationshipName": "address",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "library",
+      "otherEntityRelationshipName": "visitor",
+      "relationshipName": "library",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
     }
   ],
   "searchEngine": "no",

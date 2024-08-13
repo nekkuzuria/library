@@ -35,6 +35,22 @@
           <dd>
             <span>{{ visitor()!.membershipStatus }}</span>
           </dd>
+          <dt><span>Address</span></dt>
+          <dd>
+            @if (visitor()!.address) {
+              <div>
+                <a [routerLink]="['/location', visitor()!.address?.id, 'view']">{{ visitor()!.address?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (visitor()!.library) {
+              <div>
+                <a [routerLink]="['/library', visitor()!.library?.id, 'view']">{{ visitor()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
