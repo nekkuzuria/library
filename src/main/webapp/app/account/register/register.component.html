@@ -46,6 +46,17 @@
                 <label class="form-label" for="role">I am a</label>
               </div>
 
+              <div class="mb-3">
+                <label class="form-label" for="library">Choose Library</label>
+                <ng-select
+                  [items]="libraries"
+                  bindLabel="name"
+                  bindValue="id"
+                  placeholder="Select a library"
+                  formControlName="library"
+                ></ng-select>
+              </div>
+
               <div class="form-floating mb-3">
                 <input
                   type="text"

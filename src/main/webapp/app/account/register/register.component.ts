@@ -32,6 +32,10 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
       nonNullable: true,
       validators: [Validators.required],
     }),
+    libraries: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     login: new FormControl('', {
       nonNullable: true,
       validators: [
