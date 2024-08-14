@@ -38,12 +38,9 @@
         <div>
           @if (!success()) {
             <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
-              <div class="form-floating mb-3">
-                <select formControlName="role" id="role" class="form-control">
-                  <option value="Visitor">Visitor</option>
-                  <option value="Librarian">Librarian</option>
-                </select>
-                <label class="form-label" for="role">I am a</label>
+              <div class="mb-3">
+                <label class="form-label" for="roleSelect">I am a</label>
+                <ng-select [items]="roles" id="roleSelect" placeholder="Select a role" formControlName="role"></ng-select>
               </div>
 
               <div class="mb-3">

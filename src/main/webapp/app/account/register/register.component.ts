@@ -20,6 +20,7 @@ import { RegisterService } from './register.service';
 export default class RegisterComponent implements OnInit, AfterViewInit {
   login = viewChild.required<ElementRef>('login');
   libraries: ILibrary[] = [];
+  roles: string[] = [];
 
   doNotMatch = signal(false);
   error = signal(false);
@@ -71,6 +72,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
   private registerService = inject(RegisterService);
   ngOnInit(): void {
     this.loadLibraries();
+    this.roles = ['Visitor', 'Librarian'];
   }
   ngAfterViewInit(): void {
     this.login().nativeElement.focus();
