@@ -1,7 +1,10 @@
-import { Component, AfterViewInit, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, signal, viewChild, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LibraryService } from 'app/entities/library/service/library.service';
+import { ILibrary } from 'app/entities/library/library.model';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/error.constants';
 import SharedModule from 'app/shared/shared.module';
@@ -11,11 +14,12 @@ import { RegisterService } from './register.service';
 @Component({
   standalone: true,
   selector: 'jhi-register',
-  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
+  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, NgSelectModule],
   templateUrl: './register.component.html',
 })
-export default class RegisterComponent implements AfterViewInit {
+export default class RegisterComponent implements OnInit, AfterViewInit {
   login = viewChild.required<ElementRef>('login');
+  libraries: ILibrary[] = [];
 
   doNotMatch = signal(false);
   error = signal(false);
@@ -24,6 +28,10 @@ export default class RegisterComponent implements AfterViewInit {
   success = signal(false);
 
   registerForm = new FormGroup({
+    role: new FormControl('Visitor', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     login: new FormControl('', {
       nonNullable: true,
       validators: [
@@ -37,6 +45,14 @@ export default class RegisterComponent implements AfterViewInit {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
     }),
+    phoneNumber: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.pattern('^\\+?[1-9]\\d{1,14}$')],
+    }),
+    address: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254)],
+    }),
     password: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
@@ -47,12 +63,27 @@ export default class RegisterComponent implements AfterViewInit {
     }),
   });
 
+  constructor(private libraryService: LibraryService) {}
   private registerService = inject(RegisterService);
-
+  ngOnInit(): void {
+    this.loadLibraries();
+  }
   ngAfterViewInit(): void {
     this.login().nativeElement.focus();
   }
-
+  loadLibraries(): void {
+    this.libraryService.query().subscribe({
+      next: response => {
+        this.libraries = response.body || [];
+      },
+      error: error => {
+        console.error('Error fetching libraries:', error);
+      },
+      complete: () => {
+        console.log('Library fetch complete');
+      },
+    });
+  }
   register(): void {
     this.doNotMatch.set(false);
     this.error.set(false);
