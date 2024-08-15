@@ -7,6 +7,7 @@ import { errorRoute } from './layouts/error/error.route';
 import HomeComponent from './home/home.component';
 import NavbarComponent from './layouts/navbar/navbar.component';
 import LoginComponent from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   {
@@ -35,6 +36,12 @@ const routes: Routes = [
     path: 'login',
     component: LoginComponent,
     title: 'login.title',
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    title: 'dashboard.title',
+    canActivate: [UserRouteAccessService],
   },
   {
     path: '',

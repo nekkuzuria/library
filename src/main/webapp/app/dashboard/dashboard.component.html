@@ -1,0 +1,46 @@
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Library Book Collection</h2>
+
+  <!-- Search and Filter -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <input
+        type="text"
+        class="form-control form-control-lg rounded-5"
+        placeholder="Search for books..."
+        aria-label="Search"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+      />
+    </div>
+    <div class="col-md-4">
+      <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre"> </ng-select>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-4">
+    <ng-select [items]="sortOptions" [(ngModel)]="sortOption" (change)="sortBooks()" placeholder="Sort by"> </ng-select>
+  </div>
+
+  @if (books?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Books found</span>
+    </div>
+  }
+
+  @if (filteredBooks && filteredBooks.length > 0) {
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      @for (book of filteredBooks; track trackId) {
+        <div class="col">
+          <div class="card h-100 hover-shadow">
+            <img src="{{ book.cover }}" class="card-img-top" alt="Book Cover" style="height: 350px; object-fit: contain" />
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ book.title }}</h5>
+              <p class="card-text">{{ book.author }} - {{ book.year }}</p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
