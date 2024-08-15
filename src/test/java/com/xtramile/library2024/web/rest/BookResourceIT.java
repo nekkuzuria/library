@@ -45,6 +45,21 @@ class BookResourceIT {
     private static final Genre DEFAULT_GENRE = Genre.FICTION;
     private static final Genre UPDATED_GENRE = Genre.NONFICTION;
 
+    private static final Integer DEFAULT_YEAR = 1;
+    private static final Integer UPDATED_YEAR = 2;
+
+    private static final Integer DEFAULT_TOTAL_PAGE = 1;
+    private static final Integer UPDATED_TOTAL_PAGE = 2;
+
+    private static final String DEFAULT_AUTHOR = "AAAAAAAAAA";
+    private static final String UPDATED_AUTHOR = "BBBBBBBBBB";
+
+    private static final String DEFAULT_COVER = "AAAAAAAAAA";
+    private static final String UPDATED_COVER = "BBBBBBBBBB";
+
+    private static final String DEFAULT_SYNOPSIS = "AAAAAAAAAA";
+    private static final String UPDATED_SYNOPSIS = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/books";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -77,7 +92,15 @@ class BookResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Book createEntity(EntityManager em) {
-        Book book = new Book().title(DEFAULT_TITLE).type(DEFAULT_TYPE).genre(DEFAULT_GENRE);
+        Book book = new Book()
+            .title(DEFAULT_TITLE)
+            .type(DEFAULT_TYPE)
+            .genre(DEFAULT_GENRE)
+            .year(DEFAULT_YEAR)
+            .totalPage(DEFAULT_TOTAL_PAGE)
+            .author(DEFAULT_AUTHOR)
+            .cover(DEFAULT_COVER)
+            .synopsis(DEFAULT_SYNOPSIS);
         return book;
     }
 
@@ -88,7 +111,15 @@ class BookResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Book createUpdatedEntity(EntityManager em) {
-        Book book = new Book().title(UPDATED_TITLE).type(UPDATED_TYPE).genre(UPDATED_GENRE);
+        Book book = new Book()
+            .title(UPDATED_TITLE)
+            .type(UPDATED_TYPE)
+            .genre(UPDATED_GENRE)
+            .year(UPDATED_YEAR)
+            .totalPage(UPDATED_TOTAL_PAGE)
+            .author(UPDATED_AUTHOR)
+            .cover(UPDATED_COVER)
+            .synopsis(UPDATED_SYNOPSIS);
         return book;
     }
 
@@ -178,7 +209,12 @@ class BookResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(book.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].genre").value(hasItem(DEFAULT_GENRE.toString())));
+            .andExpect(jsonPath("$.[*].genre").value(hasItem(DEFAULT_GENRE.toString())))
+            .andExpect(jsonPath("$.[*].year").value(hasItem(DEFAULT_YEAR)))
+            .andExpect(jsonPath("$.[*].totalPage").value(hasItem(DEFAULT_TOTAL_PAGE)))
+            .andExpect(jsonPath("$.[*].author").value(hasItem(DEFAULT_AUTHOR)))
+            .andExpect(jsonPath("$.[*].cover").value(hasItem(DEFAULT_COVER)))
+            .andExpect(jsonPath("$.[*].synopsis").value(hasItem(DEFAULT_SYNOPSIS)));
     }
 
     @Test
@@ -195,7 +231,12 @@ class BookResourceIT {
             .andExpect(jsonPath("$.id").value(book.getId().intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.genre").value(DEFAULT_GENRE.toString()));
+            .andExpect(jsonPath("$.genre").value(DEFAULT_GENRE.toString()))
+            .andExpect(jsonPath("$.year").value(DEFAULT_YEAR))
+            .andExpect(jsonPath("$.totalPage").value(DEFAULT_TOTAL_PAGE))
+            .andExpect(jsonPath("$.author").value(DEFAULT_AUTHOR))
+            .andExpect(jsonPath("$.cover").value(DEFAULT_COVER))
+            .andExpect(jsonPath("$.synopsis").value(DEFAULT_SYNOPSIS));
     }
 
     @Test
@@ -217,7 +258,15 @@ class BookResourceIT {
         Book updatedBook = bookRepository.findById(book.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedBook are not directly saved in db
         em.detach(updatedBook);
-        updatedBook.title(UPDATED_TITLE).type(UPDATED_TYPE).genre(UPDATED_GENRE);
+        updatedBook
+            .title(UPDATED_TITLE)
+            .type(UPDATED_TYPE)
+            .genre(UPDATED_GENRE)
+            .year(UPDATED_YEAR)
+            .totalPage(UPDATED_TOTAL_PAGE)
+            .author(UPDATED_AUTHOR)
+            .cover(UPDATED_COVER)
+            .synopsis(UPDATED_SYNOPSIS);
         BookDTO bookDTO = bookMapper.toDto(updatedBook);
 
         restBookMockMvc
@@ -299,7 +348,7 @@ class BookResourceIT {
         Book partialUpdatedBook = new Book();
         partialUpdatedBook.setId(book.getId());
 
-        partialUpdatedBook.title(UPDATED_TITLE).genre(UPDATED_GENRE);
+        partialUpdatedBook.title(UPDATED_TITLE).genre(UPDATED_GENRE).year(UPDATED_YEAR).totalPage(UPDATED_TOTAL_PAGE);
 
         restBookMockMvc
             .perform(
@@ -327,7 +376,15 @@ class BookResourceIT {
         Book partialUpdatedBook = new Book();
         partialUpdatedBook.setId(book.getId());
 
-        partialUpdatedBook.title(UPDATED_TITLE).type(UPDATED_TYPE).genre(UPDATED_GENRE);
+        partialUpdatedBook
+            .title(UPDATED_TITLE)
+            .type(UPDATED_TYPE)
+            .genre(UPDATED_GENRE)
+            .year(UPDATED_YEAR)
+            .totalPage(UPDATED_TOTAL_PAGE)
+            .author(UPDATED_AUTHOR)
+            .cover(UPDATED_COVER)
+            .synopsis(UPDATED_SYNOPSIS);
 
         restBookMockMvc
             .perform(

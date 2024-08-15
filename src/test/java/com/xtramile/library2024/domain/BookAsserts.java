@@ -49,7 +49,12 @@ public class BookAsserts {
             .as("Verify Book relevant properties")
             .satisfies(e -> assertThat(e.getTitle()).as("check title").isEqualTo(actual.getTitle()))
             .satisfies(e -> assertThat(e.getType()).as("check type").isEqualTo(actual.getType()))
-            .satisfies(e -> assertThat(e.getGenre()).as("check genre").isEqualTo(actual.getGenre()));
+            .satisfies(e -> assertThat(e.getGenre()).as("check genre").isEqualTo(actual.getGenre()))
+            .satisfies(e -> assertThat(e.getYear()).as("check year").isEqualTo(actual.getYear()))
+            .satisfies(e -> assertThat(e.getTotalPage()).as("check totalPage").isEqualTo(actual.getTotalPage()))
+            .satisfies(e -> assertThat(e.getAuthor()).as("check author").isEqualTo(actual.getAuthor()))
+            .satisfies(e -> assertThat(e.getCover()).as("check cover").isEqualTo(actual.getCover()))
+            .satisfies(e -> assertThat(e.getSynopsis()).as("check synopsis").isEqualTo(actual.getSynopsis()));
     }
 
     /**

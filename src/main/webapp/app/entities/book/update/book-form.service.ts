@@ -21,6 +21,11 @@ type BookFormGroupContent = {
   title: FormControl<IBook['title']>;
   type: FormControl<IBook['type']>;
   genre: FormControl<IBook['genre']>;
+  year: FormControl<IBook['year']>;
+  totalPage: FormControl<IBook['totalPage']>;
+  author: FormControl<IBook['author']>;
+  cover: FormControl<IBook['cover']>;
+  synopsis: FormControl<IBook['synopsis']>;
   bookStorage: FormControl<IBook['bookStorage']>;
 };
 
@@ -46,6 +51,11 @@ export class BookFormService {
       }),
       type: new FormControl(bookRawValue.type),
       genre: new FormControl(bookRawValue.genre),
+      year: new FormControl(bookRawValue.year),
+      totalPage: new FormControl(bookRawValue.totalPage),
+      author: new FormControl(bookRawValue.author),
+      cover: new FormControl(bookRawValue.cover),
+      synopsis: new FormControl(bookRawValue.synopsis),
       bookStorage: new FormControl(bookRawValue.bookStorage),
     });
   }

@@ -23,6 +23,21 @@
             <column name="genre" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="year" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="total_page" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="author" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="cover" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="synopsis" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="book_storage_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -50,6 +65,11 @@
             <column name="title" type="string"/>
             <column name="type" type="string"/>
             <column name="genre" type="string"/>
+            <column name="year" type="numeric"/>
+            <column name="total_page" type="numeric"/>
+            <column name="author" type="string"/>
+            <column name="cover" type="string"/>
+            <column name="synopsis" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

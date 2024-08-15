@@ -1,25 +1,32 @@
 import { IBook, NewBook } from './book.model';
 
 export const sampleWithRequiredData: IBook = {
-  id: 11793,
-  title: 'slim',
+  id: 6816,
+  title: 'hm offset brisk',
 };
 
 export const sampleWithPartialData: IBook = {
-  id: 31840,
-  title: 'questioningly woot',
-  type: 'HARDCOVER',
+  id: 19314,
+  title: 'aw',
+  year: 32657,
+  author: 'trim',
+  cover: 'seldom',
 };
 
 export const sampleWithFullData: IBook = {
-  id: 3479,
-  title: 'truly',
-  type: 'JOURNAL',
-  genre: 'NONFICTION',
+  id: 14559,
+  title: 'burble',
+  type: 'EBOOK',
+  genre: 'ADVENTURE',
+  year: 16278,
+  totalPage: 23828,
+  author: 'hm aside',
+  cover: 'bake excluding glum',
+  synopsis: 'uh-huh quest yowza',
 };
 
 export const sampleWithNewData: NewBook = {
-  title: 'provoke wrapping yum',
+  title: 'quizzically content yahoo',
   id: null,
 };
 

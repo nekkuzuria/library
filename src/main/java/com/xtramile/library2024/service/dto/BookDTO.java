@@ -21,6 +21,16 @@ public class BookDTO implements Serializable {
 
     private Genre genre;
 
+    private Integer year;
+
+    private Integer totalPage;
+
+    private String author;
+
+    private String cover;
+
+    private String synopsis;
+
     private BookStorageDTO bookStorage;
 
     public Long getId() {
@@ -53,6 +63,46 @@ public class BookDTO implements Serializable {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Integer getTotalPage() {
+        return totalPage;
+    }
+
+    public void setTotalPage(Integer totalPage) {
+        this.totalPage = totalPage;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
     }
 
     public BookStorageDTO getBookStorage() {
@@ -92,6 +142,11 @@ public class BookDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", type='" + getType() + "'" +
             ", genre='" + getGenre() + "'" +
+            ", year=" + getYear() +
+            ", totalPage=" + getTotalPage() +
+            ", author='" + getAuthor() + "'" +
+            ", cover='" + getCover() + "'" +
+            ", synopsis='" + getSynopsis() + "'" +
             ", bookStorage=" + getBookStorage() +
             "}";
     }

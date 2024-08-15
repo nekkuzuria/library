@@ -18,6 +18,26 @@
       "fieldName": "genre",
       "fieldType": "Genre",
       "fieldValues": "FICTION,NONFICTION,SCIENCE_FICTION,FANTASY,BIOGRAPHY,MYSTERY,THRILLER,ROMANCE,HORROR,HISTORY,POETRY,DRAMA,ADVENTURE,CHILDRENS,YOUNG_ADULT,SELF_HELP,RELIGION,COOKING,ART,TRAVEL"
+    },
+    {
+      "fieldName": "year",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "totalPage",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "author",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "cover",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "synopsis",
+      "fieldType": "String"
     }
   ],
   "jpaMetamodelFiltering": false,

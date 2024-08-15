@@ -38,6 +38,21 @@ public class Book implements Serializable {
     @Column(name = "genre")
     private Genre genre;
 
+    @Column(name = "year")
+    private Integer year;
+
+    @Column(name = "total_page")
+    private Integer totalPage;
+
+    @Column(name = "author")
+    private String author;
+
+    @Column(name = "cover")
+    private String cover;
+
+    @Column(name = "synopsis")
+    private String synopsis;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "books", "library" }, allowSetters = true)
     private BookStorage bookStorage;
@@ -100,6 +115,71 @@ public class Book implements Serializable {
         this.genre = genre;
     }
 
+    public Integer getYear() {
+        return this.year;
+    }
+
+    public Book year(Integer year) {
+        this.setYear(year);
+        return this;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Integer getTotalPage() {
+        return this.totalPage;
+    }
+
+    public Book totalPage(Integer totalPage) {
+        this.setTotalPage(totalPage);
+        return this;
+    }
+
+    public void setTotalPage(Integer totalPage) {
+        this.totalPage = totalPage;
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public Book author(String author) {
+        this.setAuthor(author);
+        return this;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getCover() {
+        return this.cover;
+    }
+
+    public Book cover(String cover) {
+        this.setCover(cover);
+        return this;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getSynopsis() {
+        return this.synopsis;
+    }
+
+    public Book synopsis(String synopsis) {
+        this.setSynopsis(synopsis);
+        return this;
+    }
+
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
+    }
+
     public BookStorage getBookStorage() {
         return this.bookStorage;
     }
@@ -159,6 +239,11 @@ public class Book implements Serializable {
             ", title='" + getTitle() + "'" +
             ", type='" + getType() + "'" +
             ", genre='" + getGenre() + "'" +
+            ", year=" + getYear() +
+            ", totalPage=" + getTotalPage() +
+            ", author='" + getAuthor() + "'" +
+            ", cover='" + getCover() + "'" +
+            ", synopsis='" + getSynopsis() + "'" +
             "}";
     }
 }

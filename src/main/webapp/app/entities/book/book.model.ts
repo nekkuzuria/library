@@ -7,6 +7,11 @@ export interface IBook {
   title?: string | null;
   type?: keyof typeof BookType | null;
   genre?: keyof typeof Genre | null;
+  year?: number | null;
+  totalPage?: number | null;
+  author?: string | null;
+  cover?: string | null;
+  synopsis?: string | null;
   bookStorage?: Pick<IBookStorage, 'id'> | null;
 }
 
