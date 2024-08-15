@@ -2,8 +2,8 @@ import { Component, AfterViewInit, ElementRef, inject, signal, viewChild, OnInit
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LibraryService } from 'app/entities/library/service/library.service';
-import { ILibrary } from 'app/entities/library/library.model';
+import { PublicService } from 'app/core/public-service/public.service';
+import { IPublicLibrary } from 'app/core/public-service/public.library.model';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/error.constants';
@@ -19,7 +19,7 @@ import { RegisterService } from './register.service';
 })
 export default class RegisterComponent implements OnInit, AfterViewInit {
   login = viewChild.required<ElementRef>('login');
-  libraries: ILibrary[] = [];
+  libraries: IPublicLibrary[] = [];
   roles: string[] = [];
 
   doNotMatch = signal(false);
@@ -68,7 +68,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
   });
 
-  constructor(private libraryService: LibraryService) {}
+  constructor(private publicService: PublicService) {}
   private registerService = inject(RegisterService);
   ngOnInit(): void {
     this.loadLibraries();
@@ -78,7 +78,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     this.login().nativeElement.focus();
   }
   loadLibraries(): void {
-    this.libraryService.query().subscribe({
+    this.publicService.query().subscribe({
       next: response => {
         this.libraries = response.body || [];
       },

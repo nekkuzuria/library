@@ -4,7 +4,10 @@ import com.xtramile.library2024.domain.Library;
 import com.xtramile.library2024.repository.LibraryRepository;
 import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.mapper.LibraryMapper;
+import com.xtramile.library2024.web.rest.vm.LibraryVM;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -108,5 +111,15 @@ public class LibraryService {
     public void delete(Long id) {
         log.debug("Request to delete Library : {}", id);
         libraryRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LibraryVM> getAllPublicLibraries() {
+        log.debug("Request to get all public libraries");
+        return libraryRepository
+            .findAll()
+            .stream()
+            .<LibraryVM>map(library -> LibraryVM.builder().id(library.getId()).name(library.getName()).build())
+            .collect(Collectors.toList());
     }
 }
