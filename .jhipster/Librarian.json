@@ -40,6 +40,15 @@
       "relationshipName": "location",
       "relationshipSide": "left",
       "relationshipType": "one-to-one"
+    },
+    {
+      "id": false,
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "librarian",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
     }
   ],
   "searchEngine": "no",

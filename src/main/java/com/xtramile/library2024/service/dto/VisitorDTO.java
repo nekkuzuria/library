@@ -26,6 +26,8 @@ public class VisitorDTO implements Serializable {
 
     private LibraryDTO library;
 
+    private UserDTO user;
+
     public Long getId() {
         return id;
     }
@@ -90,6 +92,14 @@ public class VisitorDTO implements Serializable {
         this.library = library;
     }
 
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -123,6 +133,7 @@ public class VisitorDTO implements Serializable {
             ", membershipStatus='" + getMembershipStatus() + "'" +
             ", address=" + getAddress() +
             ", library=" + getLibrary() +
+            ", user=" + getUser() +
             "}";
     }
 }

@@ -26,6 +26,7 @@ describe('Librarian Form Service', () => {
             dateOfBirth: expect.any(Object),
             library: expect.any(Object),
             location: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -42,6 +43,7 @@ describe('Librarian Form Service', () => {
             dateOfBirth: expect.any(Object),
             library: expect.any(Object),
             location: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

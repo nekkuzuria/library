@@ -51,6 +51,10 @@
               </div>
             }
           </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ visitor()!.user?.login }}</span>
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

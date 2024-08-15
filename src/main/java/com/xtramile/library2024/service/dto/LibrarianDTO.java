@@ -24,6 +24,8 @@ public class LibrarianDTO implements Serializable {
 
     private LocationDTO location;
 
+    private UserDTO user;
+
     public Long getId() {
         return id;
     }
@@ -80,6 +82,14 @@ public class LibrarianDTO implements Serializable {
         this.location = location;
     }
 
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -112,6 +122,7 @@ public class LibrarianDTO implements Serializable {
             ", dateOfBirth='" + getDateOfBirth() + "'" +
             ", library=" + getLibrary() +
             ", location=" + getLocation() +
+            ", user=" + getUser() +
             "}";
     }
 }

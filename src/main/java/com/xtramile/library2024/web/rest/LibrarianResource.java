@@ -131,10 +131,13 @@ public class LibrarianResource {
     /**
      * {@code GET  /librarians} : get all the librarians.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of librarians in body.
      */
     @GetMapping("")
-    public List<LibrarianDTO> getAllLibrarians() {
+    public List<LibrarianDTO> getAllLibrarians(
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+    ) {
         log.debug("REST request to get all Librarians");
         return librarianService.findAll();
     }

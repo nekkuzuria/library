@@ -1,7 +1,8 @@
 package com.xtramile.library2024.web.rest;
 
-import com.xtramile.library2024.domain.User;
-import com.xtramile.library2024.repository.UserRepository;
+import com.xtramile.library2024.domain.*;
+import com.xtramile.library2024.repository.*;
+import com.xtramile.library2024.security.AuthoritiesConstants;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.MailService;
 import com.xtramile.library2024.service.UserService;
@@ -14,6 +15,8 @@ import jakarta.validation.Valid;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -39,11 +42,28 @@ public class AccountResource {
     private final UserService userService;
 
     private final MailService mailService;
+    private final LibrarianRepository librarianRepository; //TAMBAHAN========================
+    private final VisitorRepository visitorRepository;
+    private final LibraryRepository libraryRepository;
+    private final LocationRepository locationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        LibrarianRepository librarianRepository,
+        VisitorRepository visitorRepository,
+        LibraryRepository libraryRepository,
+        LocationRepository locationRepository
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.librarianRepository = librarianRepository;
+        this.visitorRepository = visitorRepository;
+        this.libraryRepository = libraryRepository;
+        this.locationRepository = locationRepository;
     }
 
     /**
@@ -61,6 +81,38 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+        Library library = libraryRepository
+            .findById(managedUserVM.getLibraryId())
+            .orElseThrow(() -> new RuntimeException("Library not found"));
+        Location location = locationRepository
+            .findById(managedUserVM.getLocationId())
+            .orElseThrow(() -> new RuntimeException("Location not found"));
+        logger.info("Library found: {}", library);
+
+        if ("Librarian".equalsIgnoreCase(managedUserVM.getRoleChoice())) { //TAMBAHAN=========================
+            userService.assignRole(user, AuthoritiesConstants.ADMIN);
+            Librarian librarian = new Librarian();
+            librarian.setUser(user);
+            librarian.setEmail(user.getEmail());
+            librarian.setName(user.getFirstName() + " " + user.getLastName());
+            librarian.setPhoneNumber(managedUserVM.getPhoneNumber());
+            librarian.setDateOfBirth(managedUserVM.getDateOfBirth());
+            librarian.setLibrary(library);
+            librarian.setLocation(location);
+            librarianRepository.save(librarian);
+        } else {
+            userService.assignRole(user, AuthoritiesConstants.USER);
+            Visitor visitor = new Visitor();
+            visitor.setUser(user);
+            visitor.setEmail(user.getEmail());
+            visitor.setName(user.getFirstName() + " " + user.getLastName());
+            visitor.setPhoneNumber(managedUserVM.getPhoneNumber());
+            visitor.setDateOfBirth(managedUserVM.getDateOfBirth());
+            visitor.setLibrary(library);
+            visitor.setAddress(location);
+            visitorRepository.save(visitor);
+        }
+
         mailService.sendActivationEmail(user);
     }
 

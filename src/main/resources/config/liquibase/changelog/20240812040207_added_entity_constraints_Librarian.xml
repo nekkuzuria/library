@@ -8,7 +8,7 @@
     <!--
         Added the constraints for entity Librarian.
     -->
-    <changeSet id="20240812040207-2" author="aminhnh">
+    <changeSet id="20240812040207-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="library_id"
                                  baseTableName="librarian"
@@ -22,6 +22,13 @@
                                  constraintName="fk_librarian__location_id"
                                  referencedColumnNames="id"
                                  referencedTableName="location"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="librarian"
+                                 constraintName="fk_librarian__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
                                  />
     </changeSet>
 </databaseChangeLog>

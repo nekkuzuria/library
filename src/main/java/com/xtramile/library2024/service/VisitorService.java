@@ -3,6 +3,8 @@ package com.xtramile.library2024.service;
 import com.xtramile.library2024.service.dto.VisitorDTO;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service Interface for managing {@link com.xtramile.library2024.domain.Visitor}.
@@ -38,6 +40,14 @@ public interface VisitorService {
      * @return the list of entities.
      */
     List<VisitorDTO> findAll();
+
+    /**
+     * Get all the visitors with eager load of many-to-many relationships.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Page<VisitorDTO> findAllWithEagerRelationships(Pageable pageable);
 
     /**
      * Get the "id" visitor.

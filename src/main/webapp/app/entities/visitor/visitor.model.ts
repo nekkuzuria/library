@@ -1,6 +1,7 @@
 import dayjs from 'dayjs/esm';
 import { ILocation } from 'app/entities/location/location.model';
 import { ILibrary } from 'app/entities/library/library.model';
+import { IUser } from 'app/entities/user/user.model';
 
 export interface IVisitor {
   id: number;
@@ -11,6 +12,7 @@ export interface IVisitor {
   membershipStatus?: boolean | null;
   address?: Pick<ILocation, 'id'> | null;
   library?: Pick<ILibrary, 'id'> | null;
+  user?: Pick<IUser, 'id' | 'login'> | null;
 }
 
 export type NewVisitor = Omit<IVisitor, 'id'> & { id: null };

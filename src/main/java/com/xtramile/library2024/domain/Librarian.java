@@ -39,13 +39,17 @@ public class Librarian implements Serializable {
     private LocalDate dateOfBirth;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "librarians", "bookStorages", "visits" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "location", "visitors", "librarians", "bookStorages", "visits" }, allowSetters = true)
     private Library library;
 
-    @JsonIgnoreProperties(value = { "librarian" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "visitor", "librarian", "library" }, allowSetters = true)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(unique = true)
     private Location location;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private User user;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "librarian")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -142,6 +146,19 @@ public class Librarian implements Serializable {
 
     public Librarian location(Location location) {
         this.setLocation(location);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Librarian user(User user) {
+        this.setUser(user);
         return this;
     }
 

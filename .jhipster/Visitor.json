@@ -52,6 +52,15 @@
       "relationshipName": "library",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
+    },
+    {
+      "id": false,
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "visitor",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
     }
   ],
   "searchEngine": "no",

@@ -89,6 +89,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -116,6 +122,9 @@
                     <a [routerLink]="['/library', visitor.library.id, 'view']">{{ visitor.library.id }}</a>
                   </div>
                 }
+              </td>
+              <td>
+                {{ visitor.user?.login }}
               </td>
               <td class="text-end">
                 <div class="btn-group">

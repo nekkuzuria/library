@@ -180,6 +180,14 @@ public class UserService {
         return user;
     }
 
+    public void assignRole(User user, String role) { //TAMBAHAN====================================
+        Set<Authority> authorities = new HashSet<>();
+        Authority authority = authorityRepository.findById(role).orElseThrow(() -> new RuntimeException("Role not found"));
+        authorities.add(authority);
+        user.setAuthorities(authorities);
+        userRepository.save(user);
+    }
+
     /**
      * Update all information for a specific user, and return the modified user.
      *

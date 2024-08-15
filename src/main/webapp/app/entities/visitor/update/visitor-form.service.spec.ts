@@ -27,6 +27,7 @@ describe('Visitor Form Service', () => {
             membershipStatus: expect.any(Object),
             address: expect.any(Object),
             library: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -44,6 +45,7 @@ describe('Visitor Form Service', () => {
             membershipStatus: expect.any(Object),
             address: expect.any(Object),
             library: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

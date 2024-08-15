@@ -11,6 +11,8 @@ import { ILibrary } from 'app/entities/library/library.model';
 import { LibraryService } from 'app/entities/library/service/library.service';
 import { ILocation } from 'app/entities/location/location.model';
 import { LocationService } from 'app/entities/location/service/location.service';
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
 import { LibrarianService } from '../service/librarian.service';
 import { ILibrarian } from '../librarian.model';
 import { LibrarianFormService, LibrarianFormGroup } from './librarian-form.service';
@@ -27,11 +29,13 @@ export class LibrarianUpdateComponent implements OnInit {
 
   librariesSharedCollection: ILibrary[] = [];
   locationsCollection: ILocation[] = [];
+  usersSharedCollection: IUser[] = [];
 
   protected librarianService = inject(LibrarianService);
   protected librarianFormService = inject(LibrarianFormService);
   protected libraryService = inject(LibraryService);
   protected locationService = inject(LocationService);
+  protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -40,6 +44,8 @@ export class LibrarianUpdateComponent implements OnInit {
   compareLibrary = (o1: ILibrary | null, o2: ILibrary | null): boolean => this.libraryService.compareLibrary(o1, o2);
 
   compareLocation = (o1: ILocation | null, o2: ILocation | null): boolean => this.locationService.compareLocation(o1, o2);
+
+  compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ librarian }) => {
@@ -97,6 +103,7 @@ export class LibrarianUpdateComponent implements OnInit {
       this.locationsCollection,
       librarian.location,
     );
+    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, librarian.user);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -117,5 +124,11 @@ export class LibrarianUpdateComponent implements OnInit {
         ),
       )
       .subscribe((locations: ILocation[]) => (this.locationsCollection = locations));
+
+    this.userService
+      .query()
+      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
+      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.librarian?.user)))
+      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }

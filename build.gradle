@@ -165,8 +165,6 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:testcontainers"
     // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly 'org.projectlombok:lombok:1.18.30'
 }
 
 task cleanResources(type: Delete) {

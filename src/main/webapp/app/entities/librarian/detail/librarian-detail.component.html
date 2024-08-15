@@ -47,6 +47,10 @@
               </div>
             }
           </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ librarian()!.user?.login }}</span>
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

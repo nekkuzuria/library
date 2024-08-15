@@ -23,5 +23,12 @@
                                  referencedColumnNames="id"
                                  referencedTableName="library"
                                  />
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="visitor"
+                                 constraintName="fk_visitor__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                 />
     </changeSet>
 </databaseChangeLog>

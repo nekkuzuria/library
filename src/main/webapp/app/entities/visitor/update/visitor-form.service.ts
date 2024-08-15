@@ -25,6 +25,7 @@ type VisitorFormGroupContent = {
   membershipStatus: FormControl<IVisitor['membershipStatus']>;
   address: FormControl<IVisitor['address']>;
   library: FormControl<IVisitor['library']>;
+  user: FormControl<IVisitor['user']>;
 };
 
 export type VisitorFormGroup = FormGroup<VisitorFormGroupContent>;
@@ -51,6 +52,7 @@ export class VisitorFormService {
       membershipStatus: new FormControl(visitorRawValue.membershipStatus),
       address: new FormControl(visitorRawValue.address),
       library: new FormControl(visitorRawValue.library),
+      user: new FormControl(visitorRawValue.user),
     });
   }
 

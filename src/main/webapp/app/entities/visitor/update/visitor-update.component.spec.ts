@@ -8,6 +8,8 @@ import { ILocation } from 'app/entities/location/location.model';
 import { LocationService } from 'app/entities/location/service/location.service';
 import { ILibrary } from 'app/entities/library/library.model';
 import { LibraryService } from 'app/entities/library/service/library.service';
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
 import { IVisitor } from '../visitor.model';
 import { VisitorService } from '../service/visitor.service';
 import { VisitorFormService } from './visitor-form.service';
@@ -22,6 +24,7 @@ describe('Visitor Management Update Component', () => {
   let visitorService: VisitorService;
   let locationService: LocationService;
   let libraryService: LibraryService;
+  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,6 +49,7 @@ describe('Visitor Management Update Component', () => {
     visitorService = TestBed.inject(VisitorService);
     locationService = TestBed.inject(LocationService);
     libraryService = TestBed.inject(LibraryService);
+    userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
@@ -91,18 +95,43 @@ describe('Visitor Management Update Component', () => {
       expect(comp.librariesSharedCollection).toEqual(expectedCollection);
     });
 
+    it('Should call User query and add missing value', () => {
+      const visitor: IVisitor = { id: 456 };
+      const user: IUser = { id: 19287 };
+      visitor.user = user;
+
+      const userCollection: IUser[] = [{ id: 8253 }];
+      jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
+      const additionalUsers = [user];
+      const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
+      jest.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ visitor });
+      comp.ngOnInit();
+
+      expect(userService.query).toHaveBeenCalled();
+      expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(
+        userCollection,
+        ...additionalUsers.map(expect.objectContaining),
+      );
+      expect(comp.usersSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const visitor: IVisitor = { id: 456 };
       const address: ILocation = { id: 5737 };
       visitor.address = address;
       const library: ILibrary = { id: 1831 };
       visitor.library = library;
+      const user: IUser = { id: 23647 };
+      visitor.user = user;
 
       activatedRoute.data = of({ visitor });
       comp.ngOnInit();
 
       expect(comp.addressesCollection).toContain(address);
       expect(comp.librariesSharedCollection).toContain(library);
+      expect(comp.usersSharedCollection).toContain(user);
       expect(comp.visitor).toEqual(visitor);
     });
   });
@@ -193,6 +222,16 @@ describe('Visitor Management Update Component', () => {
         jest.spyOn(libraryService, 'compareLibrary');
         comp.compareLibrary(entity, entity2);
         expect(libraryService.compareLibrary).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareUser', () => {
+      it('Should forward to userService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(userService, 'compareUser');
+        comp.compareUser(entity, entity2);
+        expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

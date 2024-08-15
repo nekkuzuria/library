@@ -131,10 +131,11 @@ public class VisitorResource {
     /**
      * {@code GET  /visitors} : get all the visitors.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of visitors in body.
      */
     @GetMapping("")
-    public List<VisitorDTO> getAllVisitors() {
+    public List<VisitorDTO> getAllVisitors(@RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
         log.debug("REST request to get all Visitors");
         return visitorService.findAll();
     }

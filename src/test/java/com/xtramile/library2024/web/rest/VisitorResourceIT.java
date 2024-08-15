@@ -4,25 +4,34 @@ import static com.xtramile.library2024.domain.VisitorAsserts.*;
 import static com.xtramile.library2024.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xtramile.library2024.IntegrationTest;
 import com.xtramile.library2024.domain.Visitor;
+import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.repository.VisitorRepository;
+import com.xtramile.library2024.service.VisitorService;
 import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.service.mapper.VisitorMapper;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link VisitorResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class VisitorResourceIT {
@@ -64,7 +74,16 @@ class VisitorResourceIT {
     private VisitorRepository visitorRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Mock
+    private VisitorRepository visitorRepositoryMock;
+
+    @Autowired
     private VisitorMapper visitorMapper;
+
+    @Mock
+    private VisitorService visitorServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -180,6 +199,23 @@ class VisitorResourceIT {
             .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
             .andExpect(jsonPath("$.[*].dateOfBirth").value(hasItem(DEFAULT_DATE_OF_BIRTH.toString())))
             .andExpect(jsonPath("$.[*].membershipStatus").value(hasItem(DEFAULT_MEMBERSHIP_STATUS.booleanValue())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllVisitorsWithEagerRelationshipsIsEnabled() throws Exception {
+        when(visitorServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restVisitorMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(visitorServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllVisitorsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(visitorServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restVisitorMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(visitorRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test

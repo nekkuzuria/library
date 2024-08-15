@@ -24,6 +24,7 @@ type LibrarianFormGroupContent = {
   dateOfBirth: FormControl<ILibrarian['dateOfBirth']>;
   library: FormControl<ILibrarian['library']>;
   location: FormControl<ILibrarian['location']>;
+  user: FormControl<ILibrarian['user']>;
 };
 
 export type LibrarianFormGroup = FormGroup<LibrarianFormGroupContent>;
@@ -49,6 +50,7 @@ export class LibrarianFormService {
       dateOfBirth: new FormControl(librarianRawValue.dateOfBirth),
       library: new FormControl(librarianRawValue.library),
       location: new FormControl(librarianRawValue.location),
+      user: new FormControl(librarianRawValue.user),
     });
   }
 

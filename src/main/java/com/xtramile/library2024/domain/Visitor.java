@@ -55,6 +55,10 @@ public class Visitor implements Serializable {
     @JsonIgnoreProperties(value = { "location", "visitors", "librarians", "bookStorages", "visits" }, allowSetters = true)
     private Library library;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private User user;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "visitor")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "library", "librarian", "visitor" }, allowSetters = true)
@@ -194,6 +198,19 @@ public class Visitor implements Serializable {
 
     public Visitor library(Library library) {
         this.setLibrary(library);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Visitor user(User user) {
+        this.setUser(user);
         return this;
     }
 

@@ -32,6 +32,9 @@
             <column name="location_id" type="bigint">
                 <constraints nullable="true" unique="true" uniqueConstraintName="ux_librarian__location_id" />
             </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_librarian__user_id" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
