@@ -29,11 +29,47 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
   success = signal(false);
 
   registerForm = new FormGroup({
-    role: new FormControl('Visitor', {
+    roleChoice: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    libraries: new FormControl('', {
+    libraryId: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    firstName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    lastName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    dateOfBirth: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    phoneNumber: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.pattern('^\\+?[1-9]\\d{1,14}$')],
+    }),
+    address: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    streetAddress: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    postalCode: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    city: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    stateProvince: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -49,14 +85,6 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
-    }),
-    phoneNumber: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.pattern('^\\+?[1-9]\\d{1,14}$')],
-    }),
-    address: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254)],
     }),
     password: new FormControl('', {
       nonNullable: true,
@@ -100,9 +128,37 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     if (password !== confirmPassword) {
       this.doNotMatch.set(true);
     } else {
-      const { login, email } = this.registerForm.getRawValue();
+      const {
+        roleChoice,
+        libraryId,
+        firstName,
+        lastName,
+        dateOfBirth,
+        phoneNumber,
+        streetAddress,
+        postalCode,
+        city,
+        stateProvince,
+        login,
+        email,
+      } = this.registerForm.getRawValue();
       this.registerService
-        .save({ login, email, password, langKey: 'en' })
+        .save({
+          roleChoice,
+          libraryId: Number(libraryId),
+          firstName,
+          lastName,
+          dateOfBirth,
+          phoneNumber,
+          streetAddress,
+          postalCode,
+          city,
+          stateProvince,
+          login,
+          email,
+          password,
+          langKey: 'en',
+        })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
     }
   }
