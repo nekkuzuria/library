@@ -1,14 +1,14 @@
 package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.config.Constants;
-import com.xtramile.library2024.domain.Authority;
-import com.xtramile.library2024.domain.User;
+import com.xtramile.library2024.domain.*;
 import com.xtramile.library2024.repository.AuthorityRepository;
 import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.security.AuthoritiesConstants;
 import com.xtramile.library2024.security.SecurityUtils;
-import com.xtramile.library2024.service.dto.AdminUserDTO;
-import com.xtramile.library2024.service.dto.UserDTO;
+import com.xtramile.library2024.service.dto.*;
+import com.xtramile.library2024.service.mapper.UserMapper;
+import com.xtramile.library2024.web.rest.vm.RegisterVM;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -41,16 +41,36 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final LocationService locationService;
+
+    private final LibraryService libraryService;
+
+    private final LibrarianService librarianService;
+
+    private final VisitorService visitorService;
+
+    private final UserMapper userMapper;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        LocationService locationService,
+        LibraryService libraryService,
+        LibrarianService librarianService,
+        VisitorService visitorService,
+        UserMapper userMapper
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.locationService = locationService;
+        this.libraryService = libraryService;
+        this.librarianService = librarianService;
+        this.visitorService = visitorService;
+        this.userMapper = userMapper;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -93,7 +113,7 @@ public class UserService {
             });
     }
 
-    public User registerUser(AdminUserDTO userDTO, String password) {
+    public User registerUser(RegisterVM userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
             .ifPresent(existingUser -> {
@@ -132,6 +152,42 @@ public class UserService {
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
+
+        UserDTO userDTOForRoles = userMapper.userToUserDTO(newUser);
+
+        LibraryDTO libraryDTO = libraryService.findOne(userDTO.getLibraryId()).orElseThrow(() -> new RuntimeException("Library not found"));
+
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setStreetAddress(userDTO.getStreetAddress());
+        locationDTO.setPosttalCode(userDTO.getPostalCode());
+        locationDTO.setCity(userDTO.getCity());
+        locationDTO.setStateProvince(userDTO.getStateProvince());
+        LocationDTO savedLocationDTO = locationService.save(locationDTO);
+
+        if ("Librarian".equalsIgnoreCase(userDTO.getRoleChoice())) {
+            assignRole(newUser, AuthoritiesConstants.ADMIN);
+            LibrarianDTO librarian = new LibrarianDTO();
+            librarian.setUser(userDTOForRoles);
+            librarian.setEmail(newUser.getEmail());
+            librarian.setName(newUser.getFirstName() + " " + userDTO.getLastName());
+            librarian.setPhoneNumber(userDTO.getPhoneNumber());
+            librarian.setDateOfBirth(userDTO.getDateOfBirth());
+            librarian.setLibrary(libraryDTO);
+            librarian.setLocation(savedLocationDTO);
+            librarianService.save(librarian);
+        } else {
+            assignRole(newUser, AuthoritiesConstants.USER);
+            VisitorDTO visitor = new VisitorDTO();
+            visitor.setUser(userDTOForRoles);
+            visitor.setEmail(userDTO.getEmail());
+            visitor.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
+            visitor.setPhoneNumber(userDTO.getPhoneNumber());
+            visitor.setDateOfBirth(userDTO.getDateOfBirth());
+            visitor.setLibrary(libraryDTO);
+            visitor.setAddress(savedLocationDTO);
+            visitorService.save(visitor);
+        }
+
         return newUser;
     }
 

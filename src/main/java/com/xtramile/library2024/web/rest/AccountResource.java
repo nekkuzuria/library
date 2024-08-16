@@ -11,6 +11,7 @@ import com.xtramile.library2024.service.dto.PasswordChangeDTO;
 import com.xtramile.library2024.web.rest.errors.*;
 import com.xtramile.library2024.web.rest.vm.KeyAndPasswordVM;
 import com.xtramile.library2024.web.rest.vm.ManagedUserVM;
+import com.xtramile.library2024.web.rest.vm.RegisterVM;
 import jakarta.validation.Valid;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -76,42 +77,11 @@ public class AccountResource {
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
+    public void registerAccount(@Valid @RequestBody RegisterVM registerVM) {
+        if (isPasswordLengthInvalid(registerVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        Library library = libraryRepository
-            .findById(managedUserVM.getLibraryId())
-            .orElseThrow(() -> new RuntimeException("Library not found"));
-        Location location = locationRepository
-            .findById(managedUserVM.getLocationId())
-            .orElseThrow(() -> new RuntimeException("Location not found"));
-        logger.info("Library found: {}", library);
-
-        if ("Librarian".equalsIgnoreCase(managedUserVM.getRoleChoice())) { //TAMBAHAN=========================
-            userService.assignRole(user, AuthoritiesConstants.ADMIN);
-            Librarian librarian = new Librarian();
-            librarian.setUser(user);
-            librarian.setEmail(user.getEmail());
-            librarian.setName(user.getFirstName() + " " + user.getLastName());
-            librarian.setPhoneNumber(managedUserVM.getPhoneNumber());
-            librarian.setDateOfBirth(managedUserVM.getDateOfBirth());
-            librarian.setLibrary(library);
-            librarian.setLocation(location);
-            librarianRepository.save(librarian);
-        } else {
-            userService.assignRole(user, AuthoritiesConstants.USER);
-            Visitor visitor = new Visitor();
-            visitor.setUser(user);
-            visitor.setEmail(user.getEmail());
-            visitor.setName(user.getFirstName() + " " + user.getLastName());
-            visitor.setPhoneNumber(managedUserVM.getPhoneNumber());
-            visitor.setDateOfBirth(managedUserVM.getDateOfBirth());
-            visitor.setLibrary(library);
-            visitor.setAddress(location);
-            visitorRepository.save(visitor);
-        }
+        User user = userService.registerUser(registerVM, registerVM.getPassword());
 
         mailService.sendActivationEmail(user);
     }
