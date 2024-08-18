@@ -6,6 +6,7 @@ import com.xtramile.library2024.domain.VisitorBookStorage;
 import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.dto.VisitorBookStorageDTO;
 import com.xtramile.library2024.service.dto.VisitorDTO;
+import com.xtramile.library2024.web.rest.vm.VisitorBookStorageVM;
 import org.mapstruct.*;
 
 /**
@@ -26,4 +27,21 @@ public interface VisitorBookStorageMapper extends EntityMapper<VisitorBookStorag
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     BookDTO toDtoBookId(Book book);
+
+    default VisitorBookStorageVM toVm(VisitorBookStorage e) {
+        VisitorBookStorageVM vm = new VisitorBookStorageVM(
+            e.getId(),
+            e.getBook().getId(),
+            e.getBook().getTitle(),
+            e.getBook().getType(),
+            e.getBook().getGenre(),
+            e.getBook().getYear(),
+            e.getBook().getTotalPage(),
+            e.getBook().getAuthor(),
+            e.getBook().getCover(),
+            e.getBorrowDate(),
+            e.getReturnDate()
+        );
+        return vm;
+    }
 }

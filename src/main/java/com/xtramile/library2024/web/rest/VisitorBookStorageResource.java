@@ -1,9 +1,13 @@
 package com.xtramile.library2024.web.rest;
 
+import com.xtramile.library2024.domain.Visitor;
 import com.xtramile.library2024.repository.VisitorBookStorageRepository;
 import com.xtramile.library2024.service.VisitorBookStorageService;
+import com.xtramile.library2024.service.VisitorService;
 import com.xtramile.library2024.service.dto.VisitorBookStorageDTO;
+import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
+import com.xtramile.library2024.web.rest.vm.VisitorBookStorageVM;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -40,12 +44,16 @@ public class VisitorBookStorageResource {
 
     private final VisitorBookStorageRepository visitorBookStorageRepository;
 
+    private final VisitorService visitorService;
+
     public VisitorBookStorageResource(
         VisitorBookStorageService visitorBookStorageService,
-        VisitorBookStorageRepository visitorBookStorageRepository
+        VisitorBookStorageRepository visitorBookStorageRepository,
+        VisitorService visitorService
     ) {
         this.visitorBookStorageService = visitorBookStorageService;
         this.visitorBookStorageRepository = visitorBookStorageRepository;
+        this.visitorService = visitorService;
     }
 
     /**
@@ -149,6 +157,18 @@ public class VisitorBookStorageResource {
     ) {
         log.debug("REST request to get a page of VisitorBookStorages");
         Page<VisitorBookStorageDTO> page = visitorBookStorageService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<VisitorBookStorageVM>> getCurrentUserBookStorages(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        log.debug("REST request to get a page of VisitorBookStorages of current user");
+        VisitorDTO visitorDTO = visitorService.getVisitorOfCurrentUser();
+
+        Page<VisitorBookStorageVM> page = visitorBookStorageService.getVisitorBookStoragesForCurrentUser(visitorDTO, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

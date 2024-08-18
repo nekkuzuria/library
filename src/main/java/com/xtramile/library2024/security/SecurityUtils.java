@@ -103,4 +103,10 @@ public final class SecurityUtils {
     private static Stream<String> getAuthorities(Authentication authentication) {
         return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
     }
+
+    public static Long getCurrentUserId() {
+        Authentication authetication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authetication.getPrincipal();
+        return jwt.getClaim("userId");
+    }
 }

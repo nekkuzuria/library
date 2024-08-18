@@ -37,4 +37,7 @@ public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 
     @Query("select visitor from Visitor visitor left join fetch visitor.user where visitor.id =:id")
     Optional<Visitor> findOneWithToOneRelationships(@Param("id") Long id);
+
+    @Query("select visitor from Visitor visitor where visitor.user.id = :userId")
+    Optional<Visitor> findByUserId(@Param("userId") Long userId);
 }

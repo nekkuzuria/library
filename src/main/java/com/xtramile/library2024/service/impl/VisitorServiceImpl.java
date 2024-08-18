@@ -2,9 +2,11 @@ package com.xtramile.library2024.service.impl;
 
 import com.xtramile.library2024.domain.Visitor;
 import com.xtramile.library2024.repository.VisitorRepository;
+import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.VisitorService;
 import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.service.mapper.VisitorMapper;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -87,5 +89,20 @@ public class VisitorServiceImpl implements VisitorService {
     public void delete(Long id) {
         log.debug("Request to delete Visitor : {}", id);
         visitorRepository.deleteById(id);
+    }
+
+    @Override
+    public Long getVisitorIdOfCurrentUser() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return visitorRepository.findByUserId(userId).orElseThrow(() -> new EntityNotFoundException("Visitor not found for user")).getId();
+    }
+
+    @Override
+    public VisitorDTO getVisitorOfCurrentUser() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return visitorRepository
+            .findByUserId(userId)
+            .map(visitorMapper::toDto)
+            .orElseThrow(() -> new EntityNotFoundException("Visitor not found for current user"));
     }
 }

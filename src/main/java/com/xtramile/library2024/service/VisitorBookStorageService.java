@@ -1,9 +1,13 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.Visitor;
 import com.xtramile.library2024.domain.VisitorBookStorage;
 import com.xtramile.library2024.repository.VisitorBookStorageRepository;
 import com.xtramile.library2024.service.dto.VisitorBookStorageDTO;
+import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.service.mapper.VisitorBookStorageMapper;
+import com.xtramile.library2024.service.mapper.VisitorMapper;
+import com.xtramile.library2024.web.rest.vm.VisitorBookStorageVM;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +28,16 @@ public class VisitorBookStorageService {
     private final VisitorBookStorageRepository visitorBookStorageRepository;
 
     private final VisitorBookStorageMapper visitorBookStorageMapper;
+    private final VisitorMapper visitorMapper;
 
     public VisitorBookStorageService(
         VisitorBookStorageRepository visitorBookStorageRepository,
-        VisitorBookStorageMapper visitorBookStorageMapper
+        VisitorBookStorageMapper visitorBookStorageMapper,
+        VisitorMapper visitorMapper
     ) {
         this.visitorBookStorageRepository = visitorBookStorageRepository;
         this.visitorBookStorageMapper = visitorBookStorageMapper;
+        this.visitorMapper = visitorMapper;
     }
 
     /**
@@ -111,5 +118,10 @@ public class VisitorBookStorageService {
     public void delete(Long id) {
         log.debug("Request to delete VisitorBookStorage : {}", id);
         visitorBookStorageRepository.deleteById(id);
+    }
+
+    public Page<VisitorBookStorageVM> getVisitorBookStoragesForCurrentUser(VisitorDTO visitorDTO, Pageable pageable) {
+        Visitor visitor = visitorMapper.toEntity(visitorDTO);
+        return visitorBookStorageRepository.findByVisitor(visitor, pageable).map(visitorBookStorageMapper::toVm);
     }
 }

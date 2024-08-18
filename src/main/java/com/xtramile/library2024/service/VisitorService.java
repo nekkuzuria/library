@@ -63,4 +63,8 @@ public interface VisitorService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    Long getVisitorIdOfCurrentUser();
+
+    VisitorDTO getVisitorOfCurrentUser();
 }
