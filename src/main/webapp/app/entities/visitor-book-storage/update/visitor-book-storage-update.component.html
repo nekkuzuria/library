@@ -68,7 +68,7 @@
           <label class="form-label" for="field_book">Book</label>
           <select class="form-control" id="field_book" data-cy="book" name="book" formControlName="book" [compareWith]="compareBook">
             <option [ngValue]="null"></option>
-            @for (bookOption of booksCollection; track $index) {
+            @for (bookOption of booksSharedCollection; track $index) {
               <option [ngValue]="bookOption">{{ bookOption.id }}</option>
             }
           </select>

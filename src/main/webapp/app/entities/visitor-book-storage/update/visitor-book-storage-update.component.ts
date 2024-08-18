@@ -26,7 +26,7 @@ export class VisitorBookStorageUpdateComponent implements OnInit {
   visitorBookStorage: IVisitorBookStorage | null = null;
 
   visitorsSharedCollection: IVisitor[] = [];
-  booksCollection: IBook[] = [];
+  booksSharedCollection: IBook[] = [];
 
   protected visitorBookStorageService = inject(VisitorBookStorageService);
   protected visitorBookStorageFormService = inject(VisitorBookStorageFormService);
@@ -93,7 +93,7 @@ export class VisitorBookStorageUpdateComponent implements OnInit {
       this.visitorsSharedCollection,
       visitorBookStorage.visitor,
     );
-    this.booksCollection = this.bookService.addBookToCollectionIfMissing<IBook>(this.booksCollection, visitorBookStorage.book);
+    this.booksSharedCollection = this.bookService.addBookToCollectionIfMissing<IBook>(this.booksSharedCollection, visitorBookStorage.book);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -108,9 +108,9 @@ export class VisitorBookStorageUpdateComponent implements OnInit {
       .subscribe((visitors: IVisitor[]) => (this.visitorsSharedCollection = visitors));
 
     this.bookService
-      .query({ filter: 'visitorbookstorage-is-null' })
+      .query()
       .pipe(map((res: HttpResponse<IBook[]>) => res.body ?? []))
       .pipe(map((books: IBook[]) => this.bookService.addBookToCollectionIfMissing<IBook>(books, this.visitorBookStorage?.book)))
-      .subscribe((books: IBook[]) => (this.booksCollection = books));
+      .subscribe((books: IBook[]) => (this.booksSharedCollection = books));
   }
 }

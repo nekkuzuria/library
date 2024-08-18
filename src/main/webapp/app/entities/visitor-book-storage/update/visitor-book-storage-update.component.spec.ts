@@ -73,22 +73,26 @@ describe('VisitorBookStorage Management Update Component', () => {
       expect(comp.visitorsSharedCollection).toEqual(expectedCollection);
     });
 
-    it('Should call book query and add missing value', () => {
+    it('Should call Book query and add missing value', () => {
       const visitorBookStorage: IVisitorBookStorage = { id: 456 };
       const book: IBook = { id: 31716 };
       visitorBookStorage.book = book;
 
       const bookCollection: IBook[] = [{ id: 18544 }];
       jest.spyOn(bookService, 'query').mockReturnValue(of(new HttpResponse({ body: bookCollection })));
-      const expectedCollection: IBook[] = [book, ...bookCollection];
+      const additionalBooks = [book];
+      const expectedCollection: IBook[] = [...additionalBooks, ...bookCollection];
       jest.spyOn(bookService, 'addBookToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ visitorBookStorage });
       comp.ngOnInit();
 
       expect(bookService.query).toHaveBeenCalled();
-      expect(bookService.addBookToCollectionIfMissing).toHaveBeenCalledWith(bookCollection, book);
-      expect(comp.booksCollection).toEqual(expectedCollection);
+      expect(bookService.addBookToCollectionIfMissing).toHaveBeenCalledWith(
+        bookCollection,
+        ...additionalBooks.map(expect.objectContaining),
+      );
+      expect(comp.booksSharedCollection).toEqual(expectedCollection);
     });
 
     it('Should update editForm', () => {
@@ -102,7 +106,7 @@ describe('VisitorBookStorage Management Update Component', () => {
       comp.ngOnInit();
 
       expect(comp.visitorsSharedCollection).toContain(visitor);
-      expect(comp.booksCollection).toContain(book);
+      expect(comp.booksSharedCollection).toContain(book);
       expect(comp.visitorBookStorage).toEqual(visitorBookStorage);
     });
   });

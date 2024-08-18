@@ -31,12 +31,11 @@ public class VisitorBookStorage implements Serializable {
     private LocalDate returnDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "visitorBookStorages" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "visitorBookStorages", "address", "library", "user", "visits" }, allowSetters = true)
     private Visitor visitor;
 
-    @JsonIgnoreProperties(value = { "visitorBookStorage" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "bookStorage" }, allowSetters = true)
     private Book book;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

@@ -27,13 +27,11 @@
       "relationshipType": "many-to-one"
     },
     {
-      "id": false,
       "otherEntityField": "id",
       "otherEntityName": "book",
-      "otherEntityRelationshipName": "visitorBookStorage",
       "relationshipName": "book",
       "relationshipSide": "left",
-      "relationshipType": "one-to-one"
+      "relationshipType": "many-to-one"
     }
   ],
   "searchEngine": "no",
