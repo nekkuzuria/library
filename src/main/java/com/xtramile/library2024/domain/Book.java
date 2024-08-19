@@ -57,10 +57,6 @@ public class Book implements Serializable {
     @JsonIgnoreProperties(value = { "books", "library" }, allowSetters = true)
     private BookStorage bookStorage;
 
-    @JsonIgnoreProperties(value = { "visitor", "book" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "book")
-    private VisitorBookStorage visitorBookStorage;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -190,25 +186,6 @@ public class Book implements Serializable {
 
     public Book bookStorage(BookStorage bookStorage) {
         this.setBookStorage(bookStorage);
-        return this;
-    }
-
-    public VisitorBookStorage getVisitorBookStorage() {
-        return this.visitorBookStorage;
-    }
-
-    public void setVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
-        if (this.visitorBookStorage != null) {
-            this.visitorBookStorage.setBook(null);
-        }
-        if (visitorBookStorage != null) {
-            visitorBookStorage.setBook(this);
-        }
-        this.visitorBookStorage = visitorBookStorage;
-    }
-
-    public Book visitorBookStorage(VisitorBookStorage visitorBookStorage) {
-        this.setVisitorBookStorage(visitorBookStorage);
         return this;
     }
 

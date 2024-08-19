@@ -100,7 +100,6 @@ public class BookService {
     public List<BookDTO> findAllWhereVisitorBookStorageIsNull() {
         log.debug("Request to get all books where VisitorBookStorage is null");
         return StreamSupport.stream(bookRepository.findAll().spliterator(), false)
-            .filter(book -> book.getVisitorBookStorage() == null)
             .map(bookMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
