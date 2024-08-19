@@ -9,6 +9,7 @@ import NavbarComponent from './layouts/navbar/navbar.component';
 import LoginComponent from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { BookDetailComponent } from './book-detail/book-detail.component';
+import { PersonalStorageComponent } from './personal-storage/personal-storage.component';
 
 const routes: Routes = [
   {
@@ -48,6 +49,12 @@ const routes: Routes = [
     path: 'book-detail/:id',
     component: BookDetailComponent,
     title: 'book-detail.title',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'personal-storage',
+    component: PersonalStorageComponent,
+    title: 'personal-storage.title',
     canActivate: [UserRouteAccessService],
   },
   {
