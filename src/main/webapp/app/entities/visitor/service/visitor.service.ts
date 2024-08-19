@@ -78,6 +78,10 @@ export class VisitorService {
     return o1 && o2 ? this.getVisitorIdentifier(o1) === this.getVisitorIdentifier(o2) : o1 === o2;
   }
 
+  getVisitorId(): Observable<number> {
+    return this.http.get<number>(this.resourceUrl + '/visitor-id');
+  }
+
   addVisitorToCollectionIfMissing<Type extends Pick<IVisitor, 'id'>>(
     visitorCollection: Type[],
     ...visitorsToCheck: (Type | null | undefined)[]

@@ -1,6 +1,7 @@
 package com.xtramile.library2024.web.rest;
 
 import com.xtramile.library2024.repository.VisitorRepository;
+import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.VisitorService;
 import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
@@ -166,5 +167,15 @@ public class VisitorResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/visitor-id")
+    public ResponseEntity<Long> getVisitorId() {
+        Long visitorId = visitorService.getVisitorIdOfCurrentUser();
+        if (visitorId != null) {
+            return ResponseEntity.ok(visitorId);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
