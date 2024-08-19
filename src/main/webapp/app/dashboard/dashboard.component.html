@@ -1,25 +1,25 @@
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Library Book Collection</h2>
-
-  <!-- Search and Filter -->
-  <div class="row mb-4">
-    <div class="col-md-8">
+<div class="container p-5">
+  <div class="row mb-4 align-items-center">
+    <!-- Search Input -->
+    <div class="col-md d-flex justify-content-center">
       <input
         type="text"
-        class="form-control form-control-lg rounded-5"
+        class="form-control form-control-lg rounded-pill"
         placeholder="Search for books..."
         aria-label="Search"
         [(ngModel)]="searchQuery"
         (ngModelChange)="onSearch()"
       />
     </div>
-    <div class="col-md-4">
-      <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre"> </ng-select>
-    </div>
-  </div>
 
-  <div class="col-md-4 mb-4">
-    <ng-select [items]="sortOptions" [(ngModel)]="sortOption" (change)="sortBooks()" placeholder="Sort by"> </ng-select>
+    <!-- Filters and Sorting -->
+    <div class="col-md-4 d-flex justify-content-center gap-3 dropdown">
+      <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre" class="dropdown-item">
+      </ng-select>
+
+      <ng-select [items]="sortOptions" placeholder="Sort by" [(ngModel)]="sortOption" (change)="sortBooks()" class="dropdown-item">
+      </ng-select>
+    </div>
   </div>
 
   @if (books?.length === 0) {
@@ -29,16 +29,21 @@
   }
 
   @if (filteredBooks && filteredBooks.length > 0) {
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-sm-5 g-5">
       @for (book of filteredBooks; track trackId) {
         <div class="col">
-          <div class="card h-100 hover-shadow">
-            <img src="{{ book.cover }}" class="card-img-top" alt="Book Cover" style="height: 350px; object-fit: contain" />
+          <a [routerLink]="['/book-detail', book.id]" class="h-100">
+            <img
+              src="{{ book.cover }}"
+              class="rounded-5 shadow-lg bg-body rounded"
+              alt="Book Cover"
+              style="height: 250px; object-fit: contain"
+            />
             <div class="card-body text-center">
               <h5 class="card-title">{{ book.title }}</h5>
               <p class="card-text">{{ book.author }} - {{ book.year }}</p>
             </div>
-          </div>
+          </a>
         </div>
       }
     </div>

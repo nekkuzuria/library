@@ -9,13 +9,14 @@ import { Genre } from '../entities/enumerations/genre.model';
 import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective, CommonModule, FormsModule],
+  imports: [NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective, CommonModule, FormsModule, RouterModule],
 })
 export class DashboardComponent implements OnInit {
   books?: IBook[];
@@ -36,6 +37,7 @@ export class DashboardComponent implements OnInit {
   sortOptions = [
     { value: 'title', label: 'Sort by Title' },
     { value: 'author', label: 'Sort by Author' },
+    { value: 'year', label: 'Sort by Year' },
   ];
 
   constructor(private bookService: BookService) {}
@@ -83,6 +85,12 @@ export class DashboardComponent implements OnInit {
         const authorA = a.author ?? '';
         const authorB = b.author ?? '';
         return authorA.localeCompare(authorB);
+      });
+    } else if (sortValue === 'year') {
+      this.filteredBooks.sort((a, b) => {
+        const yearA = a.year ?? 0;
+        const yearB = b.year ?? 0;
+        return yearA - yearB;
       });
     }
   }
