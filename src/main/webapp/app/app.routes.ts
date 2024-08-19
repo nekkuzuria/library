@@ -8,6 +8,7 @@ import HomeComponent from './home/home.component';
 import NavbarComponent from './layouts/navbar/navbar.component';
 import LoginComponent from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { BookDetailComponent } from './book-detail/book-detail.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,12 @@ const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     title: 'dashboard.title',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'book-detail/:id',
+    component: BookDetailComponent,
+    title: 'book-detail.title',
     canActivate: [UserRouteAccessService],
   },
   {
