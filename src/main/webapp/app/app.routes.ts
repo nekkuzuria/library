@@ -15,8 +15,9 @@ import { LibraryVisitComponent } from './library-visit/library-visit.component';
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
-    title: 'home.title',
+    component: DashboardComponent,
+    title: 'dashboard.title',
+    canActivate: [UserRouteAccessService],
   },
   {
     path: '',
