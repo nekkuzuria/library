@@ -1,0 +1,41 @@
+<div class="container">
+  <h2 class="text-center mb-4">Library Visit History</h2>
+  <div class="row">
+    @if (visits?.length === 0) {
+      <div class="alert alert-warning" id="no-result">
+        <span>No visits found found</span>
+      </div>
+    } @else {
+      <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th>Number</th>
+            <th>Cover</th>
+            <th>Book</th>
+            <th>Borrow Date</th>
+            <th>Return Date</th>
+            <th>Visitor</th>
+            <th>Librarian</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (visit of visits; track trackId) {
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td><img [src]="visit.cover" alt="{{ visit.title }}" width="50" /></td>
+              <td>{{ visit.title }} <br />by {{ visit.author }}</td>
+              <td>{{ visit.borrowDate }}</td>
+              <td>{{ visit.returnDate ? visit.returnDate : 'Not returned' }}</td>
+              <td>{{ visit.visitorName }}</td>
+              <td>{{ visit.librarianName }}</td>
+              <td>
+                <button class="btn btn-primary">View Book</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

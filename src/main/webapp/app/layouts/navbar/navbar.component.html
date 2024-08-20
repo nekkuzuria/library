@@ -37,6 +37,14 @@
               </span>
             </a>
           </li>
+          <li *jhiHasAnyAuthority="'ROLE_ADMIN'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" routerLink="/library-visit" (click)="collapseNavbar()">
+              <span>
+                <fa-icon icon="th-list"></fa-icon>
+                <span>Library Visits</span>
+              </span>
+            </a>
+          </li>
           <li
             ngbDropdown
             class="nav-item dropdown pointer"
