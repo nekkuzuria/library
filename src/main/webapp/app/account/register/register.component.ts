@@ -18,7 +18,7 @@ import { RegisterService } from './register.service';
   templateUrl: './register.component.html',
 })
 export default class RegisterComponent implements OnInit, AfterViewInit {
-  login = viewChild.required<ElementRef>('login');
+  // login = viewChild.required<ElementRef>('login');
   libraries: IPublicLibrary[] = [];
   roles: string[] = [];
 
@@ -103,7 +103,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     this.roles = ['Visitor', 'Librarian'];
   }
   ngAfterViewInit(): void {
-    this.login().nativeElement.focus();
+    // this.login().nativeElement.focus();
   }
   loadLibraries(): void {
     this.publicService.query().subscribe({

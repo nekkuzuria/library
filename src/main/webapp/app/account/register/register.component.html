@@ -1,310 +1,324 @@
-<div class="container">
-  <div class="row">
-    <div class="col-12 col-md-6 d-none d-md-block">
-      <img
-        src="https://images.unsplash.com/photo-1604866830893-c13cafa515d5?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt="Login image"
-        class="w-100 vh-100"
-        style="object-fit: cover; object-position: left"
-      />
-    </div>
-    <div class="col-12 col-md-6">
-      <div class="p-3 p-md-4 p-xl-5">
-        <div class="row">
-          <div class="col-12">
-            <div>
-              <h2 class="h3">Register</h2>
-              @if (success()) {
-                <div class="alert alert-success"><strong>Registration saved!</strong> Please check your email for confirmation.</div>
-              }
-              @if (error()) {
-                <div class="alert alert-danger"><strong>Registration failed!</strong> Please try again later.</div>
-              }
-              @if (errorUserExists()) {
-                <div class="alert alert-danger"><strong>Login name already registered!</strong> Please choose another one.</div>
-              }
-              @if (errorEmailExists()) {
-                <div class="alert alert-danger"><strong>Email is already in use!</strong> Please choose another one.</div>
-              }
-              @if (doNotMatch()) {
-                <div class="alert alert-danger">The password and its confirmation do not match!</div>
-              }
-            </div>
-          </div>
-        </div>
-        @if (!success()) {
-          <hr class="mt-4 mb-2 border-secondary-subtle" />
-          <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
-            <div class="mb-3">
-              <label class="form-label" for="roleSelect">I am a <span class="text-danger">*</span></label>
-              <ng-select [items]="roles" id="roleSelect" placeholder="Select a role" formControlName="roleChoice"></ng-select>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="library">Choose Library <span class="text-danger">*</span></label>
-              <ng-select
-                [items]="libraries"
-                bindLabel="name"
-                bindValue="id"
-                placeholder="Select a library"
-                formControlName="libraryId"
-              ></ng-select>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="firstName"
-                  id="firstName"
-                  formControlName="firstName"
-                  placeholder="First Name"
-                  required
-                />
-              </div>
-              <div class="col-6">
-                <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  name="lastName"
-                  id="lastName"
-                  formControlName="lastName"
-                  placeholder="Last Name"
-                  required
-                />
+<section
+  class="bg-image"
+  style="
+    background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  "
+>
+  <div class="d-flex align-items-center h-100">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 p-3 p-md-4 p-xl-5">
+          <div class="card p-5" style="border-radius: 15px">
+            <div class="card-body">
+              <div>
+                <h2 class="text-uppercase text-center mb-3">Join the Book Club!</h2>
+                <h4 class="text-center mb-3">Sign Up Here</h4>
+                @if (success()) {
+                  <div class="alert alert-success"><strong>Registration saved!</strong> Please check your email for confirmation.</div>
+                }
+                @if (error()) {
+                  <div class="alert alert-danger"><strong>Registration failed!</strong> Please try again later.</div>
+                }
+                @if (errorUserExists()) {
+                  <div class="alert alert-danger"><strong>Login name already registered!</strong> Please choose another one.</div>
+                }
+                @if (errorEmailExists()) {
+                  <div class="alert alert-danger"><strong>Email is already in use!</strong> Please choose another one.</div>
+                }
+                @if (doNotMatch()) {
+                  <div class="alert alert-danger">The password and its confirmation do not match!</div>
+                }
               </div>
             </div>
+            @if (!success()) {
+              <hr class="mt-4 mb-2 border-secondary-subtle" />
+              <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
+                <div class="row mb-4">
+                  <div class="col-md-6 col-12">
+                    <label class="form-label" for="roleSelect">I am a <span class="text-danger">*</span></label>
+                    <div class="form-control">
+                      <ng-select [items]="roles" id="roleSelect" placeholder="Select a role" formControlName="roleChoice"></ng-select>
+                    </div>
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label" for="field_dateOfBirth">Date Of Birth<span class="text-danger">*</span></label>
-              <div class="input-group">
-                <input
-                  id="field_dateOfBirth"
-                  data-cy="dateOfBirth"
-                  type="text"
-                  class="form-control"
-                  name="dateOfBirth"
-                  ngbDatepicker
-                  #dateOfBirthDp="ngbDatepicker"
-                  formControlName="dateOfBirth"
-                />
-                <button type="button" class="btn btn-secondary" (click)="dateOfBirthDp.toggle()">
-                  <fa-icon icon="calendar-alt"></fa-icon>
-                </button>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="phoneNumber">Phone Number<span class="text-danger">*</span></label>
-              <input
-                type="text"
-                class="form-control"
-                id="phoneNumber"
-                name="phoneNumber"
-                placeholder="Your phone number"
-                formControlName="phoneNumber"
-                data-cy="phoneNumber"
-              />
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label" for="address">Street Address<span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  placeholder="Your address"
-                  formControlName="streetAddress"
-                  data-cy="address"
-                />
-              </div>
-              <div class="col-6">
-                <label class="form-label" for="address">Postal Code<span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  placeholder="Your address"
-                  formControlName="postalCode"
-                  data-cy="address"
-                />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label" for="address">City<span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  placeholder="Your address"
-                  formControlName="city"
-                  data-cy="address"
-                />
-              </div>
-              <div class="col-6">
-                <label class="form-label" for="address">Province<span class="text-danger">*</span></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="address"
-                  name="address"
-                  placeholder="Your address"
-                  formControlName="stateProvince"
-                  data-cy="address"
-                />
-              </div>
-            </div>
-
-            <hr class="mt-4 mb-2 border-secondary-subtle" />
-
-            <div class="mb-3">
-              <label class="form-label" for="login">Username<span class="text-danger">*</span></label>
-              <input
-                type="text"
-                class="form-control"
-                id="login"
-                name="login"
-                placeholder="Your username"
-                formControlName="login"
-                data-cy="username"
-                #login
-              />
-
-              @if (registerForm.get('login')!.invalid && (registerForm.get('login')!.dirty || registerForm.get('login')!.touched)) {
-                <div>
-                  @if (registerForm.get('login')?.errors?.required) {
-                    <small class="form-text text-danger">Your username is required.</small>
-                  }
-
-                  @if (registerForm.get('login')?.errors?.minlength) {
-                    <small class="form-text text-danger">Your username is required to be at least 1 character.</small>
-                  }
-
-                  @if (registerForm.get('login')?.errors?.maxlength) {
-                    <small class="form-text text-danger">Your username cannot be longer than 50 characters.</small>
-                  }
-
-                  @if (registerForm.get('login')?.errors?.pattern) {
-                    <small class="form-text text-danger">Your username is invalid.</small>
-                  }
+                  <div class="col-md-6 col-12">
+                    <label class="form-label" for="library">Choose Library <span class="text-danger">*</span></label>
+                    <div class="form-control">
+                      <ng-select
+                        [items]="libraries"
+                        bindLabel="name"
+                        bindValue="id"
+                        placeholder="Select a library"
+                        formControlName="libraryId"
+                      ></ng-select>
+                    </div>
+                  </div>
                 </div>
-              }
-            </div>
 
-            <div class="col-12 mb-3">
-              <label class="form-label" for="email">Email<span class="text-danger">*</span></label>
-              <input
-                type="email"
-                class="form-control"
-                id="email"
-                name="email"
-                placeholder="Your email"
-                formControlName="email"
-                data-cy="email"
-              />
-              @if (registerForm.get('email')!.invalid && (registerForm.get('email')!.dirty || registerForm.get('email')!.touched)) {
-                <div>
-                  @if (registerForm.get('email')?.errors?.required) {
-                    <small class="form-text text-danger">Your email is required.</small>
-                  }
-
-                  @if (registerForm.get('email')?.errors?.invalid) {
-                    <small class="form-text text-danger">Your email is invalid.</small>
-                  }
-
-                  @if (registerForm.get('email')?.errors?.minlength) {
-                    <small class="form-text text-danger">Your email is required to be at least 5 characters.</small>
-                  }
-
-                  @if (registerForm.get('email')?.errors?.maxlength) {
-                    <small class="form-text text-danger">Your email cannot be longer than 50 characters.</small>
-                  }
+                <div class="row mb-3">
+                  <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      name="firstName"
+                      id="firstName"
+                      formControlName="firstName"
+                      placeholder="First Name"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      name="lastName"
+                      id="lastName"
+                      formControlName="lastName"
+                      placeholder="Last Name"
+                      required
+                    />
+                  </div>
                 </div>
-              }
-            </div>
 
-            <div class="mb-3">
-              <label class="form-label" for="password">Password<span class="text-danger">*</span></label>
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                placeholder="New password"
-                formControlName="password"
-                data-cy="firstPassword"
-              />
-              @if (
-                registerForm.get('password')!.invalid && (registerForm.get('password')!.dirty || registerForm.get('password')!.touched)
-              ) {
-                <div>
-                  @if (registerForm.get('password')?.errors?.required) {
-                    <small class="form-text text-danger">Your password is required.</small>
-                  }
-
-                  @if (registerForm.get('password')?.errors?.minlength) {
-                    <small class="form-text text-danger">Your password is required to be at least 4 characters.</small>
-                  }
-
-                  @if (registerForm.get('password')?.errors?.maxlength) {
-                    <small class="form-text text-danger">Your password cannot be longer than 50 characters.</small>
-                  }
+                <div class="mb-3">
+                  <label class="form-label" for="field_dateOfBirth">Date Of Birth<span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input
+                      id="field_dateOfBirth"
+                      data-cy="dateOfBirth"
+                      type="text"
+                      class="form-control rounded-start-5"
+                      name="dateOfBirth"
+                      ngbDatepicker
+                      #dateOfBirthDp="ngbDatepicker"
+                      formControlName="dateOfBirth"
+                    />
+                    <button type="button" class="btn btn-secondary" (click)="dateOfBirthDp.toggle()">
+                      <fa-icon icon="calendar-alt"></fa-icon>
+                    </button>
+                  </div>
                 </div>
-              }
-            </div>
 
-            <div class="mb-3">
-              <label class="form-label" for="confirmPassword">Password confirmation<span class="text-danger">*</span></label>
-              <input
-                type="password"
-                class="form-control"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm the new password"
-                formControlName="confirmPassword"
-                data-cy="secondPassword"
-              />
-              @if (
-                registerForm.get('confirmPassword')!.invalid &&
-                (registerForm.get('confirmPassword')!.dirty || registerForm.get('confirmPassword')!.touched)
-              ) {
-                <div>
-                  @if (registerForm.get('confirmPassword')?.errors?.required) {
-                    <small class="form-text text-danger">Your confirmation password is required.</small>
-                  }
-
-                  @if (registerForm.get('confirmPassword')?.errors?.minlength) {
-                    <small class="form-text text-danger">Your confirmation password is required to be at least 4 characters.</small>
-                  }
-
-                  @if (registerForm.get('confirmPassword')?.errors?.maxlength) {
-                    <small class="form-text text-danger">Your confirmation password cannot be longer than 50 characters.</small>
-                  }
+                <div class="mb-3">
+                  <label class="form-label" for="phoneNumber">Phone Number<span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    class="form-control rounded-5"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    placeholder="Your phone number"
+                    formControlName="phoneNumber"
+                    data-cy="phoneNumber"
+                  />
                 </div>
-              }
-            </div>
 
-            <button type="submit" class="mb-3 mt-3 btn btn-primary w-100" data-cy="submit">Register</button>
-          </form>
-        }
-        <div class="row">
-          <div class="col-12">
-            <hr class="mt-5 mb-4 border-secondary-subtle" />
-            <p class="m-0 text-secondary text-center">
-              Already have an account? <a href="/login" class="link-primary text-decoration-none">Sign in</a>
-            </p>
+                <div class="row mb-3">
+                  <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <label class="form-label" for="address">Street Address<span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      id="address"
+                      name="address"
+                      placeholder="Your address"
+                      formControlName="streetAddress"
+                      data-cy="address"
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label" for="address">Postal Code<span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      id="address"
+                      name="address"
+                      placeholder="Your address"
+                      formControlName="postalCode"
+                      data-cy="address"
+                    />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6 mb-3 col-6">
+                    <label class="form-label" for="address">City<span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      id="address"
+                      name="address"
+                      placeholder="Your address"
+                      formControlName="city"
+                      data-cy="address"
+                    />
+                  </div>
+                  <div class="col-6 col-md-6 mb-3">
+                    <label class="form-label" for="address">Province<span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      id="address"
+                      name="address"
+                      placeholder="Your address"
+                      formControlName="stateProvince"
+                      data-cy="address"
+                    />
+                  </div>
+                </div>
+
+                <hr class="mb-4 border-black" />
+
+                <div class="row mb-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label" for="login">Username<span class="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      class="form-control rounded-5"
+                      id="login"
+                      name="login"
+                      placeholder="Your username"
+                      formControlName="login"
+                      data-cy="username"
+                      #login
+                    />
+
+                    @if (registerForm.get('login')!.invalid && (registerForm.get('login')!.dirty || registerForm.get('login')!.touched)) {
+                      <div>
+                        @if (registerForm.get('login')?.errors?.required) {
+                          <small class="form-text text-danger">Your username is required.</small>
+                        }
+
+                        @if (registerForm.get('login')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your username is required to be at least 1 character.</small>
+                        }
+
+                        @if (registerForm.get('login')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your username cannot be longer than 50 characters.</small>
+                        }
+
+                        @if (registerForm.get('login')?.errors?.pattern) {
+                          <small class="form-text text-danger">Your username is invalid.</small>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label class="form-label" for="email">Email<span class="text-danger">*</span></label>
+                    <input
+                      type="email"
+                      class="form-control rounded-5"
+                      id="email"
+                      name="email"
+                      placeholder="Your email"
+                      formControlName="email"
+                      data-cy="email"
+                    />
+                    @if (registerForm.get('email')!.invalid && (registerForm.get('email')!.dirty || registerForm.get('email')!.touched)) {
+                      <div>
+                        @if (registerForm.get('email')?.errors?.required) {
+                          <small class="form-text text-danger">Your email is required.</small>
+                        }
+
+                        @if (registerForm.get('email')?.errors?.invalid) {
+                          <small class="form-text text-danger">Your email is invalid.</small>
+                        }
+
+                        @if (registerForm.get('email')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your email is required to be at least 5 characters.</small>
+                        }
+
+                        @if (registerForm.get('email')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your email cannot be longer than 50 characters.</small>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-6 col-12">
+                    <label class="form-label" for="password">Password<span class="text-danger">*</span></label>
+                    <input
+                      type="password"
+                      class="form-control rounded-5"
+                      id="password"
+                      name="password"
+                      placeholder="New password"
+                      formControlName="password"
+                      data-cy="firstPassword"
+                    />
+                    @if (
+                      registerForm.get('password')!.invalid &&
+                      (registerForm.get('password')!.dirty || registerForm.get('password')!.touched)
+                    ) {
+                      <div>
+                        @if (registerForm.get('password')?.errors?.required) {
+                          <small class="form-text text-danger">Your password is required.</small>
+                        }
+
+                        @if (registerForm.get('password')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your password is required to be at least 4 characters.</small>
+                        }
+
+                        @if (registerForm.get('password')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your password cannot be longer than 50 characters.</small>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-md-6 col-12">
+                    <label class="form-label" for="confirmPassword">Password confirmation<span class="text-danger">*</span></label>
+                    <input
+                      type="password"
+                      class="form-control rounded-5"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Confirm the new password"
+                      formControlName="confirmPassword"
+                      data-cy="secondPassword"
+                    />
+                    @if (
+                      registerForm.get('confirmPassword')!.invalid &&
+                      (registerForm.get('confirmPassword')!.dirty || registerForm.get('confirmPassword')!.touched)
+                    ) {
+                      <div>
+                        @if (registerForm.get('confirmPassword')?.errors?.required) {
+                          <small class="form-text text-danger">Your confirmation password is required.</small>
+                        }
+
+                        @if (registerForm.get('confirmPassword')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your confirmation password is required to be at least 4 characters.</small>
+                        }
+
+                        @if (registerForm.get('confirmPassword')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your confirmation password cannot be longer than 50 characters.</small>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit">Register</button>
+              </form>
+            }
+            <div class="row">
+              <div class="col-12">
+                <hr class="mt-5 mb-4 border-secondary-subtle" />
+                <p class="m-0 text-secondary text-center">
+                  Already have an account? <a href="/login" class="link-primary text-decoration-none">Sign in</a>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
