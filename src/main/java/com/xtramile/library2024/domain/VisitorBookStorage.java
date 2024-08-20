@@ -40,6 +40,9 @@ public class VisitorBookStorage implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     public Long getId() {
         return this.id;
     }
@@ -106,6 +109,13 @@ public class VisitorBookStorage implements Serializable {
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 
     @Override
     public boolean equals(Object o) {

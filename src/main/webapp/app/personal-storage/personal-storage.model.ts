@@ -12,4 +12,5 @@ export interface IPersonalStorage {
   cover?: string | null;
   borrowDate?: dayjs.Dayjs | null;
   returnDate?: dayjs.Dayjs | null;
+  quantity: number;
 }

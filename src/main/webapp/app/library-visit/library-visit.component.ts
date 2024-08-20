@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { LibraryVisitService } from './librrary-visit.service';
 import { IVisitVM } from './library-visit.model';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'jhi-library-visit',
   standalone: true,
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './library-visit.component.html',
   styleUrl: './library-visit.component.scss',
 })

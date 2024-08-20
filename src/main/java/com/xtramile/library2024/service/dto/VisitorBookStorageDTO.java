@@ -20,6 +20,8 @@ public class VisitorBookStorageDTO implements Serializable {
 
     private BookDTO book;
 
+    private Integer quantity;
+
     public Long getId() {
         return id;
     }
@@ -58,6 +60,14 @@ public class VisitorBookStorageDTO implements Serializable {
 
     public void setBook(BookDTO book) {
         this.book = book;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     @Override

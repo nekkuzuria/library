@@ -40,7 +40,8 @@ public interface VisitorBookStorageMapper extends EntityMapper<VisitorBookStorag
             e.getBook().getAuthor(),
             e.getBook().getCover(),
             e.getBorrowDate(),
-            e.getReturnDate()
+            e.getReturnDate(),
+            e.getQuantity()
         );
         return vm;
     }

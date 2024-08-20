@@ -83,6 +83,7 @@ export class BookDetailComponent implements OnInit {
             book: { id: this.book!.id },
             borrowDate: dayjs().startOf('day'),
             returnDate: null,
+            quantity: this.selectedQuantity,
           };
 
           this.visitorBookStorageService.create(newRecord).subscribe(() => {

@@ -33,4 +33,6 @@ public class VisitorBookStorageVM {
     private LocalDate borrowDate;
 
     private LocalDate returnDate;
+
+    private Integer quantity;
 }

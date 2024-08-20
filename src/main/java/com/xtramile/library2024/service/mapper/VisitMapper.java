@@ -44,7 +44,8 @@ public interface VisitMapper extends EntityMapper<VisitDTO, Visit> {
             visit.getLibrarian().getId(),
             visit.getLibrarian().getName(),
             visit.getVisitor().getId(),
-            visit.getVisitor().getName()
+            visit.getVisitor().getName(),
+            visit.getVisitorBookStorage().getQuantity()
         );
         return vm;
     }

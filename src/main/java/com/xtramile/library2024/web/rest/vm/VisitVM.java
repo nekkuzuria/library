@@ -36,4 +36,6 @@ public class VisitVM {
     private Long visitorId;
 
     private String visitorName;
+
+    private Integer quantity;
 }

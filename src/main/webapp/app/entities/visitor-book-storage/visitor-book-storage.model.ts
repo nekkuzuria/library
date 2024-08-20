@@ -8,6 +8,7 @@ export interface IVisitorBookStorage {
   returnDate?: dayjs.Dayjs | null;
   visitor?: Pick<IVisitor, 'id'> | null;
   book?: Pick<IBook, 'id'> | null;
+  quantity?: number | null;
 }
 
 export type NewVisitorBookStorage = Omit<IVisitorBookStorage, 'id'> & { id: null };

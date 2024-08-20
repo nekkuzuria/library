@@ -14,4 +14,5 @@ export interface IVisitVM {
   librarianName: string;
   visitorId: number;
   visitorName: string;
+  quantity: number;
 }
