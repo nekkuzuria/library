@@ -43,6 +43,16 @@
               </div>
             }
           </dd>
+          <dt><span>Visitor Book Storage</span></dt>
+          <dd>
+            @if (visit()!.visitorBookStorage) {
+              <div>
+                <a [routerLink]="['/visitor-book-storage', visit()!.visitorBookStorage?.id, 'view']">{{
+                  visit()!.visitorBookStorage?.id
+                }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

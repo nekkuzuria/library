@@ -63,4 +63,6 @@ public interface LibrarianService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    LibrarianDTO getLibrarianOfCurrentUser();
 }

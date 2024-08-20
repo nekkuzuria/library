@@ -41,6 +41,10 @@ public class Visit implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visits", "visitor", "book" }, allowSetters = true)
+    private VisitorBookStorage visitorBookStorage;
+
     public Long getId() {
         return this.id;
     }
@@ -107,6 +111,14 @@ public class Visit implements Serializable {
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    public VisitorBookStorage getVisitorBookStorage() {
+        return visitorBookStorage;
+    }
+
+    public void setVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        this.visitorBookStorage = visitorBookStorage;
+    }
 
     @Override
     public boolean equals(Object o) {

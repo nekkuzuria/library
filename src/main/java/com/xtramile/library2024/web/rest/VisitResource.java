@@ -1,9 +1,13 @@
 package com.xtramile.library2024.web.rest;
 
 import com.xtramile.library2024.repository.VisitRepository;
+import com.xtramile.library2024.service.LibrarianService;
+import com.xtramile.library2024.service.LibraryService;
 import com.xtramile.library2024.service.VisitService;
+import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.dto.VisitDTO;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
+import com.xtramile.library2024.web.rest.vm.VisitVM;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -40,9 +44,17 @@ public class VisitResource {
 
     private final VisitRepository visitRepository;
 
-    public VisitResource(VisitService visitService, VisitRepository visitRepository) {
+    private final LibraryService libraryService;
+
+    public VisitResource(
+        VisitService visitService,
+        VisitRepository visitRepository,
+        LibrarianService librarianService,
+        LibraryService libraryService
+    ) {
         this.visitService = visitService;
         this.visitRepository = visitRepository;
+        this.libraryService = libraryService;
     }
 
     /**
@@ -143,6 +155,16 @@ public class VisitResource {
     public ResponseEntity<List<VisitDTO>> getAllVisits(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Visits");
         Page<VisitDTO> page = visitService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @GetMapping("/my-library")
+    public ResponseEntity<List<VisitVM>> getCurrentUserLibraryVisits(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        log.debug("REST request to get a page of Visits of current user's library");
+        LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentLibrarian();
+
+        Page<VisitVM> page = visitService.getVisitsForCurrentUserLibrary(libraryDTO, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

@@ -24,6 +24,7 @@ describe('Visit Form Service', () => {
             library: expect.any(Object),
             librarian: expect.any(Object),
             visitor: expect.any(Object),
+            visitorBookStorage: expect.any(Object),
           }),
         );
       });
@@ -38,6 +39,7 @@ describe('Visit Form Service', () => {
             library: expect.any(Object),
             librarian: expect.any(Object),
             visitor: expect.any(Object),
+            visitorBookStorage: expect.any(Object),
           }),
         );
       });

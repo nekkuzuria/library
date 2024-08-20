@@ -20,6 +20,8 @@ public class VisitDTO implements Serializable {
 
     private VisitorDTO visitor;
 
+    private VisitorBookStorageDTO visitorBookStorageDTO;
+
     public Long getId() {
         return id;
     }
@@ -60,6 +62,14 @@ public class VisitDTO implements Serializable {
         this.visitor = visitor;
     }
 
+    public VisitorBookStorageDTO getVisitorBookStorage() {
+        return visitorBookStorageDTO;
+    }
+
+    public void setVisitorBookStorage(VisitorBookStorageDTO visitorBookStorageDTO) {
+        this.visitorBookStorageDTO = visitorBookStorageDTO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,6 +100,7 @@ public class VisitDTO implements Serializable {
             ", library=" + getLibrary() +
             ", librarian=" + getLibrarian() +
             ", visitor=" + getVisitor() +
+            ", visitorBookStorage=" + getVisitorBookStorage() +
             "}";
     }
 }

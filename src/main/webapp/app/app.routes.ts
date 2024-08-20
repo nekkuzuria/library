@@ -10,6 +10,7 @@ import LoginComponent from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { BookDetailComponent } from './book-detail/book-detail.component';
 import { PersonalStorageComponent } from './personal-storage/personal-storage.component';
+import { LibraryVisitComponent } from './library-visit/library-visit.component';
 
 const routes: Routes = [
   {
@@ -55,6 +56,12 @@ const routes: Routes = [
     path: 'personal-storage',
     component: PersonalStorageComponent,
     title: 'personal-storage.title',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'library-visit',
+    component: LibraryVisitComponent,
+    title: 'library-visit.title',
     canActivate: [UserRouteAccessService],
   },
   {

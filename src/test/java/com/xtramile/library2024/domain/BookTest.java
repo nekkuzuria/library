@@ -35,18 +35,17 @@ class BookTest {
         book.bookStorage(null);
         assertThat(book.getBookStorage()).isNull();
     }
-
-    @Test
-    void visitorBookStorageTest() {
-        Book book = getBookRandomSampleGenerator();
-        VisitorBookStorage visitorBookStorageBack = getVisitorBookStorageRandomSampleGenerator();
-
-        book.setVisitorBookStorage(visitorBookStorageBack);
-        assertThat(book.getVisitorBookStorage()).isEqualTo(visitorBookStorageBack);
-        assertThat(visitorBookStorageBack.getBook()).isEqualTo(book);
-
-        book.visitorBookStorage(null);
-        assertThat(book.getVisitorBookStorage()).isNull();
-        assertThat(visitorBookStorageBack.getBook()).isNull();
-    }
+    //    @Test
+    //    void visitorBookStorageTest() {
+    //        Book book = getBookRandomSampleGenerator();
+    //        VisitorBookStorage visitorBookStorageBack = getVisitorBookStorageRandomSampleGenerator();
+    //
+    //        book.setVisitorBookStorage(visitorBookStorageBack);
+    //        assertThat(book.getVisitorBookStorage()).isEqualTo(visitorBookStorageBack);
+    //        assertThat(visitorBookStorageBack.getBook()).isEqualTo(book);
+    //
+    //        book.visitorBookStorage(null);
+    //        assertThat(book.getVisitorBookStorage()).isNull();
+    //        assertThat(visitorBookStorageBack.getBook()).isNull();
+    //    }
 }

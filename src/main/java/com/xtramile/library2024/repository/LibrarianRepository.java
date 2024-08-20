@@ -37,4 +37,7 @@ public interface LibrarianRepository extends JpaRepository<Librarian, Long> {
 
     @Query("select librarian from Librarian librarian left join fetch librarian.user where librarian.id =:id")
     Optional<Librarian> findOneWithToOneRelationships(@Param("id") Long id);
+
+    @Query("select librarian from Librarian librarian where librarian.user.id = :userId")
+    Optional<Librarian> findByUserId(@Param("userId") Long userId);
 }

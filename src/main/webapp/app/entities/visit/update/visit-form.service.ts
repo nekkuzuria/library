@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { IVisit, NewVisit } from '../visit.model';
+import { IVisitorBookStorage } from 'app/entities/visitor-book-storage/visitor-book-storage.model';
 
 /**
  * A partial Type with required key is used as form input.

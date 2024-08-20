@@ -1,13 +1,8 @@
 package com.xtramile.library2024.service.mapper;
 
-import com.xtramile.library2024.domain.Librarian;
-import com.xtramile.library2024.domain.Library;
-import com.xtramile.library2024.domain.Visit;
-import com.xtramile.library2024.domain.Visitor;
-import com.xtramile.library2024.service.dto.LibrarianDTO;
-import com.xtramile.library2024.service.dto.LibraryDTO;
-import com.xtramile.library2024.service.dto.VisitDTO;
-import com.xtramile.library2024.service.dto.VisitorDTO;
+import com.xtramile.library2024.domain.*;
+import com.xtramile.library2024.service.dto.*;
+import com.xtramile.library2024.web.rest.vm.VisitVM;
 import org.mapstruct.*;
 
 /**
@@ -34,4 +29,23 @@ public interface VisitMapper extends EntityMapper<VisitDTO, Visit> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     VisitorDTO toDtoVisitorId(Visitor visitor);
+
+    default VisitVM toVm(Visit visit) {
+        VisitVM vm = new VisitVM(
+            visit.getId(),
+            visit.getVisitorBookStorage().getBook().getId(),
+            visit.getVisitorBookStorage().getBook().getTitle(),
+            visit.getVisitorBookStorage().getBook().getType(),
+            visit.getVisitorBookStorage().getBook().getAuthor(),
+            visit.getVisitorBookStorage().getBook().getCover(),
+            visit.getVisitorBookStorage().getId(),
+            visit.getVisitorBookStorage().getBorrowDate(),
+            visit.getVisitorBookStorage().getReturnDate(),
+            visit.getLibrarian().getId(),
+            visit.getLibrarian().getName(),
+            visit.getVisitor().getId(),
+            visit.getVisitor().getName()
+        );
+        return vm;
+    }
 }

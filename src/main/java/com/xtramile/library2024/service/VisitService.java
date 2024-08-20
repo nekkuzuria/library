@@ -1,9 +1,13 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.Library;
 import com.xtramile.library2024.domain.Visit;
 import com.xtramile.library2024.repository.VisitRepository;
+import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.dto.VisitDTO;
+import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.service.mapper.VisitMapper;
+import com.xtramile.library2024.web.rest.vm.VisitVM;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +29,12 @@ public class VisitService {
 
     private final VisitMapper visitMapper;
 
-    public VisitService(VisitRepository visitRepository, VisitMapper visitMapper) {
+    private final LibraryMapper libraryMapper;
+
+    public VisitService(VisitRepository visitRepository, VisitMapper visitMapper, LibraryMapper libraryMapper) {
         this.visitRepository = visitRepository;
         this.visitMapper = visitMapper;
+        this.libraryMapper = libraryMapper;
     }
 
     /**
@@ -108,5 +115,10 @@ public class VisitService {
     public void delete(Long id) {
         log.debug("Request to delete Visit : {}", id);
         visitRepository.deleteById(id);
+    }
+
+    public Page<VisitVM> getVisitsForCurrentUserLibrary(LibraryDTO libraryDTO, Pageable pageable) {
+        Library library = libraryMapper.toEntity(libraryDTO);
+        return visitRepository.findByLibrary(library, pageable).map(visitMapper::toVm);
     }
 }

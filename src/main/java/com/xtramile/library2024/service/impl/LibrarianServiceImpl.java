@@ -2,9 +2,11 @@ package com.xtramile.library2024.service.impl;
 
 import com.xtramile.library2024.domain.Librarian;
 import com.xtramile.library2024.repository.LibrarianRepository;
+import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.LibrarianService;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.mapper.LibrarianMapper;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -87,5 +89,14 @@ public class LibrarianServiceImpl implements LibrarianService {
     public void delete(Long id) {
         log.debug("Request to delete Librarian : {}", id);
         librarianRepository.deleteById(id);
+    }
+
+    @Override
+    public LibrarianDTO getLibrarianOfCurrentUser() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return librarianRepository
+            .findByUserId(userId)
+            .map(librarianMapper::toDto)
+            .orElseThrow(() -> new EntityNotFoundException("Librarian not found for current user"));
     }
 }

@@ -2,6 +2,7 @@ package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.Library;
 import com.xtramile.library2024.repository.LibraryRepository;
+import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.web.rest.vm.LibraryVM;
@@ -28,9 +29,12 @@ public class LibraryService {
 
     private final LibraryMapper libraryMapper;
 
-    public LibraryService(LibraryRepository libraryRepository, LibraryMapper libraryMapper) {
+    private final LibrarianService librarianService;
+
+    public LibraryService(LibraryRepository libraryRepository, LibraryMapper libraryMapper, LibrarianService librarianService) {
         this.libraryRepository = libraryRepository;
         this.libraryMapper = libraryMapper;
+        this.librarianService = librarianService;
     }
 
     /**
@@ -121,5 +125,11 @@ public class LibraryService {
             .stream()
             .<LibraryVM>map(library -> LibraryVM.builder().id(library.getId()).name(library.getName()).build())
             .collect(Collectors.toList());
+    }
+
+    public LibraryDTO getLibraryOfCurrentLibrarian() {
+        log.debug("Request to get Library of current librarian");
+        LibrarianDTO librarianDTO = librarianService.getLibrarianOfCurrentUser();
+        return librarianDTO.getLibrary();
     }
 }
