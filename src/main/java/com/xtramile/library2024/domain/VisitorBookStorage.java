@@ -14,7 +14,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "visitor_book_storage")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class VisitorBookStorage implements Serializable {
+public class VisitorBookStorage extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -141,6 +141,10 @@ public class VisitorBookStorage implements Serializable {
             "id=" + getId() +
             ", borrowDate='" + getBorrowDate() + "'" +
             ", returnDate='" + getReturnDate() + "'" +
-            "}";
+            ", createdBy='" + getCreatedBy() + "'" +
+            ", createdDate=" + getCreatedDate() + "'" +
+            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
+            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
+            '}';
     }
 }

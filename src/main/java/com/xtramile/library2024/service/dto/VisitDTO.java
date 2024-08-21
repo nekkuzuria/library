@@ -1,6 +1,7 @@
 package com.xtramile.library2024.service.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -21,6 +22,14 @@ public class VisitDTO implements Serializable {
     private VisitorDTO visitor;
 
     private VisitorBookStorageDTO visitorBookStorageDTO;
+
+    private String createdBy;
+
+    private Instant createdDate;
+
+    private String lastModifiedBy;
+
+    private Instant lastModifiedDate;
 
     public Long getId() {
         return id;
@@ -70,6 +79,38 @@ public class VisitDTO implements Serializable {
         this.visitorBookStorageDTO = visitorBookStorageDTO;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -97,10 +138,14 @@ public class VisitDTO implements Serializable {
         return "VisitDTO{" +
             "id=" + getId() +
             ", date='" + getDate() + "'" +
-            ", library=" + getLibrary() +
-            ", librarian=" + getLibrarian() +
-            ", visitor=" + getVisitor() +
-            ", visitorBookStorage=" + getVisitorBookStorage() +
-            "}";
+            ", library=" + getLibrary() + "'" +
+            ", librarian=" + getLibrarian() + "'" +
+            ", visitor=" + getVisitor() + "'" +
+            ", visitorBookStorage=" + getVisitorBookStorage() + "'" +
+            ", createdBy='" + getCreatedBy() + "'" +
+            ", createdDate=" + getCreatedDate() + "'" +
+            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
+            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
+            '}';
     }
 }

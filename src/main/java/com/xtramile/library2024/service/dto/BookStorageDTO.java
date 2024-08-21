@@ -1,6 +1,7 @@
 package com.xtramile.library2024.service.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -14,6 +15,14 @@ public class BookStorageDTO implements Serializable {
     private Integer quantity;
 
     private LibraryDTO library;
+
+    private String createdBy;
+
+    private Instant createdDate;
+
+    private String lastModifiedBy;
+
+    private Instant lastModifiedDate;
 
     public Long getId() {
         return id;
@@ -37,6 +46,38 @@ public class BookStorageDTO implements Serializable {
 
     public void setLibrary(LibraryDTO library) {
         this.library = library;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override
@@ -66,7 +107,11 @@ public class BookStorageDTO implements Serializable {
         return "BookStorageDTO{" +
             "id=" + getId() +
             ", quantity=" + getQuantity() +
-            ", library=" + getLibrary() +
-            "}";
+            ", library=" + getLibrary() + "'" +
+            ", createdBy='" + getCreatedBy() + "'" +
+            ", createdDate=" + getCreatedDate() + "'" +
+            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
+            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
+            '}';
     }
 }

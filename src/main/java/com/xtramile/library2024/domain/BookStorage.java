@@ -15,7 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "book_storage")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class BookStorage implements Serializable {
+public class BookStorage extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -133,7 +133,11 @@ public class BookStorage implements Serializable {
     public String toString() {
         return "BookStorage{" +
             "id=" + getId() +
-            ", quantity=" + getQuantity() +
-            "}";
+            ", quantity=" + getQuantity() + "'" +
+            ", createdBy='" + getCreatedBy() + "'" +
+            ", createdDate=" + getCreatedDate() + "'" +
+            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
+            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
+            '}';
     }
 }

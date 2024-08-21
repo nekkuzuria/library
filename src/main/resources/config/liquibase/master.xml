@@ -30,4 +30,5 @@
     <include file="config/liquibase/changelog/20240819113500_added_column_and_constraint_Visit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240820110000_added_quantity_to_VisitorBookStorage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240820160000_added_entity_PendingTask.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240821100000_added_columns_AbstractAuditingEntity.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
