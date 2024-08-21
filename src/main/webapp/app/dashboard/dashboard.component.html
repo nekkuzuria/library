@@ -1,47 +1,71 @@
-<div class="container p-5 bg-body-secondary">
-  <div class="row mb-4 align-items-center">
-    <!-- Search Input -->
-    <div class="col-md d-flex justify-content-center">
+<div class="container p-5 bg-body-tertiary">
+  <!-- Search Bar -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-md-8 col-lg-6 d-flex">
       <input
         type="text"
-        class="form-control form-control-lg rounded-pill"
+        class="form-control rounded-pill shadow-lg px-4"
         placeholder="Search for books..."
         aria-label="Search"
         [(ngModel)]="searchQuery"
         (ngModelChange)="onSearch()"
       />
     </div>
+  </div>
 
-    <!-- Filters and Sorting -->
-    <div class="col-md-4 d-flex justify-content-center gap-3 dropdown">
-      <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre" class="dropdown-item">
-      </ng-select>
-
-      <ng-select [items]="sortOptions" placeholder="Sort by" [(ngModel)]="sortOption" (change)="sortBooks()" class="dropdown-item">
-      </ng-select>
+  <!-- Filters and Sorting -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-md-8 col-lg-6 d-flex gap-3 filter-book">
+      <div class="form-control shadow-lg">
+        <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre"> </ng-select>
+      </div>
+      <div class="form-control shadow-lg">
+        <ng-select [items]="sortOptions" placeholder="Sort by" (change)="sortBooks()" [(ngModel)]="sortOption"> </ng-select>
+      </div>
     </div>
   </div>
 
+  <!-- Add Book Button -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-md-8 col-lg-12 d-flex justify-content-end">
+      <div class="col-md-6 col-lg-2">
+        <!-- Adjust these classes as needed -->
+        <button *jhiHasAnyAuthority="'ROLE_ADMIN'" class="btn btn-primary rounded-pill shadow-lg w-100">Add Book</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Books Found Message -->
   @if (books?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
+    <div class="alert alert-warning text-center" id="no-result">
       <span>No Books found</span>
     </div>
   }
 
+  <!-- Book List -->
   @if (filteredBooks && filteredBooks.length > 0) {
-    <div class="row row-cols-sm-5 g-5">
+    <div class="row g-5 mt-2">
       @for (book of filteredBooks; track trackId) {
-        <div class="col">
-          <a [routerLink]="['/book-detail', book.id]" class="h-100">
-            <img
-              src="{{ book.cover }}"
-              class="rounded-5 shadow-lg bg-body rounded"
-              alt="Book Cover"
-              style="height: 250px; object-fit: contain"
-            />
-            <div class="card-body text-center">
-              <h5 class="card-title">{{ book.title }}</h5>
-              <p class="card-text">{{ book.author }} - {{ book.year }}</p>
+        <div class="col-12 col-md-2 d-flex justify-content-center book-item">
+          <a [routerLink]="['/book-detail', book.id]" class="text-decoration-none">
+            <div class="card border-0 rounded-4 shadow-lg h-100 book-card">
+              <img
+                [src]="book.cover"
+                alt="Book Cover"
+                class="card-img-top rounded-4 book-cover"
+                style="width: 100%; height: 220px; object-fit: cover"
+              />
+              <div class="card-body text-center book-info">
+                <h5 class="card-title" style="font-size: 12px; font-weight: bold">
+                  {{ book.title }}
+                </h5>
+                <p class="card-text text-muted mb-0" style="font-size: 8px; font-weight: normal">
+                  {{ book.year }}
+                </p>
+                <p class="card-text text-muted" style="font-size: 10px; font-weight: normal">
+                  {{ book.author }}
+                </p>
+              </div>
             </div>
           </a>
         </div>

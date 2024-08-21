@@ -3,6 +3,7 @@
 @import 'bootstrap/scss/variables';
 @import '~@ng-select/ng-select/themes/default.theme.css';
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
 
 /* ==============================================================
 Bootstrap tweaks
@@ -79,7 +80,7 @@ Generic styles
   // margin-top: 20px;
   border: none;
   height: 100%;
-  width: 100%;
+  width: 100vw;
   display: flex;
 }
 
@@ -243,7 +244,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 /* jhipster-needle-scss-add-main JHipster will add new css style */
 * {
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .input-group {
@@ -277,6 +278,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   padding-left: 0;
   padding-right: 0;
   height: 100vh;
+  max-width: 100vw;
 }
 
 .btn {
@@ -285,4 +287,57 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 jhi-login {
   height: 100vh;
+}
+
+app-dashboard {
+  --bs-bg-opacity: 1;
+  background-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity)) !important;
+  max-width: 100vw;
+}
+
+.navbar {
+  height: 50px !important;
+}
+@media (max-width: 768px) {
+  .book-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .book-card {
+    display: flex;
+    flex-direction: row;
+    width: 340px;
+    max-width: 400px;
+    height: 140px !important;
+  }
+
+  .book-cover {
+    width: 150px !important;
+    height: 140px !important;
+    object-fit: contain;
+    margin-right: 10px;
+  }
+
+  .book-info {
+    max-width: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .card-title .card-text {
+    text-align: left;
+  }
+
+  .filter-book {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-control {
+    margin: 0 auto;
+  }
 }

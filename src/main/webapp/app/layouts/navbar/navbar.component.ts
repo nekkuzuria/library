@@ -29,7 +29,7 @@ export default class NavbarComponent implements OnInit {
   private profileService = inject(ProfileService);
   private router = inject(Router);
 
-  constructor() {
+  constructor(private accountService: AccountService) {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
     }
@@ -54,10 +54,20 @@ export default class NavbarComponent implements OnInit {
   logout(): void {
     this.collapseNavbar();
     this.loginService.logout();
-    this.router.navigate(['']);
+    this.router.navigate(['/login']);
   }
 
   toggleNavbar(): void {
     this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
+  }
+
+  hasOnlyUserRole(): boolean {
+    if (!this.accountService) {
+      return true;
+    }
+
+    const hasUserRole = this.accountService.hasAnyAuthority(['ROLE_USER']);
+    const hasAdminRole = this.accountService.hasAnyAuthority(['ROLE_ADMIN']);
+    return hasUserRole && !hasAdminRole;
   }
 }

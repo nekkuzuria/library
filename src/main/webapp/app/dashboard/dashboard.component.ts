@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
   itemsPerPage = ITEMS_PER_PAGE;
   sortState = sortStateSignal({});
   page = 1;
-  sortOption: string = '';
+  sortOption: string | null = null;
 
   protected sortService = inject(SortService);
 
@@ -72,7 +72,12 @@ export class DashboardComponent implements OnInit {
   }
 
   sortBooks(): void {
-    const sortValue = typeof this.sortOption === 'string' ? this.sortOption : (this.sortOption as { value: string }).value;
+    const sortValue =
+      typeof this.sortOption === 'string'
+        ? this.sortOption
+        : this.sortOption !== null
+          ? (this.sortOption as { value: string }).value
+          : null;
     console.log(sortValue);
     if (sortValue === 'title') {
       this.filteredBooks.sort((a, b) => {
@@ -100,6 +105,7 @@ export class DashboardComponent implements OnInit {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.books = dataFromBody;
     this.filteredBooks = this.books;
+    console.log(this.filteredBooks);
     this.sortBooks();
   }
 
