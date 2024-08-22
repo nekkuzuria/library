@@ -100,9 +100,6 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public VisitorDTO getVisitorOfCurrentUser() {
         Long userId = SecurityUtils.getCurrentUserId();
-        return visitorRepository
-            .findByUserId(userId)
-            .map(visitorMapper::toDto)
-            .orElseThrow(() -> new EntityNotFoundException("Visitor not found for current user"));
+        return visitorRepository.findByUserId(userId).map(visitorMapper::toDto).orElse(null);
     }
 }

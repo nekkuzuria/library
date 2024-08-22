@@ -94,9 +94,6 @@ public class LibrarianServiceImpl implements LibrarianService {
     @Override
     public LibrarianDTO getLibrarianOfCurrentUser() {
         Long userId = SecurityUtils.getCurrentUserId();
-        return librarianRepository
-            .findByUserId(userId)
-            .map(librarianMapper::toDto)
-            .orElseThrow(() -> new EntityNotFoundException("Librarian not found for current user"));
+        return librarianRepository.findByUserId(userId).map(librarianMapper::toDto).orElse(null);
     }
 }

@@ -9,6 +9,6 @@ import lombok.Data;
 @Builder
 public class LibraryVM {
 
-    public Long id;
-    public String name;
+    private Long id;
+    private String name;
 }

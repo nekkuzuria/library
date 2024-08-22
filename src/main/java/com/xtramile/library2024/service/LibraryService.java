@@ -4,8 +4,10 @@ import com.xtramile.library2024.domain.Library;
 import com.xtramile.library2024.repository.LibraryRepository;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.dto.LibraryDTO;
+import com.xtramile.library2024.service.dto.VisitorDTO;
 import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.web.rest.vm.LibraryVM;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,10 +33,18 @@ public class LibraryService {
 
     private final LibrarianService librarianService;
 
-    public LibraryService(LibraryRepository libraryRepository, LibraryMapper libraryMapper, LibrarianService librarianService) {
+    private final VisitorService visitorService;
+
+    public LibraryService(
+        LibraryRepository libraryRepository,
+        LibraryMapper libraryMapper,
+        LibrarianService librarianService,
+        VisitorService visitorService
+    ) {
         this.libraryRepository = libraryRepository;
         this.libraryMapper = libraryMapper;
         this.librarianService = librarianService;
+        this.visitorService = visitorService;
     }
 
     /**
@@ -131,5 +141,22 @@ public class LibraryService {
         log.debug("Request to get Library of current librarian");
         LibrarianDTO librarianDTO = librarianService.getLibrarianOfCurrentUser();
         return librarianDTO.getLibrary();
+    }
+
+    public LibraryDTO getLibraryOfCurrentUser() {
+        log.debug("Request to get Library of current user");
+
+        LibrarianDTO librarianDTO = librarianService.getLibrarianOfCurrentUser();
+        if (librarianDTO != null) {
+            return librarianDTO.getLibrary();
+        }
+
+        VisitorDTO visitorDTO = visitorService.getVisitorOfCurrentUser();
+        if (visitorDTO != null) {
+            return visitorDTO.getLibrary();
+        }
+
+        log.warn("User is neither a librarian nor a visitor");
+        throw new EntityNotFoundException("User is neither a librarian nor a visitor");
     }
 }

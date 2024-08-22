@@ -1,9 +1,16 @@
 package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.Book;
+import com.xtramile.library2024.domain.BookStorage;
 import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.service.dto.BookDTO;
+import com.xtramile.library2024.service.dto.BookStorageDTO;
+import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.mapper.BookMapper;
+import com.xtramile.library2024.service.mapper.BookStorageMapper;
+import com.xtramile.library2024.service.mapper.LibraryMapper;
+import com.xtramile.library2024.web.rest.vm.BookVM;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +36,24 @@ public class BookService {
 
     private final BookMapper bookMapper;
 
-    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
+    private final LibraryService libraryService;
+
+    private final BookStorageService bookStorageService;
+
+    private final BookStorageMapper bookStorageMapper;
+
+    public BookService(
+        BookRepository bookRepository,
+        BookMapper bookMapper,
+        LibraryService libraryService,
+        BookStorageService bookStorageService,
+        BookStorageMapper bookStorageMapper
+    ) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+        this.libraryService = libraryService;
+        this.bookStorageService = bookStorageService;
+        this.bookStorageMapper = bookStorageMapper;
     }
 
     /**
@@ -50,12 +72,14 @@ public class BookService {
     /**
      * Update a book.
      *
-     * @param bookDTO the entity to save.
+     * @param bookVM the entity to save.
      * @return the persisted entity.
      */
-    public BookDTO update(BookDTO bookDTO) {
-        log.debug("Request to update Book : {}", bookDTO);
-        Book book = bookMapper.toEntity(bookDTO);
+    public BookDTO update(BookVM bookVM) {
+        log.debug("Request to update Book : {}", bookVM);
+        Book book = bookMapper.toEntity(bookVM);
+
+        bookStorageService.partialUpdate(bookStorageMapper.toDto(book.getBookStorage()));
         book = bookRepository.save(book);
         return bookMapper.toDto(book);
     }
@@ -63,17 +87,17 @@ public class BookService {
     /**
      * Partially update a book.
      *
-     * @param bookDTO the entity to update partially.
+     * @param bookVM the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<BookDTO> partialUpdate(BookDTO bookDTO) {
-        log.debug("Request to partially update Book : {}", bookDTO);
+    public Optional<BookDTO> partialUpdate(BookVM bookVM) {
+        log.debug("Request to partially update Book : {}", bookVM);
 
         return bookRepository
-            .findById(bookDTO.getId())
+            .findById(bookVM.getId())
             .map(existingBook -> {
-                bookMapper.partialUpdate(existingBook, bookDTO);
-
+                bookMapper.partialUpdate(existingBook, bookMapper.toDTO(bookVM));
+                bookStorageService.partialUpdate(bookStorageMapper.toDto(bookMapper.toEntity(bookVM).getBookStorage()));
                 return existingBook;
             })
             .map(bookRepository::save)
@@ -111,9 +135,9 @@ public class BookService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<BookDTO> findOne(Long id) {
+    public Optional<BookVM> findOne(Long id) {
         log.debug("Request to get Book : {}", id);
-        return bookRepository.findById(id).map(bookMapper::toDto);
+        return bookRepository.findById(id).map(bookMapper::toVM);
     }
 
     /**
@@ -123,6 +147,57 @@ public class BookService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Book : {}", id);
-        bookRepository.deleteById(id);
+        Optional<Book> optionalBook = bookRepository.findById(id);
+        if (optionalBook.isPresent()) {
+            Book book = optionalBook.get();
+            Long bookStorageId = book.getBookStorage().getId();
+            if (bookStorageId != null) {
+                bookStorageService.delete(bookStorageId);
+            } else {
+                log.warn("BookStorage for book id {} not found", book.getId());
+            }
+            bookRepository.deleteById(id);
+        } else {
+            log.warn("Book with id {} not found", id);
+            throw new EntityNotFoundException("Book with id " + id + " not found");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BookVM> getBooksForCurrentUserLibrary(Pageable pageable) {
+        log.debug("Getting current user's library...");
+        LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentUser();
+        if (libraryDTO == null) {
+            log.error("Library not found for the current user");
+            throw new EntityNotFoundException("Library not found for current user");
+        }
+
+        log.debug("Fetching book storages for the library...");
+        List<BookStorage> bookStorages = bookStorageService.findAllByLibrary(libraryDTO);
+        if (bookStorages.isEmpty()) {
+            log.error("No book storages found for the library");
+            throw new EntityNotFoundException("No book storages found for the library");
+        }
+
+        List<Long> bookStorageIds = bookStorages.stream().map(BookStorage::getId).collect(Collectors.toList());
+
+        log.debug("Fetching books for the book storages...");
+        Page<BookVM> result = bookRepository.findByBookStorageIds(bookStorageIds, pageable).map(bookMapper::toVM);
+
+        log.debug("Returning the result...");
+        return result;
+    }
+
+    @Transactional
+    public BookVM createBook(BookVM bookVm) {
+        BookStorageDTO bookStorage = new BookStorageDTO();
+        bookStorage.setQuantity(bookVm.getQuantity());
+        BookStorageDTO savedBookStorage = bookStorageService.save(bookStorage);
+
+        bookVm.setBookStorageId(savedBookStorage.getId());
+        Book book = bookMapper.toEntity(bookVm);
+        Book savedBook = bookRepository.save(book);
+
+        return bookMapper.toVM(savedBook);
     }
 }

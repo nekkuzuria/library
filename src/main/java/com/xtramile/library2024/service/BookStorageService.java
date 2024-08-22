@@ -3,7 +3,10 @@ package com.xtramile.library2024.service;
 import com.xtramile.library2024.domain.BookStorage;
 import com.xtramile.library2024.repository.BookStorageRepository;
 import com.xtramile.library2024.service.dto.BookStorageDTO;
+import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.mapper.BookStorageMapper;
+import com.xtramile.library2024.service.mapper.LibraryMapper;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +28,20 @@ public class BookStorageService {
 
     private final BookStorageMapper bookStorageMapper;
 
-    public BookStorageService(BookStorageRepository bookStorageRepository, BookStorageMapper bookStorageMapper) {
+    private final LibraryService libraryService;
+
+    private final LibraryMapper libraryMapper;
+
+    public BookStorageService(
+        BookStorageRepository bookStorageRepository,
+        BookStorageMapper bookStorageMapper,
+        LibraryService libraryService,
+        LibraryMapper libraryMapper
+    ) {
         this.bookStorageRepository = bookStorageRepository;
         this.bookStorageMapper = bookStorageMapper;
+        this.libraryService = libraryService;
+        this.libraryMapper = libraryMapper;
     }
 
     /**
@@ -38,6 +52,7 @@ public class BookStorageService {
      */
     public BookStorageDTO save(BookStorageDTO bookStorageDTO) {
         log.debug("Request to save BookStorage : {}", bookStorageDTO);
+        bookStorageDTO.setLibrary(libraryService.getLibraryOfCurrentUser());
         BookStorage bookStorage = bookStorageMapper.toEntity(bookStorageDTO);
         bookStorage = bookStorageRepository.save(bookStorage);
         return bookStorageMapper.toDto(bookStorage);
@@ -108,5 +123,11 @@ public class BookStorageService {
     public void delete(Long id) {
         log.debug("Request to delete BookStorage : {}", id);
         bookStorageRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookStorage> findAllByLibrary(LibraryDTO libraryDTO) {
+        log.debug("Request to get all BookStorage of library: {}", libraryDTO);
+        return bookStorageRepository.findByLibrary(libraryMapper.toEntity(libraryDTO));
     }
 }

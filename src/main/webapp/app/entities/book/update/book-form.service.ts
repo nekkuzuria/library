@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
-import { IBook, NewBook } from '../book.model';
+import { IBookVM, NewBook } from '../bookvm.model';
 
 /**
  * A partial Type with required key is used as form input.
@@ -12,21 +12,22 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  * Type for createFormGroup and resetForm argument.
  * It accepts IBook for edit and NewBookFormGroupInput for create.
  */
-type BookFormGroupInput = IBook | PartialWithRequiredKeyOf<NewBook>;
+type BookFormGroupInput = IBookVM | PartialWithRequiredKeyOf<NewBook>;
 
 type BookFormDefaults = Pick<NewBook, 'id'>;
 
 type BookFormGroupContent = {
-  id: FormControl<IBook['id'] | NewBook['id']>;
-  title: FormControl<IBook['title']>;
-  type: FormControl<IBook['type']>;
-  genre: FormControl<IBook['genre']>;
-  year: FormControl<IBook['year']>;
-  totalPage: FormControl<IBook['totalPage']>;
-  author: FormControl<IBook['author']>;
-  cover: FormControl<IBook['cover']>;
-  synopsis: FormControl<IBook['synopsis']>;
-  bookStorage: FormControl<IBook['bookStorage']>;
+  id: FormControl<IBookVM['id'] | NewBook['id']>;
+  title: FormControl<IBookVM['title']>;
+  type: FormControl<IBookVM['type']>;
+  genre: FormControl<IBookVM['genre']>;
+  year: FormControl<IBookVM['year']>;
+  totalPage: FormControl<IBookVM['totalPage']>;
+  author: FormControl<IBookVM['author']>;
+  cover: FormControl<IBookVM['cover']>;
+  synopsis: FormControl<IBookVM['synopsis']>;
+  bookStorageId: FormControl<IBookVM['bookStorageId']>;
+  quantity: FormControl<IBookVM['quantity']>;
 };
 
 export type BookFormGroup = FormGroup<BookFormGroupContent>;
@@ -56,12 +57,13 @@ export class BookFormService {
       author: new FormControl(bookRawValue.author),
       cover: new FormControl(bookRawValue.cover),
       synopsis: new FormControl(bookRawValue.synopsis),
-      bookStorage: new FormControl(bookRawValue.bookStorage),
+      bookStorageId: new FormControl(bookRawValue.bookStorageId),
+      quantity: new FormControl(bookRawValue.quantity),
     });
   }
 
-  getBook(form: BookFormGroup): IBook | NewBook {
-    return form.getRawValue() as IBook | NewBook;
+  getBook(form: BookFormGroup): IBookVM | NewBook {
+    return form.getRawValue() as IBookVM | NewBook;
   }
 
   resetForm(form: BookFormGroup, book: BookFormGroupInput): void {

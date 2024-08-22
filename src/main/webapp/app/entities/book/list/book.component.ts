@@ -15,6 +15,7 @@ import { SORT, ITEM_DELETED_EVENT, DEFAULT_SORT_DATA } from 'app/config/navigati
 import { IBook } from '../book.model';
 import { EntityArrayResponseType, BookService } from '../service/book.service';
 import { BookDeleteDialogComponent } from '../delete/book-delete-dialog.component';
+import { IBookVM } from '../bookvm.model';
 
 @Component({
   standalone: true,
@@ -34,7 +35,7 @@ import { BookDeleteDialogComponent } from '../delete/book-delete-dialog.componen
 })
 export class BookComponent implements OnInit {
   subscription: Subscription | null = null;
-  books?: IBook[];
+  books?: IBookVM[];
   isLoading = false;
 
   sortState = sortStateSignal({});
