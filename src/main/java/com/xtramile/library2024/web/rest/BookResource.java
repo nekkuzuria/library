@@ -143,7 +143,6 @@ public class BookResource {
      * {@code GET  /books} : get all the books.
      *
      * @param pageable the pagination information.
-     * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of books in body.
      */
     @GetMapping("")

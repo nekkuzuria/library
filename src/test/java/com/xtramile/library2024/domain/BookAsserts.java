@@ -66,6 +66,7 @@ public class BookAsserts {
     public static void assertBookUpdatableRelationshipsEquals(Book expected, Book actual) {
         assertThat(expected)
             .as("Verify Book relationships")
-            .satisfies(e -> assertThat(e.getBookStorage()).as("check bookStorage").isEqualTo(actual.getBookStorage()));
+            .satisfies(e -> assertThat(e.getBookStorage()).as("check bookStorage").isEqualTo(actual.getBookStorage()))
+            .satisfies(e -> assertThat(e.getFile()).as("check file").isEqualTo(actual.getFile()));
     }
 }

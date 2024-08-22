@@ -4,7 +4,6 @@ import com.xtramile.library2024.domain.enumeration.BookType;
 import com.xtramile.library2024.domain.enumeration.Genre;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -34,13 +33,7 @@ public class BookDTO implements Serializable {
 
     private BookStorageDTO bookStorage;
 
-    private String createdBy;
-
-    private Instant createdDate;
-
-    private String lastModifiedBy;
-
-    private Instant lastModifiedDate;
+    private FileDTO file;
 
     public Long getId() {
         return id;
@@ -122,36 +115,12 @@ public class BookDTO implements Serializable {
         this.bookStorage = bookStorage;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public FileDTO getFile() {
+        return file;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setFile(FileDTO file) {
+        this.file = file;
     }
 
     @Override
@@ -188,11 +157,8 @@ public class BookDTO implements Serializable {
             ", author='" + getAuthor() + "'" +
             ", cover='" + getCover() + "'" +
             ", synopsis='" + getSynopsis() + "'" +
-            ", bookStorage=" + getBookStorage() + "'" +
-            ", createdBy='" + getCreatedBy() + "'" +
-            ", createdDate=" + getCreatedDate() + "'" +
-            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
-            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
-            '}';
+            ", bookStorage=" + getBookStorage() +
+            ", file=" + getFile() +
+            "}";
     }
 }

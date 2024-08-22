@@ -1,5 +1,7 @@
 import { BookType } from 'app/entities/enumerations/book-type.model';
 import { Genre } from 'app/entities/enumerations/genre.model';
+import { IFile } from 'app/entities/file/file.model';
+import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
 
 export interface IBookVM {
   id: number;
@@ -11,8 +13,9 @@ export interface IBookVM {
   author?: string | null;
   cover?: string | null;
   synopsis?: string | null;
-  bookStorageId?: number | null;
+  bookStorageId?: Pick<IBookStorage, 'id'> | null;
   quantity?: number | null;
+  file?: Pick<IFile, 'id'> | null;
 }
 
 export type NewBook = Omit<IBookVM, 'id'> & { id: null };

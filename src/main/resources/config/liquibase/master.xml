@@ -19,6 +19,7 @@
     <include file="config/liquibase/changelog/20240812070619_added_entity_BookStorage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240813004912_added_entity_VisitorBookStorage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240813025332_added_entity_Visit.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240821042440_added_entity_File.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20240813004912_added_entity_constraints_VisitorBookStorage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240813025332_added_entity_constraints_Visit.xml" relativeToChangelogFile="false"/>
@@ -31,4 +32,5 @@
     <include file="config/liquibase/changelog/20240820110000_added_quantity_to_VisitorBookStorage.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240820160000_added_entity_PendingTask.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240821100000_added_columns_AbstractAuditingEntity.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/added_columns_jhi_user.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

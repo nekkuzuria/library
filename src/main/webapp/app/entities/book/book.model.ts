@@ -1,4 +1,5 @@
 import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
+import { IFile } from 'app/entities/file/file.model';
 import { BookType } from 'app/entities/enumerations/book-type.model';
 import { Genre } from 'app/entities/enumerations/genre.model';
 
@@ -12,7 +13,8 @@ export interface IBook {
   author?: string | null;
   cover?: string | null;
   synopsis?: string | null;
-  bookStorage?: Pick<IBookStorage, 'id'> | null;
+  bookStorageId?: Pick<IBookStorage, 'id'> | null;
+  file?: Pick<IFile, 'id'> | null;
 }
 
 export type NewBook = Omit<IBook, 'id'> & { id: null };

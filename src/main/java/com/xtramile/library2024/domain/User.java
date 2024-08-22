@@ -82,6 +82,10 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "reset_date")
     private Instant resetDate = null;
 
+    @OneToOne
+    @JoinColumn(name = "file_id")
+    private File file;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -228,5 +232,13 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 }

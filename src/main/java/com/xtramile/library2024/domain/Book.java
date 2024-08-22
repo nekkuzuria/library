@@ -57,6 +57,11 @@ public class Book extends AbstractAuditingEntity implements Serializable {
     @JsonIgnoreProperties(value = { "books", "library" }, allowSetters = true)
     private BookStorage bookStorage;
 
+    @JsonIgnoreProperties(value = { "book" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private File file;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -189,6 +194,19 @@ public class Book extends AbstractAuditingEntity implements Serializable {
         return this;
     }
 
+    public File getFile() {
+        return this.file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public Book file(File file) {
+        this.setFile(file);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -221,10 +239,6 @@ public class Book extends AbstractAuditingEntity implements Serializable {
             ", author='" + getAuthor() + "'" +
             ", cover='" + getCover() + "'" +
             ", synopsis='" + getSynopsis() + "'" +
-            ", createdBy='" + getCreatedBy() + "'" +
-            ", createdDate=" + getCreatedDate() + "'" +
-            ", lastModifiedBy='" + getLastModifiedBy() + "'" +
-            ", lastModifiedDate=" + getLastModifiedDate() + "'" +
-            '}';
+            "}";
     }
 }

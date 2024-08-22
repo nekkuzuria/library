@@ -2,7 +2,7 @@ package com.xtramile.library2024.domain;
 
 import static com.xtramile.library2024.domain.BookStorageTestSamples.*;
 import static com.xtramile.library2024.domain.BookTestSamples.*;
-import static com.xtramile.library2024.domain.VisitorBookStorageTestSamples.*;
+import static com.xtramile.library2024.domain.FileTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.xtramile.library2024.web.rest.TestUtil;
@@ -35,17 +35,16 @@ class BookTest {
         book.bookStorage(null);
         assertThat(book.getBookStorage()).isNull();
     }
-    //    @Test
-    //    void visitorBookStorageTest() {
-    //        Book book = getBookRandomSampleGenerator();
-    //        VisitorBookStorage visitorBookStorageBack = getVisitorBookStorageRandomSampleGenerator();
-    //
-    //        book.setVisitorBookStorage(visitorBookStorageBack);
-    //        assertThat(book.getVisitorBookStorage()).isEqualTo(visitorBookStorageBack);
-    //        assertThat(visitorBookStorageBack.getBook()).isEqualTo(book);
-    //
-    //        book.visitorBookStorage(null);
-    //        assertThat(book.getVisitorBookStorage()).isNull();
-    //        assertThat(visitorBookStorageBack.getBook()).isNull();
-    //    }
+
+    @Test
+    void fileTest() {
+        Book book = getBookRandomSampleGenerator();
+        File fileBack = getFileRandomSampleGenerator();
+
+        book.setFile(fileBack);
+        assertThat(book.getFile()).isEqualTo(fileBack);
+
+        book.file(null);
+        assertThat(book.getFile()).isNull();
+    }
 }

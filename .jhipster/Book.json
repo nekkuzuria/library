@@ -52,6 +52,15 @@
       "relationshipName": "bookStorage",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"
+    },
+    {
+      "id": false,
+      "otherEntityField": "id",
+      "otherEntityName": "file",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "file",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
     }
   ],
   "searchEngine": "no",
