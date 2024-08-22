@@ -4,15 +4,16 @@ import com.xtramile.library2024.domain.*;
 import com.xtramile.library2024.repository.*;
 import com.xtramile.library2024.security.AuthoritiesConstants;
 import com.xtramile.library2024.security.SecurityUtils;
-import com.xtramile.library2024.service.MailService;
-import com.xtramile.library2024.service.UserService;
-import com.xtramile.library2024.service.dto.AdminUserDTO;
-import com.xtramile.library2024.service.dto.PasswordChangeDTO;
+import com.xtramile.library2024.service.*;
+import com.xtramile.library2024.service.dto.*;
 import com.xtramile.library2024.web.rest.errors.*;
+import com.xtramile.library2024.web.rest.errors.EmailAlreadyUsedException;
+import com.xtramile.library2024.web.rest.errors.InvalidPasswordException;
 import com.xtramile.library2024.web.rest.vm.KeyAndPasswordVM;
 import com.xtramile.library2024.web.rest.vm.ManagedUserVM;
 import com.xtramile.library2024.web.rest.vm.RegisterVM;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST controller for managing the current user's account.
@@ -43,28 +46,28 @@ public class AccountResource {
     private final UserService userService;
 
     private final MailService mailService;
-    private final LibrarianRepository librarianRepository; //TAMBAHAN========================
-    private final VisitorRepository visitorRepository;
-    private final LibraryRepository libraryRepository;
-    private final LocationRepository locationRepository;
+
+    private final LibrarianService librarianService;
+    private final VisitorService visitorService;
+
     private static final Logger logger = LoggerFactory.getLogger(AccountResource.class);
+
+    private final FileService fileService;
 
     public AccountResource(
         UserRepository userRepository,
         UserService userService,
         MailService mailService,
-        LibrarianRepository librarianRepository,
-        VisitorRepository visitorRepository,
-        LibraryRepository libraryRepository,
-        LocationRepository locationRepository
+        LibrarianService librarianService,
+        VisitorService visitorService,
+        FileService fileService
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
-        this.librarianRepository = librarianRepository;
-        this.visitorRepository = visitorRepository;
-        this.libraryRepository = libraryRepository;
-        this.locationRepository = locationRepository;
+        this.librarianService = librarianService;
+        this.visitorService = visitorService;
+        this.fileService = fileService;
     }
 
     /**
@@ -82,8 +85,6 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(registerVM, registerVM.getPassword());
-
-        mailService.sendActivationEmail(user);
     }
 
     /**
@@ -122,7 +123,7 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
     @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
+    public void saveAccount(@RequestParam("user") AdminUserDTO userDTO, @RequestParam("file") MultipartFile file) throws IOException {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
@@ -133,12 +134,16 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("User could not be found");
         }
+
+        fileService.saveImage(file);
+
         userService.updateUser(
             userDTO.getFirstName(),
             userDTO.getLastName(),
             userDTO.getEmail(),
             userDTO.getLangKey(),
-            userDTO.getImageUrl()
+            userDTO.getImageUrl(),
+            userDTO.getFile()
         );
     }
 
@@ -198,5 +203,22 @@ public class AccountResource {
             password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
             password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    @GetMapping("/user-settings")
+    public ResponseEntity<?> getUserSettings() {
+        return userService
+            .getUserWithAuthorities()
+            .map(user -> {
+                Long userId = SecurityUtils.getCurrentUserId();
+                if (SecurityUtils.hasCurrentUserThisAuthority("ROLE_ADMIN")) {
+                    return ResponseEntity.ok(userService.getCombinedUserLibrarianResponse(userId));
+                } else if (SecurityUtils.hasCurrentUserThisAuthority("ROLE_USER")) {
+                    return ResponseEntity.ok(userService.getCombinedUserVisitorResponse(userId));
+                } else {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+                }
+            })
+            .orElseThrow(() -> new UserResource.UserNotFoundException("User could not be found"));
     }
 }

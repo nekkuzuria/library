@@ -210,4 +210,11 @@ public class UserResource {
             .headers(HeaderUtil.createAlert(applicationName, "A user is deleted with identifier " + login, login))
             .build();
     }
+
+    public static class UserNotFoundException extends RuntimeException {
+
+        public UserNotFoundException(String message) {
+            super(message);
+        }
+    }
 }

@@ -2,12 +2,11 @@ package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.config.Constants;
 import com.xtramile.library2024.domain.*;
-import com.xtramile.library2024.repository.AuthorityRepository;
-import com.xtramile.library2024.repository.UserRepository;
+import com.xtramile.library2024.repository.*;
 import com.xtramile.library2024.security.AuthoritiesConstants;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.dto.*;
-import com.xtramile.library2024.service.mapper.UserMapper;
+import com.xtramile.library2024.service.mapper.*;
 import com.xtramile.library2024.web.rest.vm.RegisterVM;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -50,6 +49,15 @@ public class UserService {
     private final VisitorService visitorService;
 
     private final UserMapper userMapper;
+    private final LibrarianRepository librarianRepository;
+    private final VisitorRepository visitorRepository;
+    private final UserCombinedMapper userCombinedMapper;
+    private final LibrarianMapper librarianMapper;
+    private final VisitorMapper visitorMapper;
+    private final FileMapper fileMapper;
+    private final LocationMapper locationMapper;
+    private final LocationRepository locationRepository;
+    private final FileRepository fileRepository;
 
     public UserService(
         UserRepository userRepository,
@@ -60,7 +68,16 @@ public class UserService {
         LibraryService libraryService,
         LibrarianService librarianService,
         VisitorService visitorService,
-        UserMapper userMapper
+        UserMapper userMapper,
+        LibrarianRepository librarianRepository,
+        UserCombinedMapper userCombinedMapper,
+        VisitorRepository visitorRepository,
+        LibrarianMapper librarianMapper,
+        VisitorMapper visitorMapper,
+        FileMapper fileMapper,
+        LocationMapper locationMapper,
+        LocationRepository locationRepository,
+        FileRepository fileRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -71,6 +88,15 @@ public class UserService {
         this.librarianService = librarianService;
         this.visitorService = visitorService;
         this.userMapper = userMapper;
+        this.librarianRepository = librarianRepository;
+        this.visitorRepository = visitorRepository;
+        this.userCombinedMapper = userCombinedMapper;
+        this.librarianMapper = librarianMapper;
+        this.visitorMapper = visitorMapper;
+        this.fileMapper = fileMapper;
+        this.locationMapper = locationMapper;
+        this.locationRepository = locationRepository;
+        this.fileRepository = fileRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -143,7 +169,7 @@ public class UserService {
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
         // new user is not active
-        newUser.setActivated(false);
+        newUser.setActivated(true);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
@@ -266,6 +292,7 @@ public class UserService {
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
                 Set<Authority> managedAuthorities = user.getAuthorities();
+                //                user.setFile(userDTO.getFile());
                 managedAuthorities.clear();
                 userDTO
                     .getAuthorities()
@@ -301,7 +328,7 @@ public class UserService {
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, File file) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
@@ -312,6 +339,7 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                user.setFile(file);
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
@@ -383,6 +411,52 @@ public class UserService {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
+        }
+    }
+
+    public Optional<LibrarianDTO> getLibrarian(Long id) {
+        return librarianRepository.findById(id).map(librarianMapper::toDto);
+    }
+
+    public Optional<VisitorDTO> getVisitor(Long id) {
+        return visitorRepository.findById(id).map(visitorMapper::toDto);
+    }
+
+    public UserLibrarianDTO getCombinedUserLibrarianResponse(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            AdminUserDTO adminUserDTO = userMapper.userToAdminUserDTO(user);
+
+            LibrarianDTO librarianDTO = librarianMapper.toDto(librarianRepository.findByUserId(userId).orElse(null));
+            LocationDTO locationDTO = locationMapper.toDto(locationRepository.findById(librarianDTO.getLocation().getId()).orElse(null));
+            FileDTO fileDTO = fileMapper.toDto(user.getFile());
+
+            return userCombinedMapper.toCombinedResponseLibrarianDTO(
+                new UserLibrarianDTO(),
+                adminUserDTO,
+                librarianDTO,
+                locationDTO,
+                fileDTO
+            );
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public UserVisitorDTO getCombinedUserVisitorResponse(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            AdminUserDTO adminUserDTO = userMapper.userToAdminUserDTO(user);
+
+            VisitorDTO visitorDTO = visitorMapper.toDto(visitorRepository.findByUserId(userId).orElse(null));
+            LocationDTO locationDTO = locationMapper.toDto(locationRepository.findById(visitorDTO.getAddress().getId()).orElse(null));
+            FileDTO fileDTO = fileMapper.toDto(user.getFile());
+
+            return userCombinedMapper.toCombinedResponseVisitorDTO(new UserVisitorDTO(), adminUserDTO, visitorDTO, locationDTO, fileDTO);
+        } else {
+            throw new RuntimeException("User not found");
         }
     }
 }
