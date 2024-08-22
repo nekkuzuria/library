@@ -1,11 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import SharedModule from 'app/shared/shared.module';
-import { AccountService } from 'app/core/auth/account.service';
-import { Account } from 'app/core/auth/account.model';
-
-const initialAccount: Account = {} as Account;
+import { SettingsService } from './settings.component.service';
 
 @Component({
   standalone: true,
@@ -15,35 +11,35 @@ const initialAccount: Account = {} as Account;
 })
 export default class SettingsComponent implements OnInit {
   success = signal(false);
+  imagePreview: string | ArrayBuffer | null = null;
 
-  settingsForm = new FormGroup({
-    firstName: new FormControl(initialAccount.firstName, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
-    }),
-    lastName: new FormControl(initialAccount.lastName, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
-    }),
-    email: new FormControl(initialAccount.email, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
-    }),
-    langKey: new FormControl(initialAccount.langKey, { nonNullable: true }),
+  settingsForm: FormGroup = new FormGroup({});
 
-    activated: new FormControl(initialAccount.activated, { nonNullable: true }),
-    authorities: new FormControl(initialAccount.authorities, { nonNullable: true }),
-    imageUrl: new FormControl(initialAccount.imageUrl, { nonNullable: true }),
-    login: new FormControl(initialAccount.login, { nonNullable: true }),
-  });
+  private settingsService = inject(SettingsService);
 
-  private accountService = inject(AccountService);
-
+  constructor(private formBuilder: FormBuilder) {}
   ngOnInit(): void {
-    this.accountService.identity().subscribe(account => {
-      if (account) {
-        this.settingsForm.patchValue(account);
+    this.settingsService.getUserSettings().subscribe(data => {
+      if (data) {
+        console.log(data.image);
+        this.initializeForm(data);
+        this.imagePreview = `data:image/jpeg;base64,${data.image}`;
       }
+    });
+  }
+
+  private initializeForm(data: any): void {
+    this.settingsForm = this.formBuilder.group({
+      firstName: [data.firstName || '', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      lastName: [data.lastName || '', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      email: [data.email || '', [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(254)]],
+      login: [data.username || ''],
+      phoneNumber: [data.phoneNumber || ''],
+      dateOfBirth: [data.dateOfBirth || ''],
+      streetAddress: [data.streetAddress || ''],
+      postalCode: [data.postalCode || ''],
+      city: [data.city || ''],
+      stateProvince: [data.stateProvince || ''],
     });
   }
 
@@ -51,10 +47,35 @@ export default class SettingsComponent implements OnInit {
     this.success.set(false);
 
     const account = this.settingsForm.getRawValue();
-    this.accountService.save(account).subscribe(() => {
-      this.success.set(true);
+    this.settingsService.updateUserSettings(account).subscribe(
+      () => {
+        this.success.set(true);
+      },
+      () => {
+        this.success.set(false); // Reset in case of failure
+      },
+    );
+  }
 
-      this.accountService.authenticate(account);
-    });
+  onImageChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+
+      this.settingsService.uploadImageFile(file).subscribe(
+        () => {
+          console.log('Image uploaded successfully');
+        },
+        error => {
+          console.error('Error uploading image', error);
+        },
+      );
+
+      this.settingsForm.patchValue({ file });
+    }
   }
 }
