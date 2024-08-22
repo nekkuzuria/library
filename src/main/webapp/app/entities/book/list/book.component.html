@@ -1,4 +1,4 @@
-<div>
+<div class="container">
   <h2 id="page-heading" data-cy="BookHeading">
     <span>Books</span>
 
@@ -63,6 +63,53 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="year">
+              <div class="d-flex">
+                <span>Year</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="totalPage">
+              <div class="d-flex">
+                <span>Total Page</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="author">
+              <div class="d-flex">
+                <span>Author</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="cover">
+              <div class="d-flex">
+                <span>Cover</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="synopsis">
+              <div class="d-flex">
+                <span>Synopsis</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span>Book Storage</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="file.id">
+              <div class="d-flex">
+                <span>File</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th>
               <div class="d-flex">
                 <span>Quantity</span>
@@ -120,11 +167,32 @@
                   }[book.genre ?? 'null']
                 }}
               </td>
+              <td>{{ book.year }}</td>
+              <td>{{ book.totalPage }}</td>
+              <td>{{ book.author }}</td>
+              <td>{{ book.cover }}</td>
+              <td>{{ book.synopsis }}</td>
+              <td>
+                @if (book.bookStorageId) {
+                  <div>
+                    <a [routerLink]="['/book-storage', book.bookStorageId, 'view']">{{ book.bookStorageId }}</a>
+                  </div>
+                }
+              </td>
+
+              <td>
+                @if (book.file) {
+                  <div>
+                    <a [routerLink]="['/file', book.file.id, 'view']">{{ book.file.id }}</a>
+                  </div>
+                }
+              </td>
               <td>
                 <div>
                   {{ book.quantity }}
                 </div>
               </td>
+
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/book-detail', book.id]" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

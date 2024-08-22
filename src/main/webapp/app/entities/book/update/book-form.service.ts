@@ -28,6 +28,7 @@ type BookFormGroupContent = {
   synopsis: FormControl<IBookVM['synopsis']>;
   bookStorageId: FormControl<IBookVM['bookStorageId']>;
   quantity: FormControl<IBookVM['quantity']>;
+  file: FormControl<IBookVM['file']>;
 };
 
 export type BookFormGroup = FormGroup<BookFormGroupContent>;
@@ -59,6 +60,7 @@ export class BookFormService {
       synopsis: new FormControl(bookRawValue.synopsis),
       bookStorageId: new FormControl(bookRawValue.bookStorageId),
       quantity: new FormControl(bookRawValue.quantity),
+      file: new FormControl(bookRawValue.file),
     });
   }
 

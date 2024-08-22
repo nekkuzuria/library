@@ -9,6 +9,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
 import { BookStorageService } from 'app/entities/book-storage/service/book-storage.service';
+import { IFile } from 'app/entities/file/file.model';
+import { FileService } from 'app/entities/file/service/file.service';
 import { BookType } from 'app/entities/enumerations/book-type.model';
 import { Genre } from 'app/entities/enumerations/genre.model';
 import { BookService } from '../service/book.service';
@@ -28,16 +30,20 @@ export class BookUpdateComponent implements OnInit {
   genreValues = Object.keys(Genre);
 
   bookStoragesSharedCollection: IBookStorage[] = [];
+  filesCollection: IFile[] = [];
 
   protected bookService = inject(BookService);
   protected bookFormService = inject(BookFormService);
   protected bookStorageService = inject(BookStorageService);
+  protected fileService = inject(FileService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: BookFormGroup = this.bookFormService.createBookFormGroup();
 
   compareBookStorage = (o1: IBookStorage | null, o2: IBookStorage | null): boolean => this.bookStorageService.compareBookStorage(o1, o2);
+
+  compareFile = (o1: IFile | null, o2: IFile | null): boolean => this.fileService.compareFile(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ book }) => {
@@ -89,8 +95,9 @@ export class BookUpdateComponent implements OnInit {
 
     this.bookStoragesSharedCollection = this.bookStorageService.addBookStorageToCollectionIfMissing<IBookStorage>(
       this.bookStoragesSharedCollection,
-      book.bookStorage,
+      book.bookStorageId,
     );
+    this.filesCollection = this.fileService.addFileToCollectionIfMissing<IFile>(this.filesCollection, book.file);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -99,9 +106,15 @@ export class BookUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IBookStorage[]>) => res.body ?? []))
       .pipe(
         map((bookStorages: IBookStorage[]) =>
-          this.bookStorageService.addBookStorageToCollectionIfMissing<IBookStorage>(bookStorages, this.book?.bookStorage),
+          this.bookStorageService.addBookStorageToCollectionIfMissing<IBookStorage>(bookStorages, this.book?.bookStorageId),
         ),
       )
       .subscribe((bookStorages: IBookStorage[]) => (this.bookStoragesSharedCollection = bookStorages));
+
+    this.fileService
+      .query({ filter: 'book-is-null' })
+      .pipe(map((res: HttpResponse<IFile[]>) => res.body ?? []))
+      .pipe(map((files: IFile[]) => this.fileService.addFileToCollectionIfMissing<IFile>(files, this.book?.file)))
+      .subscribe((files: IFile[]) => (this.filesCollection = files));
   }
 }

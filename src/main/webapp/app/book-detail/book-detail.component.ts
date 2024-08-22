@@ -45,7 +45,13 @@ export class BookDetailComponent implements OnInit {
       next: (response: HttpResponse<IBook>) => {
         this.book = response.body ?? undefined;
         if (this.book) {
-          this.loadBookStorage(this.book.id);
+          console.log(this.book.bookStorageId);
+          const storageId = this.book.bookStorageId;
+          if (typeof storageId === 'number') {
+            this.loadBookStorage(storageId); // Pass the numeric `id`
+          } else {
+            console.warn('Book storage ID is not available or not a number');
+          }
         }
       },
       error: err => {
@@ -62,6 +68,7 @@ export class BookDetailComponent implements OnInit {
       next: (response: HttpResponse<IBookStorage>) => {
         const storageRecord: IBookStorage | undefined = response.body ?? undefined;
         this.quantity = storageRecord?.quantity ?? 0;
+        console.log('storagrerecord', storageRecord);
       },
       error: err => {
         console.error('Error fetching book storage:', err);
@@ -87,8 +94,13 @@ export class BookDetailComponent implements OnInit {
           };
 
           this.visitorBookStorageService.create(newRecord).subscribe(() => {
-            if (this.book && this.book.id) {
-              this.updateBookQuantity(this.book.id, -this.selectedQuantity);
+            if (this.book) {
+              const storageId = this.book.bookStorageId;
+              if (typeof storageId === 'number') {
+                this.updateBookQuantity(storageId, -this.selectedQuantity);
+              } else {
+                console.warn('Book storage ID is not available or not a number');
+              }
               alert('Book borrowed successfully');
             } else {
               alert('Book borrow failed');
@@ -115,6 +127,7 @@ export class BookDetailComponent implements OnInit {
           this.bookStorageService.update(storageRecord).subscribe(response => {
             const bookStorage = response.body ?? undefined;
             if (bookStorage) {
+              console.log('sudahhhhhhhh');
               this.quantity = bookStorage.quantity!;
             }
           });

@@ -6,8 +6,10 @@ import { of, Subject, from } from 'rxjs';
 
 import { IBookStorage } from 'app/entities/book-storage/book-storage.model';
 import { BookStorageService } from 'app/entities/book-storage/service/book-storage.service';
-import { BookService } from '../service/book.service';
+import { IFile } from 'app/entities/file/file.model';
+import { FileService } from 'app/entities/file/service/file.service';
 import { IBook } from '../book.model';
+import { BookService } from '../service/book.service';
 import { BookFormService } from './book-form.service';
 
 import { BookUpdateComponent } from './book-update.component';
@@ -19,6 +21,7 @@ describe('Book Management Update Component', () => {
   let bookFormService: BookFormService;
   let bookService: BookService;
   let bookStorageService: BookStorageService;
+  let fileService: FileService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,6 +45,7 @@ describe('Book Management Update Component', () => {
     bookFormService = TestBed.inject(BookFormService);
     bookService = TestBed.inject(BookService);
     bookStorageService = TestBed.inject(BookStorageService);
+    fileService = TestBed.inject(FileService);
 
     comp = fixture.componentInstance;
   });
@@ -69,15 +73,36 @@ describe('Book Management Update Component', () => {
       expect(comp.bookStoragesSharedCollection).toEqual(expectedCollection);
     });
 
+    it('Should call file query and add missing value', () => {
+      const book: IBook = { id: 456 };
+      const file: IFile = { id: 11684 };
+      book.file = file;
+
+      const fileCollection: IFile[] = [{ id: 8131 }];
+      jest.spyOn(fileService, 'query').mockReturnValue(of(new HttpResponse({ body: fileCollection })));
+      const expectedCollection: IFile[] = [file, ...fileCollection];
+      jest.spyOn(fileService, 'addFileToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ book });
+      comp.ngOnInit();
+
+      expect(fileService.query).toHaveBeenCalled();
+      expect(fileService.addFileToCollectionIfMissing).toHaveBeenCalledWith(fileCollection, file);
+      expect(comp.filesCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const book: IBook = { id: 456 };
       const bookStorage: IBookStorage = { id: 15932 };
       book.bookStorage = bookStorage;
+      const file: IFile = { id: 1134 };
+      book.file = file;
 
       activatedRoute.data = of({ book });
       comp.ngOnInit();
 
       expect(comp.bookStoragesSharedCollection).toContain(bookStorage);
+      expect(comp.filesCollection).toContain(file);
       expect(comp.book).toEqual(book);
     });
   });
@@ -158,6 +183,16 @@ describe('Book Management Update Component', () => {
         jest.spyOn(bookStorageService, 'compareBookStorage');
         comp.compareBookStorage(entity, entity2);
         expect(bookStorageService.compareBookStorage).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareFile', () => {
+      it('Should forward to fileService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(fileService, 'compareFile');
+        comp.compareFile(entity, entity2);
+        expect(fileService.compareFile).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

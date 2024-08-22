@@ -85,9 +85,17 @@
           </dd>
           <dt><span>Book Storage</span></dt>
           <dd>
-            @if (book()!.bookStorage) {
+            @if (book()!.bookStorageId) {
               <div>
-                <a [routerLink]="['/book-storage', book()!.bookStorage?.id, 'view']">{{ book()!.bookStorage?.id }}</a>
+                <a [routerLink]="['/book-storage', book()!.bookStorageId, 'view']">{{ book()!.bookStorageId }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>File</span></dt>
+          <dd>
+            @if (book()!.file) {
+              <div>
+                <a [routerLink]="['/file', book()!.file?.id, 'view']">{{ book()!.file?.id }}</a>
               </div>
             }
           </dd>
