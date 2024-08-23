@@ -166,7 +166,7 @@ public class BookService {
     @Transactional(readOnly = true)
     public Page<BookVM> getBooksForCurrentUserLibrary(Pageable pageable) {
         log.debug("Getting current user's library...");
-        LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentUser();
+        LibraryDTO libraryDTO = libraryService.getSelectedLibrary();
         if (libraryDTO == null) {
             log.error("Library not found for the current user");
             throw new EntityNotFoundException("Library not found for current user");
@@ -199,5 +199,10 @@ public class BookService {
         Book savedBook = bookRepository.save(book);
 
         return bookMapper.toVM(savedBook);
+    }
+
+    public BookDTO findById(Long id) {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        return bookMapper.toDto(book);
     }
 }
