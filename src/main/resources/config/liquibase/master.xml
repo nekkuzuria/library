@@ -33,4 +33,5 @@
     <include file="config/liquibase/changelog/20240820160000_added_entity_PendingTask.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240821100000_added_columns_AbstractAuditingEntity.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/added_columns_jhi_user.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240823134200_added_columns_PendingTask.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

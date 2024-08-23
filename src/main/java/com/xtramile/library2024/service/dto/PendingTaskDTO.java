@@ -1,11 +1,15 @@
 package com.xtramile.library2024.service.dto;
 
 import com.xtramile.library2024.domain.enumeration.PendingTaskStatus;
+import com.xtramile.library2024.domain.enumeration.PendingTaskType;
+import java.time.Instant;
 import java.util.Objects;
 
 public class PendingTaskDTO {
 
     private Long id;
+
+    private PendingTaskType type;
 
     private PendingTaskStatus status;
 
@@ -16,6 +20,20 @@ public class PendingTaskDTO {
     private BookDTO book;
 
     private Integer quantity;
+
+    private LibrarianDTO librarian;
+
+    private VisitorBookStorageDTO visitorBookStorage;
+
+    private String reason;
+
+    private String createdBy;
+
+    private Instant createdDate;
+
+    private String lastModifiedBy;
+
+    private Instant lastModifiedDate;
 
     public Long getId() {
         return id;
@@ -63,6 +81,70 @@ public class PendingTaskDTO {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public PendingTaskType getType() {
+        return type;
+    }
+
+    public void setType(PendingTaskType type) {
+        this.type = type;
+    }
+
+    public LibrarianDTO getLibrarian() {
+        return librarian;
+    }
+
+    public void setLibrarian(LibrarianDTO librarian) {
+        this.librarian = librarian;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public VisitorBookStorageDTO getVisitorBookStorage() {
+        return visitorBookStorage;
+    }
+
+    public void setVisitorBookStorage(VisitorBookStorageDTO visitorBookStorage) {
+        this.visitorBookStorage = visitorBookStorage;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override

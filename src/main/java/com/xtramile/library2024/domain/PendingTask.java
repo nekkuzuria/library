@@ -2,14 +2,16 @@ package com.xtramile.library2024.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.xtramile.library2024.domain.enumeration.PendingTaskStatus;
+import com.xtramile.library2024.domain.enumeration.PendingTaskType;
 import jakarta.persistence.*;
+import java.io.Serializable;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "pending_task")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class PendingTask {
+public class PendingTask extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,6 +20,10 @@ public class PendingTask {
     @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "id")
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private PendingTaskType type;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -37,6 +43,17 @@ public class PendingTask {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visitorBookStorages", "address", "user", "visits", "bookStorages", "visitors" }, allowSetters = true)
+    private Librarian librarian;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "visitorBookStorages", "address", "user", "visits", "bookStorages", "visitors" }, allowSetters = true)
+    private VisitorBookStorage visitorBookStorage;
+
+    @Column(name = "reason")
+    private String reason;
 
     public Long getId() {
         return id;
@@ -99,6 +116,38 @@ public class PendingTask {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public PendingTaskType getType() {
+        return type;
+    }
+
+    public void setType(PendingTaskType type) {
+        this.type = type;
+    }
+
+    public Librarian getLibrarian() {
+        return librarian;
+    }
+
+    public void setLibrarian(Librarian librarian) {
+        this.librarian = librarian;
+    }
+
+    public VisitorBookStorage getVisitorBookStorage() {
+        return visitorBookStorage;
+    }
+
+    public void setVisitorBookStorage(VisitorBookStorage visitorBookStorage) {
+        this.visitorBookStorage = visitorBookStorage;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     @Override

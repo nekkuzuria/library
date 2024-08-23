@@ -4,6 +4,7 @@ import com.xtramile.library2024.repository.PendingTaskRepository;
 import com.xtramile.library2024.service.PendingTaskService;
 import com.xtramile.library2024.service.dto.PendingTaskDTO;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
+import com.xtramile.library2024.web.rest.vm.PendingTaskVM;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -23,7 +24,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
-@RequestMapping("/api/pending-task")
+@RequestMapping("/api/pending-tasks")
 public class PendingTaskResource {
 
     private static final Logger log = LoggerFactory.getLogger(PendingTaskResource.class);
@@ -45,20 +46,20 @@ public class PendingTaskResource {
     /**
      * {@code POST  /pending-task} : Create a new pendingTask.
      *
-     * @param pendingTaskDTO the pendingTaskDTO to create.
+     * @param pendingTaskVM the pendingTaskDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new pendingTaskDTO, or with status {@code 400 (Bad Request)} if the pendingTask has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<PendingTaskDTO> createPendingTask(@RequestBody PendingTaskDTO pendingTaskDTO) throws URISyntaxException {
-        log.debug("REST request to save PendingTask : {}", pendingTaskDTO);
-        if (pendingTaskDTO.getId() != null) {
+    public ResponseEntity<PendingTaskVM> createPendingTask(@RequestBody PendingTaskVM pendingTaskVM) throws URISyntaxException {
+        log.debug("REST request to save PendingTask : {}", pendingTaskVM);
+        if (pendingTaskVM.getId() != null) {
             throw new BadRequestAlertException("A new pendingTask cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        pendingTaskDTO = pendingTaskService.save(pendingTaskDTO);
-        return ResponseEntity.created(new URI("/api/pending-task/" + pendingTaskDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, pendingTaskDTO.getId().toString()))
-            .body(pendingTaskDTO);
+        pendingTaskVM = pendingTaskService.createNew(pendingTaskVM);
+        return ResponseEntity.created(new URI("/api/pending-task/" + pendingTaskVM.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, pendingTaskVM.getId().toString()))
+            .body(pendingTaskVM);
     }
 
     /**
@@ -106,7 +107,7 @@ public class PendingTaskResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<PendingTaskDTO> partialUpdatePendingTask(
+    public ResponseEntity<PendingTaskVM> partialUpdatePendingTask(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody PendingTaskDTO pendingTaskDTO
     ) throws URISyntaxException {
@@ -122,7 +123,7 @@ public class PendingTaskResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<PendingTaskDTO> result = pendingTaskService.partialUpdate(pendingTaskDTO);
+        Optional<PendingTaskVM> result = pendingTaskService.partialUpdate(pendingTaskDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -137,9 +138,9 @@ public class PendingTaskResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pendingTasks in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<PendingTaskDTO>> getAllPendingTasks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of PendingTasks");
-        Page<PendingTaskDTO> page = pendingTaskService.findAll(pageable);
+        Page<PendingTaskVM> page = pendingTaskService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

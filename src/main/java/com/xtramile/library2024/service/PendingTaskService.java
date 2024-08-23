@@ -1,10 +1,15 @@
 package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.PendingTask;
+import com.xtramile.library2024.domain.enumeration.PendingTaskStatus;
+import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.repository.PendingTaskRepository;
+import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.dto.PendingTaskDTO;
+import com.xtramile.library2024.service.mapper.BookMapper;
 import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.service.mapper.PendingTaskMapper;
+import com.xtramile.library2024.web.rest.vm.PendingTaskVM;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -25,14 +30,33 @@ public class PendingTaskService {
 
     private final LibraryMapper libraryMapper;
 
+    LibraryService libraryService;
+
+    VisitorService visitorService;
+
+    BookService bookService;
+
+    BookMapper bookMapper;
+    private final BookRepository bookRepository;
+
     public PendingTaskService(
         PendingTaskRepository pendingTaskRepository,
         PendingTaskMapper pendingTaskMapper,
-        LibraryMapper libraryMapper
+        LibraryMapper libraryMapper,
+        LibraryService libraryService,
+        VisitorService visitorService,
+        BookService bookService,
+        BookRepository bookRepository,
+        BookMapper bookMapper
     ) {
         this.pendingTaskRepository = pendingTaskRepository;
         this.pendingTaskMapper = pendingTaskMapper;
         this.libraryMapper = libraryMapper;
+        this.libraryService = libraryService;
+        this.visitorService = visitorService;
+        this.bookService = bookService;
+        this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
     /**
@@ -67,7 +91,7 @@ public class PendingTaskService {
      * @param pendingTaskDTO the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<PendingTaskDTO> partialUpdate(PendingTaskDTO pendingTaskDTO) {
+    public Optional<PendingTaskVM> partialUpdate(PendingTaskDTO pendingTaskDTO) {
         log.debug("Request to partially update PendingTask : {}", pendingTaskDTO);
 
         return pendingTaskRepository
@@ -78,7 +102,7 @@ public class PendingTaskService {
                 return existingPendingTask;
             })
             .map(pendingTaskRepository::save)
-            .map(pendingTaskMapper::toDto);
+            .map(pendingTaskMapper::toVm);
     }
 
     /**
@@ -88,9 +112,9 @@ public class PendingTaskService {
      * @return the list of entities.
      */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Page<PendingTaskDTO> findAll(Pageable pageable) {
+    public Page<PendingTaskVM> findAll(Pageable pageable) {
         log.debug("Request to get all PendingTasks");
-        return pendingTaskRepository.findAll(pageable).map(pendingTaskMapper::toDto);
+        return pendingTaskRepository.findAll(pageable).map(pendingTaskMapper::toVm);
     }
 
     /**
@@ -113,5 +137,21 @@ public class PendingTaskService {
     public void delete(Long id) {
         log.debug("Request to delete PendingTask : {}", id);
         pendingTaskRepository.deleteById(id);
+    }
+
+    public PendingTaskVM createNew(PendingTaskVM pendingTaskVM) {
+        log.debug("Request to save PendingTask : {}", pendingTaskVM);
+        PendingTaskDTO pendingTaskDTO = pendingTaskMapper.toDto(pendingTaskVM);
+
+        BookDTO bookDTO = bookService.findById(pendingTaskVM.getBookId());
+        pendingTaskDTO.setBook(bookDTO);
+        pendingTaskDTO.setLibrarian(null);
+        pendingTaskDTO.setStatus(PendingTaskStatus.PENDING);
+        pendingTaskDTO.setVisitor(visitorService.getVisitorOfCurrentUser());
+        pendingTaskDTO.setLibrary(libraryService.getSelectedLibrary());
+
+        PendingTask pendingTask = pendingTaskMapper.toEntity(pendingTaskDTO);
+        pendingTask = pendingTaskRepository.save(pendingTask);
+        return pendingTaskMapper.toVm(pendingTask);
     }
 }
