@@ -1,0 +1,81 @@
+<div class="container">
+  <h2 data-cy="BookHeading">
+    <span>Book Borrow Request</span>
+  </h2>
+
+  @if (pendingTasks?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No borrow request</span>
+    </div>
+  }
+  @if (pendingTasks && pendingTasks.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort>
+            <th scope="col" jhiSortBy="title">
+              <div class="d-flex">
+                <span>Title</span>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="author">
+              <div class="d-flex">
+                <span>Author</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span>Quantity</span>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="visitorName">
+              <div class="d-flex">
+                <span>Visitor</span>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="createdDate">
+              <div class="d-flex">
+                <span>Request Date</span>
+              </div>
+            </th>
+            <th scope="col"><div class="d-flex">Status</div></th>
+            <th scope="col"><div class="d-flex"></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of pendingTasks; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/book', p.id, 'view']">{{ p.bookTitle }}</a>
+              </td>
+              <td>{{ p.bookAuthor }}</td>
+              <td>{{ p.quantity }}</td>
+              <td>{{ p.visitorName }}</td>
+              <td>{{ p.createdDate ? p.createdDate.format('DD-MM-YYYY') : '' }}</td>
+              <td>{{ p.status }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button
+                    (click)="p.id !== null ? updateTaskStatus(p.id, 'APPROVED') : null"
+                    class="btn btn-success btn-sm"
+                    data-cy="approveBorrowRequestButton"
+                  >
+                    <span class="d-none d-md-inline">APPROVE</span>
+                  </button>
+                  <button
+                    (click)="p.id !== null ? updateTaskStatus(p.id, 'DENIED') : null"
+                    class="btn btn-danger btn-sm"
+                    data-cy="denyBorrowRequestButton"
+                  >
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">DENY</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
