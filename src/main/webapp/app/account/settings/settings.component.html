@@ -1,12 +1,13 @@
 <div>
   <div class="d-flex justify-content-center">
     <div class="col-md-8">
-      <!-- Display user settings header -->
-      <div *ngIf="settingsForm.get('login')?.value">
-        <h2>
-          User settings for [<strong>{{ settingsForm.get('login')?.value }}</strong
-          >]
-        </h2>
+      <div *ngIf="settingsForm">
+        <div *ngIf="settingsForm.get('login')?.value">
+          <h2>
+            User settings for [<strong>{{ settingsForm.get('login')?.value }}</strong
+            >]
+          </h2>
+        </div>
       </div>
 
       <!-- Display success message -->
@@ -18,7 +19,7 @@
       <jhi-alert-error></jhi-alert-error>
 
       <!-- Form for user settings -->
-      <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm">
+      <form *ngIf="settingsForm" name="form" (ngSubmit)="save()" [formGroup]="settingsForm">
         <div class="row">
           <!-- Input First Name -->
           <div class="mb-3 col-6">

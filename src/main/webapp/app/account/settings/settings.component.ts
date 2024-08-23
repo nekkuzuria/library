@@ -13,7 +13,7 @@ export default class SettingsComponent implements OnInit {
   success = signal(false);
   imagePreview: string | ArrayBuffer | null = null;
 
-  settingsForm: FormGroup = new FormGroup({});
+  settingsForm: FormGroup | null = null;
 
   private settingsService = inject(SettingsService);
 
@@ -46,7 +46,7 @@ export default class SettingsComponent implements OnInit {
   save(): void {
     this.success.set(false);
 
-    const account = this.settingsForm.getRawValue();
+    const account = this.settingsForm!.getRawValue();
     this.settingsService.updateUserSettings(account).subscribe(
       () => {
         this.success.set(true);
@@ -75,7 +75,7 @@ export default class SettingsComponent implements OnInit {
         },
       );
 
-      this.settingsForm.patchValue({ file });
+      this.settingsForm!.patchValue({ file });
     }
   }
 }
