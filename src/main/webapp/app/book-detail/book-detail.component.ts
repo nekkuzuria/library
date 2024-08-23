@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VisitorService } from '../entities/visitor/service/visitor.service';
 import dayjs from 'dayjs/esm';
+import { PendingTaskService } from 'app/pending-task/pending-task.service';
+import { IPendingTaskVM, NewPendingTask } from 'app/pending-task/pending-task.model';
 
 @Component({
   selector: 'app-book-detail',
@@ -31,6 +33,7 @@ export class BookDetailComponent implements OnInit {
     private visitorBookStorageService: VisitorBookStorageService,
     private router: Router,
     private visitorService: VisitorService,
+    private pendingTaskService: PendingTaskService,
   ) {}
 
   ngOnInit(): void {
@@ -82,60 +85,27 @@ export class BookDetailComponent implements OnInit {
   onBorrow(): void {
     if (this.selectedQuantity <= this.quantity && this.selectedQuantity != 0) {
       if (this.book) {
-        this.visitorService.getVisitorId().subscribe(visitorId => {
-          console.log(visitorId);
-          const newRecord: NewVisitorBookStorage = {
-            id: null,
-            visitor: { id: visitorId },
-            book: { id: this.book!.id },
-            borrowDate: dayjs().startOf('day'),
-            returnDate: null,
-            quantity: this.selectedQuantity,
-          };
-
-          this.visitorBookStorageService.create(newRecord).subscribe(() => {
-            if (this.book) {
-              const storageId = this.book.bookStorageId;
-              if (typeof storageId === 'number') {
-                this.updateBookQuantity(storageId, -this.selectedQuantity);
-              } else {
-                console.warn('Book storage ID is not available or not a number');
-              }
-              alert('Book borrowed successfully');
-            } else {
-              alert('Book borrow failed');
-            }
-          });
+        const pendingTask: NewPendingTask = {
+          id: null,
+          bookId: this.book.id,
+          type: 'BORROW',
+          quantity: this.selectedQuantity,
+        };
+        this.pendingTaskService.create(pendingTask).subscribe({
+          next: response => {
+            console.log('Pending task created successfully:', response);
+            alert('Borrow request created successfully');
+          },
+          error: error => {
+            console.error('Error creating pending task:', error);
+            alert('Borrow request created failed');
+          },
         });
       } else {
-        alert('Could not determine user ID');
+        alert('Could not determine book ID');
       }
     } else {
       alert('Selected quantity exceeds available stock.');
     }
-  }
-
-  updateBookQuantity(bookId: number, quantityChange: number): void {
-    this.bookStorageService.find(bookId).subscribe({
-      next: (response: HttpResponse<IBookStorage>) => {
-        const storageRecord = response.body;
-        if (storageRecord) {
-          if (storageRecord.quantity == null) {
-            storageRecord.quantity = 0;
-          }
-          storageRecord.quantity += quantityChange;
-          this.bookStorageService.update(storageRecord).subscribe(response => {
-            const bookStorage = response.body ?? undefined;
-            if (bookStorage) {
-              console.log('sudahhhhhhhh');
-              this.quantity = bookStorage.quantity!;
-            }
-          });
-        }
-      },
-      error: err => {
-        console.error('Error updating quantity:', err);
-      },
-    });
   }
 }
