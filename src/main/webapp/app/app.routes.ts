@@ -11,6 +11,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { BookDetailComponent } from './book-detail/book-detail.component';
 import { PersonalStorageComponent } from './personal-storage/personal-storage.component';
 import { LibraryVisitComponent } from './library-visit/library-visit.component';
+import { PendingTaskComponent } from './pending-task/pending-task.component';
 
 const routes: Routes = [
   {
@@ -63,6 +64,12 @@ const routes: Routes = [
     path: 'library-visit',
     component: LibraryVisitComponent,
     title: 'library-visit.title',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'pending-tasks',
+    component: PendingTaskComponent,
+    title: 'Pending Tasks',
     canActivate: [UserRouteAccessService],
   },
   {
