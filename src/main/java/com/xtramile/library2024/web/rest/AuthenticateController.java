@@ -6,6 +6,7 @@ import static com.xtramile.library2024.security.SecurityUtils.JWT_ALGORITHM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.xtramile.library2024.domain.User;
 import com.xtramile.library2024.repository.UserRepository;
+import com.xtramile.library2024.service.LibraryService;
 import com.xtramile.library2024.web.rest.vm.LoginVM;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -47,15 +48,18 @@ public class AuthenticateController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final UserRepository userRepository;
+    private final LibraryService libraryService;
 
     public AuthenticateController(
         JwtEncoder jwtEncoder,
         AuthenticationManagerBuilder authenticationManagerBuilder,
-        UserRepository userRepository
+        UserRepository userRepository,
+        LibraryService libraryService
     ) {
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userRepository = userRepository;
+        this.libraryService = libraryService;
     }
 
     @PostMapping("/authenticate")
@@ -65,11 +69,16 @@ public class AuthenticateController {
             loginVM.getPassword()
         );
 
+        //        if (!libraryService.isAdminLibraryValid()) {
+        //            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        //        }
+
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = this.createToken(authentication, loginVM.isRememberMe());
+        String jwt = this.createToken(authentication, loginVM.isRememberMe(), loginVM.getLibraryId());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
+
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
@@ -85,7 +94,7 @@ public class AuthenticateController {
         return request.getRemoteUser();
     }
 
-    public String createToken(Authentication authentication, boolean rememberMe) {
+    public String createToken(Authentication authentication, boolean rememberMe, Long libraryId) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" "));
 
         //obtain userid
@@ -108,6 +117,7 @@ public class AuthenticateController {
             .subject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
             .claim("userId", userId)
+            .claim("libraryId", libraryId)
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

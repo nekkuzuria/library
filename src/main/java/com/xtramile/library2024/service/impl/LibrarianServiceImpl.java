@@ -1,7 +1,9 @@
 package com.xtramile.library2024.service.impl;
 
 import com.xtramile.library2024.domain.Librarian;
+import com.xtramile.library2024.domain.User;
 import com.xtramile.library2024.repository.LibrarianRepository;
+import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.LibrarianService;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +33,12 @@ public class LibrarianServiceImpl implements LibrarianService {
     private final LibrarianRepository librarianRepository;
 
     private final LibrarianMapper librarianMapper;
+    private final UserRepository userRepository;
 
-    public LibrarianServiceImpl(LibrarianRepository librarianRepository, LibrarianMapper librarianMapper) {
+    public LibrarianServiceImpl(LibrarianRepository librarianRepository, LibrarianMapper librarianMapper, UserRepository userRepository) {
         this.librarianRepository = librarianRepository;
         this.librarianMapper = librarianMapper;
+        this.userRepository = userRepository;
     }
 
     @Override

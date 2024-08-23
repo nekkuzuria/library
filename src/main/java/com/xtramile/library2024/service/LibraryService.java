@@ -1,7 +1,9 @@
 package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.Library;
+import com.xtramile.library2024.domain.User;
 import com.xtramile.library2024.repository.LibraryRepository;
+import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.dto.VisitorDTO;
@@ -11,10 +13,16 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -158,5 +166,25 @@ public class LibraryService {
 
         log.warn("User is neither a librarian nor a visitor");
         throw new EntityNotFoundException("User is neither a librarian nor a visitor");
+    }
+
+    public LibraryDTO getSelectedLibrary() {
+        Authentication authetication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authetication.getPrincipal();
+
+        Long libraryIdClaim = jwt.getClaim("libraryId");
+        if (libraryIdClaim != null) {
+            Optional<Library> libraryOptional = libraryRepository.findById(libraryIdClaim);
+            return libraryOptional.map(libraryMapper::toDto).orElse(null);
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isAdminLibraryValid() {
+        if (getSelectedLibrary() != null && getLibraryOfCurrentUser() != null) {
+            return getSelectedLibrary().getId().equals(getLibraryOfCurrentUser().getId());
+        }
+        return false;
     }
 }

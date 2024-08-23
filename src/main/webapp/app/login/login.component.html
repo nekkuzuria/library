@@ -16,11 +16,13 @@
             <div class="card-body">
               <h2 class="text-uppercase text-center">Welcome Back!</h2>
               <h4 class="text-center mb-5">Let's Get Reading!</h4>
-              @if (authenticationError()) {
-                <div class="alert alert-danger text-center mb-4">
-                  <strong>Sign in failed!</strong> Please check your credentials and try again.
-                </div>
-              }
+              <div *ngIf="authenticationError()" class="alert alert-danger text-center mb-4">
+                <strong>Sign in failed!</strong> Please check your credentials and try again.
+              </div>
+
+              <div *ngIf="unauthorizedError()" class="alert alert-danger text-center mb-4">
+                <strong>Unauthorized!</strong> You do not have permission to access this resource.
+              </div>
               <form class="form" (ngSubmit)="login()" [formGroup]="loginForm">
                 <div class="mb-3">
                   <label class="form-label" for="username">Username</label>
@@ -36,7 +38,7 @@
                   />
                 </div>
 
-                <div class="mb-5">
+                <div class="mb-3">
                   <label class="form-label" for="password">Password</label>
                   <input
                     type="password"
@@ -49,7 +51,20 @@
                   />
                 </div>
 
-                <div class="d-grid">
+                <div class="col-12">
+                  <label class="form-label" for="library">Choose Library <span class="text-danger">*</span></label>
+                  <div class="form-control">
+                    <ng-select
+                      [items]="libraries"
+                      bindLabel="name"
+                      bindValue="id"
+                      placeholder="Select a library"
+                      formControlName="libraryId"
+                    ></ng-select>
+                  </div>
+                </div>
+
+                <div class="d-grid mt-5">
                   <button type="submit" class="btn btn-primary w-100 rounded-5 mb-5" data-cy="submit">Sign in</button>
                 </div>
               </form>
