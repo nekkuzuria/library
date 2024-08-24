@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BookService } from '../entities/book/service/book.service';
 import { BookStorageService } from '../entities/book-storage/service/book-storage.service';
@@ -13,18 +13,23 @@ import { VisitorService } from '../entities/visitor/service/visitor.service';
 import dayjs from 'dayjs/esm';
 import { PendingTaskService } from 'app/pending-task/pending-task.service';
 import { IPendingTaskVM, NewPendingTask } from 'app/pending-task/pending-task.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BookDeleteDialogComponent } from '../entities/book/delete/book-delete-dialog.component';
+import SharedModule from 'app/shared/shared.module';
+import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
 
 @Component({
   selector: 'app-book-detail',
   templateUrl: './book-detail.component.html',
   styleUrls: ['./book-detail.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedModule, HasAnyAuthorityDirective],
 })
 export class BookDetailComponent implements OnInit {
   book?: IBook;
   quantity: number = 0;
   selectedQuantity: number = 1;
+  protected modalService = inject(NgbModal);
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -106,6 +111,24 @@ export class BookDetailComponent implements OnInit {
       }
     } else {
       alert('Selected quantity exceeds available stock.');
+    }
+  }
+
+  onEdit(): void {
+    if (this.book) {
+      this.router.navigate(['/book', this.book.id, 'edit']);
+    }
+  }
+
+  onDelete(): void {
+    if (this.book) {
+      const modalRef = this.modalService.open(BookDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+      modalRef.componentInstance.book = this.book;
+      modalRef.closed.subscribe(reason => {
+        if (reason === 'deleted') {
+          this.router.navigate(['/dashboard']);
+        }
+      });
     }
   }
 }

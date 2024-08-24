@@ -15,8 +15,8 @@
           <p class="card-text"><strong>Synopsis:</strong></p>
           <p class="card-text text-muted">{{ book.synopsis }}</p>
 
-          <!-- Quantity Selection and Borrow Button -->
-          <div class="mt-4">
+          <!-- Quantity Selection and Borrow Button for ROLE_USER -->
+          <div *jhiHasAnyAuthority="'ROLE_USER'" class="mt-4">
             <form (ngSubmit)="onBorrow()">
               <div class="d-flex align-items-center mb-3">
                 <input
@@ -33,6 +33,12 @@
                 <button type="submit" class="btn btn-primary">Borrow</button>
               </div>
             </form>
+          </div>
+
+          <!-- Edit and Delete Buttons for ROLE_ADMIN -->
+          <div *jhiHasAnyAuthority="'ROLE_ADMIN'" class="mt-4">
+            <button class="btn btn-warning me-2" (click)="onEdit()">Edit</button>
+            <button class="btn btn-danger" (click)="onDelete()">Delete</button>
           </div>
         </div>
       </div>
