@@ -1,16 +1,17 @@
 package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.PendingTask;
+import com.xtramile.library2024.domain.VisitorBookStorage;
 import com.xtramile.library2024.domain.enumeration.PendingTaskStatus;
+import com.xtramile.library2024.domain.enumeration.PendingTaskType;
 import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.repository.PendingTaskRepository;
-import com.xtramile.library2024.service.dto.BookDTO;
-import com.xtramile.library2024.service.dto.PendingTaskDTO;
-import com.xtramile.library2024.service.mapper.BookMapper;
-import com.xtramile.library2024.service.mapper.LibraryMapper;
-import com.xtramile.library2024.service.mapper.PendingTaskMapper;
+import com.xtramile.library2024.service.dto.*;
+import com.xtramile.library2024.service.mapper.*;
 import com.xtramile.library2024.web.rest.vm.PendingTaskVM;
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +31,28 @@ public class PendingTaskService {
 
     private final LibraryMapper libraryMapper;
 
-    LibraryService libraryService;
+    private final LibraryService libraryService;
 
-    VisitorService visitorService;
+    private final VisitorService visitorService;
 
-    BookService bookService;
+    private final BookService bookService;
 
-    BookMapper bookMapper;
+    private final VisitorBookStorageService visitorBookStorageService;
+
+    private final LibrarianService librarianService;
+
+    private final VisitService visitService;
+
+    private final BookStorageService bookStorageService;
+
+    private final VisitorMapper visitorMapper;
+
+    private final BookMapper bookMapper;
+
+    private final VisitorBookStorageMapper visitorBookStorageMapper;
+
+    private final BookStorageMapper bookStorageMapper;
+
     private final BookRepository bookRepository;
 
     public PendingTaskService(
@@ -47,7 +63,14 @@ public class PendingTaskService {
         VisitorService visitorService,
         BookService bookService,
         BookRepository bookRepository,
-        BookMapper bookMapper
+        BookMapper bookMapper,
+        VisitorBookStorageService visitorBookStorageService,
+        VisitorMapper visitorMapper,
+        VisitorBookStorageMapper visitorBookStorageMapper,
+        LibrarianService librarianService,
+        VisitService visitService,
+        BookStorageService bookStorageService,
+        BookStorageMapper bookStorageMapper
     ) {
         this.pendingTaskRepository = pendingTaskRepository;
         this.pendingTaskMapper = pendingTaskMapper;
@@ -57,6 +80,13 @@ public class PendingTaskService {
         this.bookService = bookService;
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+        this.visitorBookStorageService = visitorBookStorageService;
+        this.visitorMapper = visitorMapper;
+        this.visitorBookStorageMapper = visitorBookStorageMapper;
+        this.librarianService = librarianService;
+        this.visitService = visitService;
+        this.bookStorageService = bookStorageService;
+        this.bookStorageMapper = bookStorageMapper;
     }
 
     /**
@@ -153,5 +183,87 @@ public class PendingTaskService {
         PendingTask pendingTask = pendingTaskMapper.toEntity(pendingTaskDTO);
         pendingTask = pendingTaskRepository.save(pendingTask);
         return pendingTaskMapper.toVm(pendingTask);
+    }
+
+    public Optional<PendingTaskVM> processPendingTask(PendingTaskDTO pendingTaskDTO) {
+        log.debug("Request to partially update PendingTask : {}", pendingTaskDTO);
+
+        Optional<PendingTaskVM> pendingTaskVM = pendingTaskRepository
+            .findById(pendingTaskDTO.getId())
+            .map(existingPendingTask -> {
+                PendingTaskType type = existingPendingTask.getType();
+                PendingTaskStatus status = pendingTaskDTO.getStatus();
+
+                LibrarianDTO currentLibrarian = librarianService.getLibrarianOfCurrentUser();
+
+                if (status == PendingTaskStatus.APPROVED) {
+                    VisitorBookStorageDTO newVbs = handleApproval(type, currentLibrarian, existingPendingTask);
+                    pendingTaskDTO.setVisitorBookStorage(newVbs);
+                }
+
+                pendingTaskDTO.setLibrarian(currentLibrarian);
+
+                pendingTaskMapper.partialUpdate(existingPendingTask, pendingTaskDTO);
+                return existingPendingTask;
+            })
+            .map(pendingTaskRepository::save)
+            .map(pendingTaskMapper::toVm);
+
+        return pendingTaskVM;
+    }
+
+    /**
+     * Handles the approval process for a pending task.
+     *
+     * This method is responsible for processing the approval of a pending task.
+     * It creates a new VisitorBookStorage and Visit, and
+     * it alters the quantity in BookStorage depending on if book is being returned or is being borrowed
+     *
+     * @param type The type of the pending task that needs approval.
+     * @param currentLibrarian The current librarian who is performing the approval action.
+     * @param existingPendingTask The pending task that is being approved.
+     * @return VisitorBookStorageDTO The visitor book storage details after approval processing.
+     */
+    private VisitorBookStorageDTO handleApproval(PendingTaskType type, LibrarianDTO currentLibrarian, PendingTask existingPendingTask) {
+        VisitorBookStorageDTO savedVbs = null;
+        VisitorDTO visitorDTO = visitorMapper.toDto(existingPendingTask.getVisitor());
+        BookDTO bookDTO = bookMapper.toDto(existingPendingTask.getBook());
+        BookStorageDTO bookStorageDTO = bookStorageMapper.toDto(existingPendingTask.getBook().getBookStorage());
+        Integer quantity = existingPendingTask.getQuantity();
+
+        if (type == PendingTaskType.BORROW) {
+            VisitorBookStorageDTO vbsDTO = new VisitorBookStorageDTO();
+            vbsDTO.setBorrowDate(existingPendingTask.getCreatedDate().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate());
+            vbsDTO.setVisitor(visitorDTO);
+            vbsDTO.setBook(bookDTO);
+            vbsDTO.setQuantity(quantity);
+            savedVbs = visitorBookStorageService.save(vbsDTO);
+
+            bookStorageDTO.setQuantity(bookStorageDTO.getQuantity() - quantity);
+            bookStorageService.save(bookStorageDTO);
+        } else if (type == PendingTaskType.RETURN) {
+            VisitorBookStorage vbs = existingPendingTask.getVisitorBookStorage();
+            vbs.setReturnDate(LocalDate.now());
+            savedVbs = visitorBookStorageService.save(visitorBookStorageMapper.toDto(vbs));
+
+            bookStorageDTO.setQuantity(bookStorageDTO.getQuantity() + quantity);
+            bookStorageService.save(bookStorageDTO);
+        }
+        VisitDTO visitDTO = new VisitDTO();
+        visitDTO.setDate(LocalDate.now());
+        visitDTO.setLibrary(libraryMapper.toDto(existingPendingTask.getLibrary()));
+        visitDTO.setLibrarian(currentLibrarian);
+        visitDTO.setVisitor(visitorDTO);
+        visitDTO.setVisitorBookStorage(savedVbs);
+        visitService.save(visitDTO);
+
+        return savedVbs;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<PendingTaskVM> findAllFromCurrentLibrary(Pageable pageable) {
+        log.debug("Request to get all PendingTasks");
+        LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentLibrarian();
+        return pendingTaskRepository.findByLibrary(libraryMapper.toEntity(libraryDTO), pageable).map(pendingTaskMapper::toVm);
     }
 }

@@ -8,6 +8,7 @@ import { sortStateSignal, SortDirective, SortByDirective, type SortState, SortSe
 import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
 import { ItemCountComponent } from 'app/shared/pagination';
 import dayjs from 'dayjs/esm';
+import { PendingTaskStatus } from './pending-task-status.model';
 
 @Component({
   selector: 'jhi-pending-task',
@@ -27,7 +28,11 @@ import dayjs from 'dayjs/esm';
   styleUrl: './pending-task.component.scss',
 })
 export class PendingTaskComponent implements OnInit {
+  PendingTaskStatus = PendingTaskStatus;
   pendingTasks?: IPendingTaskVM[];
+  selectedPendingTask: IPendingTaskVM = {} as IPendingTaskVM;
+  reason: string = '';
+  isApproved: boolean = false;
 
   constructor(private pendingTaskService: PendingTaskService) {}
 
@@ -49,13 +54,20 @@ export class PendingTaskComponent implements OnInit {
     return item.id ?? 0;
   }
 
-  updateTaskStatus(taskId: number, status: string): void {
-    this.pendingTaskService.updateStatus(taskId, status).subscribe({
-      next: () => {
-        console.log('Pending task updated successfully');
-        this.loadCurrentPendingTasks();
-      },
-      error: err => console.error('Error updating pending task status', err),
-    });
+  updateSelected(isApproved: boolean, pendingTask: IPendingTaskVM): void {
+    this.isApproved = isApproved;
+    this.selectedPendingTask = pendingTask;
+  }
+
+  updateTaskStatus(): void {
+    if (this.selectedPendingTask.id !== null) {
+      this.pendingTaskService.updateStatus(this.isApproved, this.selectedPendingTask.id, this.reason).subscribe({
+        next: () => {
+          console.log('Pending task updated successfully');
+          this.loadCurrentPendingTasks();
+        },
+        error: err => console.error('Error updating pending task status', err),
+      });
+    }
   }
 }

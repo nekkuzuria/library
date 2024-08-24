@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IPendingTaskVM, NewPendingTask } from './pending-task.model';
+import { PendingTaskStatus } from './pending-task-status.model';
 
 export type EntityResponseType = HttpResponse<IPendingTaskVM>;
 export type EntityArrayResponseType = HttpResponse<IPendingTaskVM[]>;
@@ -25,11 +26,16 @@ export class PendingTaskService {
     return this.http.get<IPendingTaskVM[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  updateStatus(taskId: number, status: string): Observable<any> {
+  updateStatus(isApproved: boolean, taskId: number, reason: string): Observable<any> {
     const requestBody = {
       id: taskId,
-      status: status,
+      status: isApproved ? PendingTaskStatus.APPROVED : PendingTaskStatus.DENIED,
+      reason: reason,
     };
-    return this.http.patch(`${this.resourceUrl}/${taskId}`, requestBody);
+    if (isApproved) {
+      return this.http.patch(`${this.resourceUrl}/${taskId}`, requestBody);
+    } else {
+      return this.http.patch(`${this.resourceUrl}/${taskId}`, requestBody);
+    }
   }
 }

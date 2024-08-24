@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -123,7 +125,7 @@ public class PendingTaskResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<PendingTaskVM> result = pendingTaskService.partialUpdate(pendingTaskDTO);
+        Optional<PendingTaskVM> result = pendingTaskService.processPendingTask(pendingTaskDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -138,9 +140,14 @@ public class PendingTaskResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pendingTasks in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasks(
+        @org.springdoc.core.annotations.ParameterObject @PageableDefault(
+            sort = "createdDate",
+            direction = Sort.Direction.ASC
+        ) Pageable pageable
+    ) {
         log.debug("REST request to get a page of PendingTasks");
-        Page<PendingTaskVM> page = pendingTaskService.findAll(pageable);
+        Page<PendingTaskVM> page = pendingTaskService.findAllFromCurrentLibrary(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

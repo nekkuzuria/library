@@ -1,76 +1,92 @@
 <div class="container">
   <h2 data-cy="BookHeading">
-    <span>Book Borrow Request</span>
+    <span>Book Borrow & Return Request</span>
   </h2>
 
   @if (pendingTasks?.length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span>No borrow request</span>
+      <span>No requests</span>
     </div>
   }
   @if (pendingTasks && pendingTasks.length > 0) {
     <div class="table-responsive table-entities" id="entities">
       <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
+        <thead class="text-center">
           <tr jhiSort>
-            <th scope="col" jhiSortBy="title">
-              <div class="d-flex">
-                <span>Title</span>
+            <th scope="col">
+              <div class="d-flex" class="text-center">
+                <span>Type</span>
               </div>
             </th>
-            <th scope="col" jhiSortBy="author">
-              <div class="d-flex">
-                <span>Author</span>
+            <th scope="col">
+              <div class="d-flex" class="text-center">
+                <span>Book</span>
               </div>
             </th>
             <th>
-              <div class="d-flex">
+              <div class="d-flex" class="text-center">
                 <span>Quantity</span>
               </div>
             </th>
-            <th scope="col" jhiSortBy="visitorName">
-              <div class="d-flex">
+            <th scope="col">
+              <div class="d-flex" class="text-center">
                 <span>Visitor</span>
               </div>
             </th>
             <th scope="col" jhiSortBy="createdDate">
-              <div class="d-flex">
-                <span>Request Date</span>
+              <div class="d-flex" class="text-center">
+                <span>Date</span>
               </div>
             </th>
-            <th scope="col"><div class="d-flex">Status</div></th>
-            <th scope="col"><div class="d-flex"></div></th>
+            <th scope="col">
+              <div class="d-flex" class="text-center">
+                <span>Status</span>
+              </div>
+            </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
           @for (p of pendingTasks; track trackId) {
             <tr data-cy="entityTable">
+              <td>{{ p.type }}</td>
               <td>
-                <a [routerLink]="['/book', p.id, 'view']">{{ p.bookTitle }}</a>
+                <a [routerLink]="['/book', p.id, 'view']">{{ p.bookTitle }}</a
+                ><br />
+                by {{ p.bookAuthor }}
               </td>
-              <td>{{ p.bookAuthor }}</td>
               <td>{{ p.quantity }}</td>
               <td>{{ p.visitorName }}</td>
               <td>{{ p.createdDate ? p.createdDate.format('DD-MM-YYYY') : '' }}</td>
-              <td>{{ p.status }}</td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <button
-                    (click)="p.id !== null ? updateTaskStatus(p.id, 'APPROVED') : null"
-                    class="btn btn-success btn-sm"
-                    data-cy="approveBorrowRequestButton"
-                  >
-                    <span class="d-none d-md-inline">APPROVE</span>
-                  </button>
-                  <button
-                    (click)="p.id !== null ? updateTaskStatus(p.id, 'DENIED') : null"
-                    class="btn btn-danger btn-sm"
-                    data-cy="denyBorrowRequestButton"
-                  >
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">DENY</span>
-                  </button>
+              <td class="text-center">
+                <div *ngIf="p.status === PendingTaskStatus.PENDING; else notPending">
+                  <div class="btn-group">
+                    <button
+                      type="button"
+                      (click)="updateSelected(true, p)"
+                      class="btn btn-success btn-sm"
+                      data-cy="approveBorrowRequestButton"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modal"
+                    >
+                      <fa-icon icon="check"></fa-icon>
+                      <span class="d-none d-md-inline">APPROVE</span>
+                    </button>
+                    <button
+                      type="button"
+                      (click)="updateSelected(false, p)"
+                      class="btn btn-danger btn-sm"
+                      data-cy="denyBorrowRequestButton"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modal"
+                    >
+                      <fa-icon icon="times"></fa-icon>
+                      <span class="d-none d-md-inline">DENY</span>
+                    </button>
+                  </div>
                 </div>
+                <ng-template #notPending>
+                  {{ p.status }}
+                </ng-template>
               </td>
             </tr>
           }
@@ -78,4 +94,35 @@
       </table>
     </div>
   }
+  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">
+            {{ isApproved ? 'Approve' : 'Deny' }} request to {{ selectedPendingTask.type?.toLowerCase() }} book
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Type your reason for {{ isApproved ? 'approving' : 'denying' }} this request...</p>
+          <input type="text" class="form-control" [(ngModel)]="reason" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <div *ngIf="isApproved; else deniedTemplate">
+            <button type="button" class="btn btn-success" (click)="updateTaskStatus()">
+              <fa-icon icon="check"></fa-icon>
+              Approve Request
+            </button>
+          </div>
+          <ng-template #deniedTemplate>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="updateTaskStatus()">
+              <fa-icon icon="times"></fa-icon>
+              Deny Request
+            </button>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
