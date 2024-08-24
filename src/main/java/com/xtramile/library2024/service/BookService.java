@@ -2,6 +2,7 @@ package com.xtramile.library2024.service;
 
 import com.xtramile.library2024.domain.Book;
 import com.xtramile.library2024.domain.BookStorage;
+import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.dto.BookStorageDTO;
@@ -11,6 +12,7 @@ import com.xtramile.library2024.service.mapper.BookStorageMapper;
 import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.web.rest.vm.BookVM;
 import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -41,19 +43,22 @@ public class BookService {
     private final BookStorageService bookStorageService;
 
     private final BookStorageMapper bookStorageMapper;
+    private final FileService fileService;
 
     public BookService(
         BookRepository bookRepository,
         BookMapper bookMapper,
         LibraryService libraryService,
         BookStorageService bookStorageService,
-        BookStorageMapper bookStorageMapper
+        BookStorageMapper bookStorageMapper,
+        FileService fileService
     ) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
         this.libraryService = libraryService;
         this.bookStorageService = bookStorageService;
         this.bookStorageMapper = bookStorageMapper;
+        this.fileService = fileService;
     }
 
     /**
@@ -189,7 +194,7 @@ public class BookService {
     }
 
     @Transactional
-    public BookVM createBook(BookVM bookVm) {
+    public BookVM createBook(BookVM bookVm) throws IOException {
         BookStorageDTO bookStorage = new BookStorageDTO();
         bookStorage.setQuantity(bookVm.getQuantity());
         BookStorageDTO savedBookStorage = bookStorageService.save(bookStorage);
@@ -204,5 +209,12 @@ public class BookService {
     public BookDTO findById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book not found"));
         return bookMapper.toDto(book);
+    }
+
+    public void updateBookImage(Long bookId, File file) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        book.setFile(file);
+        log.info("BOOK=====" + book.toString());
+        bookRepository.save(book);
     }
 }

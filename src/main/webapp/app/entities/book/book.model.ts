@@ -14,7 +14,7 @@ export interface IBook {
   cover?: string | null;
   synopsis?: string | null;
   bookStorageId?: Pick<IBookStorage, 'id'> | null;
-  file?: Pick<IFile, 'id'> | null;
+  file?: IFile | null;
 }
 
 export type NewBook = Omit<IBook, 'id'> & { id: null };

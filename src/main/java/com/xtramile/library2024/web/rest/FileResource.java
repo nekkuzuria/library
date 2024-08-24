@@ -2,7 +2,9 @@ package com.xtramile.library2024.web.rest;
 
 import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.repository.FileRepository;
+import com.xtramile.library2024.service.BookService;
 import com.xtramile.library2024.service.FileService;
+import com.xtramile.library2024.service.UserService;
 import com.xtramile.library2024.service.dto.FileDTO;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
 import java.io.IOException;
@@ -38,10 +40,14 @@ public class FileResource {
     private final FileService fileService;
 
     private final FileRepository fileRepository;
+    private final UserService userService;
+    private final BookService bookService;
 
-    public FileResource(FileService fileService, FileRepository fileRepository) {
+    public FileResource(FileService fileService, FileRepository fileRepository, UserService userService, BookService bookService) {
         this.fileService = fileService;
         this.fileRepository = fileRepository;
+        this.userService = userService;
+        this.bookService = bookService;
     }
 
     /**
@@ -147,7 +153,7 @@ public class FileResource {
      * @param id the id of the fileDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the fileDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<FileDTO> getFile(@PathVariable("id") Long id) {
         log.debug("REST request to get File : {}", id);
         Optional<FileDTO> fileDTO = fileService.findOne(id);
@@ -169,9 +175,17 @@ public class FileResource {
             .build();
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<File> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    @PostMapping("/upload-user-image")
+    public ResponseEntity<File> uploadUserImage(@RequestParam("file") MultipartFile file) throws IOException {
         File savedFile = fileService.saveImage(file);
+        userService.updateUserImage(savedFile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedFile);
+    }
+
+    @PostMapping("/upload-book-image")
+    public ResponseEntity<File> uploadBookImage(@RequestParam("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        File savedFile = fileService.saveImage(file);
+        bookService.updateBookImage(id, savedFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFile);
     }
 

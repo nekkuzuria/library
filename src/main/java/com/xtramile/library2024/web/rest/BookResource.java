@@ -1,14 +1,18 @@
 package com.xtramile.library2024.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.service.BookService;
 import com.xtramile.library2024.service.BookStorageService;
+import com.xtramile.library2024.service.FileService;
 import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.mapper.BookMapper;
 import com.xtramile.library2024.web.rest.errors.BadRequestAlertException;
 import com.xtramile.library2024.web.rest.vm.BookVM;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -22,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -44,10 +49,14 @@ public class BookResource {
     private final BookService bookService;
 
     private final BookRepository bookRepository;
+    private final FileService fileService;
+    private final ObjectMapper objectMapper;
 
-    public BookResource(BookService bookService, BookRepository bookRepository) {
+    public BookResource(BookService bookService, BookRepository bookRepository, FileService fileService, ObjectMapper objectMapper) {
         this.bookService = bookService;
         this.bookRepository = bookRepository;
+        this.fileService = fileService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -58,10 +67,18 @@ public class BookResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<BookVM> createBook(@Valid @RequestBody BookVM bookVm) throws URISyntaxException {
-        log.debug("REST request to save Book : {}", bookVm);
+    public ResponseEntity<BookVM> createBook(
+        @RequestPart("book") String bookJson,
+        @RequestPart(value = "file", required = false) MultipartFile file
+    ) throws URISyntaxException, IOException {
+        //        log.debug("REST request to save Book : {}", bookVm);
+        BookVM bookVm = objectMapper.readValue(bookJson, BookVM.class);
         if (bookVm.getId() != null) {
             throw new BadRequestAlertException("A new book cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (!file.isEmpty()) {
+            File savedFile = fileService.saveImage(file);
+            bookVm.setFile(savedFile);
         }
         BookVM savedBookVM = bookService.createBook(bookVm);
 
@@ -83,8 +100,10 @@ public class BookResource {
     @PutMapping("/{id}")
     public ResponseEntity<BookDTO> updateBook(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody BookVM bookVM
-    ) throws URISyntaxException {
+        @RequestPart("book") String bookJson,
+        @RequestPart(value = "file", required = false) MultipartFile file
+    ) throws URISyntaxException, IOException {
+        BookVM bookVM = objectMapper.readValue(bookJson, BookVM.class);
         log.debug("REST request to update Book : {}, {}", id, bookVM);
         if (bookVM.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -98,6 +117,12 @@ public class BookResource {
         }
 
         BookDTO bookDTO = bookService.update(bookVM);
+
+        if (file != null && !file.isEmpty()) {
+            File savedFile = fileService.saveImage(file);
+            bookService.updateBookImage(id, savedFile);
+        }
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookDTO.getId().toString()))
             .body(bookDTO);

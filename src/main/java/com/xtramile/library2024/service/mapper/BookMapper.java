@@ -26,10 +26,12 @@ public interface BookMapper extends EntityMapper<BookDTO, Book> {
     @Named("fileId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "image", source = "image")
     FileDTO toDtoFileId(File file);
 
     @Mapping(source = "bookStorage.id", target = "bookStorageId")
     @Mapping(source = "bookStorage.quantity", target = "quantity")
+    @Mapping(source = "file.image", target = "file.image")
     BookVM toVM(Book book);
 
     @Mapping(source = "bookStorageId", target = "bookStorage.id")

@@ -23,6 +23,7 @@ public class BookStorageDTO implements Serializable {
     private String lastModifiedBy;
 
     private Instant lastModifiedDate;
+    private FileDTO file;
 
     public Long getId() {
         return id;
@@ -113,5 +114,13 @@ public class BookStorageDTO implements Serializable {
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +
             ", lastModifiedDate=" + getLastModifiedDate() + "'" +
             '}';
+    }
+
+    public FileDTO getFile() {
+        return file;
+    }
+
+    public void setFile(FileDTO file) {
+        this.file = file;
     }
 }

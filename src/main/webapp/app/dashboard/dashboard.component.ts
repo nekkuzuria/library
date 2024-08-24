@@ -107,6 +107,11 @@ export class DashboardComponent implements OnInit {
     this.filteredBooks = this.books;
     console.log(this.filteredBooks);
     this.sortBooks();
+    this.filteredBooks.forEach(book => {
+      if (book.file && book.file.image) {
+        book.cover = `data:image/jpeg;base64,${book.file.image}`;
+      }
+    });
   }
 
   protected fillComponentAttributesFromResponseBody(data: IBook[] | null): IBook[] {

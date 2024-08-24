@@ -48,7 +48,7 @@ export class BookDetailComponent implements OnInit {
       next: (response: HttpResponse<IBook>) => {
         this.book = response.body ?? undefined;
         if (this.book) {
-          console.log(this.book.bookStorageId);
+          this.book.cover = `data:image/jpeg;base64,${this.book!.file!.image}`;
           const storageId = this.book.bookStorageId;
           if (typeof storageId === 'number') {
             this.loadBookStorage(storageId); // Pass the numeric `id`

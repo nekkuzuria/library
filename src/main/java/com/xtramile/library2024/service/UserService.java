@@ -328,7 +328,7 @@ public class UserService {
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, File file) {
+    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
@@ -339,7 +339,6 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
-                user.setFile(file);
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
@@ -458,5 +457,12 @@ public class UserService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    public void updateUserImage(File file) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setFile(file);
+        userRepository.save(user);
     }
 }

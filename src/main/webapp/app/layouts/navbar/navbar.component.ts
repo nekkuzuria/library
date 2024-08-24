@@ -60,14 +60,4 @@ export default class NavbarComponent implements OnInit {
   toggleNavbar(): void {
     this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
   }
-
-  hasOnlyUserRole(): boolean {
-    if (!this.accountService) {
-      return true;
-    }
-
-    const hasUserRole = this.accountService.hasAnyAuthority(['ROLE_USER']);
-    const hasAdminRole = this.accountService.hasAnyAuthority(['ROLE_ADMIN']);
-    return hasUserRole && !hasAdminRole;
-  }
 }

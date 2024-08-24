@@ -1,7 +1,9 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.Book;
 import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.domain.User;
+import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.repository.FileRepository;
 import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.security.SecurityUtils;
@@ -32,11 +34,13 @@ public class FileService {
 
     private final FileMapper fileMapper;
     private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
-    public FileService(FileRepository fileRepository, FileMapper fileMapper, UserRepository userRepository) {
+    public FileService(FileRepository fileRepository, FileMapper fileMapper, UserRepository userRepository, BookRepository bookRepository) {
         this.fileRepository = fileRepository;
         this.fileMapper = fileMapper;
         this.userRepository = userRepository;
+        this.bookRepository = bookRepository;
     }
 
     /**
@@ -122,16 +126,7 @@ public class FileService {
         File fileEntity = new File();
         fileEntity.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
         File savedFileEntity = fileRepository.save(fileEntity);
-        updateUserImage(savedFileEntity);
         return savedFileEntity;
-    }
-
-    public void updateUserImage(File file) {
-        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User is not logged in"));
-
-        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setFile(file);
-        userRepository.save(user);
     }
 
     public byte[] getImage() {

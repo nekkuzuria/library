@@ -28,9 +28,11 @@ export class BookUpdateComponent implements OnInit {
   book: IBook | null = null;
   bookTypeValues = Object.keys(BookType);
   genreValues = Object.keys(Genre);
+  file = null;
 
   bookStoragesSharedCollection: IBookStorage[] = [];
   filesCollection: IFile[] = [];
+  imagePreview: string | ArrayBuffer | null = null;
 
   protected bookService = inject(BookService);
   protected bookFormService = inject(BookFormService);
@@ -64,9 +66,18 @@ export class BookUpdateComponent implements OnInit {
     this.isSaving = true;
     const book = this.bookFormService.getBook(this.editForm);
     if (book.id !== null) {
-      this.subscribeToSaveResponse(this.bookService.update(book));
+      if (this.file) {
+        console.log(this.file);
+        this.subscribeToSaveResponse(this.bookService.update(book, this.file));
+      } else {
+        this.subscribeToSaveResponse(this.bookService.update(book));
+      }
     } else {
-      this.subscribeToSaveResponse(this.bookService.create(book));
+      if (this.file) {
+        this.subscribeToSaveResponse(this.bookService.create(book, this.file));
+      } else {
+        this.subscribeToSaveResponse(this.bookService.create(book));
+      }
     }
   }
 
@@ -98,6 +109,15 @@ export class BookUpdateComponent implements OnInit {
       book.bookStorageId,
     );
     this.filesCollection = this.fileService.addFileToCollectionIfMissing<IFile>(this.filesCollection, book.file);
+
+    if (book.file) {
+      this.fileService.find(book.file.id).subscribe((response: HttpResponse<IFile>) => {
+        const file = response.body;
+        if (file && file.image) {
+          this.imagePreview = 'data:image/jpeg;base64,' + file.image;
+        }
+      });
+    }
   }
 
   protected loadRelationshipsOptions(): void {
@@ -116,5 +136,16 @@ export class BookUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IFile[]>) => res.body ?? []))
       .pipe(map((files: IFile[]) => this.fileService.addFileToCollectionIfMissing<IFile>(files, this.book?.file)))
       .subscribe((files: IFile[]) => (this.filesCollection = files));
+  }
+
+  onImageChange(event: any): void {
+    this.file = event.target.files[0];
+    if (this.file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(this.file);
+    }
   }
 }

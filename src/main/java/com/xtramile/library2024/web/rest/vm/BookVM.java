@@ -1,10 +1,12 @@
 package com.xtramile.library2024.web.rest.vm;
 
+import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.domain.enumeration.BookType;
 import com.xtramile.library2024.domain.enumeration.Genre;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -32,4 +34,6 @@ public class BookVM {
     private Long bookStorageId;
 
     private Integer quantity;
+
+    private File file;
 }

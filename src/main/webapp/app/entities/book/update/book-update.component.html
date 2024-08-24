@@ -102,7 +102,20 @@
 
         <div class="mb-3">
           <label class="form-label" for="field_cover">Cover</label>
-          <input type="file" class="form-control" name="cover" id="field_cover" data-cy="cover" formControlName="cover" accept="image/*" />
+          <input
+            type="file"
+            class="form-control"
+            name="file"
+            id="field_cover"
+            data-cy="cover"
+            formControlName="cover"
+            accept="image/*"
+            formenctype="multipart/form-data"
+            (change)="onImageChange($event)"
+          />
+        </div>
+        <div *ngIf="imagePreview">
+          <img [src]="imagePreview" alt="Image preview" class="img-fluid mt-2" />
         </div>
 
         <div class="mb-3">
@@ -116,16 +129,6 @@
         <div class="mb-3">
           <label class="form-label" for="field_year">Quantity</label>
           <input type="number" class="form-control" name="quantity" id="field_quantity" data-cy="quantity" formControlName="quantity" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_file">File</label>
-          <select class="form-control" id="field_file" data-cy="file" name="file" formControlName="file" [compareWith]="compareFile">
-            <option [ngValue]="null"></option>
-            @for (fileOption of filesCollection; track $index) {
-              <option [ngValue]="fileOption">{{ fileOption.id }}</option>
-            }
-          </select>
         </div>
       </div>
 

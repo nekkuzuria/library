@@ -2,9 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { createRequestOption } from 'app/core/request/request-util';
 import { IBook, NewBook } from '../book.model';
 
 export type PartialUpdateBook = Partial<IBook> & Pick<IBook, 'id'>;
@@ -18,13 +16,27 @@ export class BookService {
   protected applicationConfigService = inject(ApplicationConfigService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/books');
+  //   protected fileUrl = this.applicationConfigService.getEndpointFor('api/files');
 
-  create(book: NewBook): Observable<EntityResponseType> {
-    return this.http.post<IBook>(this.resourceUrl, book, { observe: 'response' });
+  create(book: NewBook, file?: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('book', JSON.stringify(book));
+    if (file) {
+      formData.append('file', file);
+    }
+    console.log(formData);
+    return this.http.post<any>(this.resourceUrl, formData, { observe: 'response' });
   }
 
-  update(book: IBook): Observable<EntityResponseType> {
-    return this.http.put<IBook>(`${this.resourceUrl}/${this.getBookIdentifier(book)}`, book, { observe: 'response' });
+  update(book: any, file?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('book', JSON.stringify(book));
+    if (file) {
+      formData.append('file', file);
+    }
+
+    const id = book.id;
+    return this.http.put<any>(`${this.resourceUrl}/${id}`, formData, { observe: 'response' });
   }
 
   partialUpdate(book: PartialUpdateBook): Observable<EntityResponseType> {
@@ -36,8 +48,7 @@ export class BookService {
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
-    const options = createRequestOption(req);
-    return this.http.get<IBook[]>(this.resourceUrl, { params: options, observe: 'response' });
+    return this.http.get<IBook[]>(this.resourceUrl, { params: req, observe: 'response' });
   }
 
   delete(id: number): Observable<HttpResponse<{}>> {
@@ -56,7 +67,7 @@ export class BookService {
     bookCollection: Type[],
     ...booksToCheck: (Type | null | undefined)[]
   ): Type[] {
-    const books: Type[] = booksToCheck.filter(isPresent);
+    const books: Type[] = booksToCheck.filter((book): book is Type => book !== null && book !== undefined);
     if (books.length > 0) {
       const bookCollectionIdentifiers = bookCollection.map(bookItem => this.getBookIdentifier(bookItem));
       const booksToAdd = books.filter(bookItem => {
