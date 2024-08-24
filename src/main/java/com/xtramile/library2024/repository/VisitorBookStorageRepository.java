@@ -16,4 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VisitorBookStorageRepository extends JpaRepository<VisitorBookStorage, Long> {
     Page<VisitorBookStorage> findByVisitor(Visitor visitor, Pageable pageable);
+
+    boolean existsByBookIdAndReturnDateIsNull(Long bookId);
 }

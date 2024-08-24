@@ -203,6 +203,22 @@ public class BookResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable("id") Long id) {
         log.debug("REST request to delete Book : {}", id);
+
+        // Check if the book is being borrowed
+        if (bookService.isBookBorrowed(id)) {
+            return ResponseEntity.badRequest()
+                .headers(
+                    HeaderUtil.createFailureAlert(
+                        applicationName,
+                        false,
+                        ENTITY_NAME,
+                        "bookborrowed",
+                        "The book is currently borrowed and cannot be deleted."
+                    )
+                )
+                .build();
+        }
+
         bookService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))

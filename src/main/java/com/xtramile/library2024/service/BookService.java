@@ -3,7 +3,9 @@ package com.xtramile.library2024.service;
 import com.xtramile.library2024.domain.Book;
 import com.xtramile.library2024.domain.BookStorage;
 import com.xtramile.library2024.domain.File;
+import com.xtramile.library2024.domain.VisitorBookStorage;
 import com.xtramile.library2024.repository.BookRepository;
+import com.xtramile.library2024.repository.VisitorBookStorageRepository;
 import com.xtramile.library2024.service.dto.BookDTO;
 import com.xtramile.library2024.service.dto.BookStorageDTO;
 import com.xtramile.library2024.service.dto.LibraryDTO;
@@ -43,7 +45,7 @@ public class BookService {
     private final BookStorageService bookStorageService;
 
     private final BookStorageMapper bookStorageMapper;
-    private final FileService fileService;
+    private final VisitorBookStorageRepository visitorBookStorageRepository;
 
     public BookService(
         BookRepository bookRepository,
@@ -51,14 +53,15 @@ public class BookService {
         LibraryService libraryService,
         BookStorageService bookStorageService,
         BookStorageMapper bookStorageMapper,
-        FileService fileService
+        FileService fileService,
+        VisitorBookStorageRepository visitorBookStorageRepository
     ) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
         this.libraryService = libraryService;
         this.bookStorageService = bookStorageService;
         this.bookStorageMapper = bookStorageMapper;
-        this.fileService = fileService;
+        this.visitorBookStorageRepository = visitorBookStorageRepository;
     }
 
     /**
@@ -216,5 +219,9 @@ public class BookService {
         book.setFile(file);
         log.info("BOOK=====" + book.toString());
         bookRepository.save(book);
+    }
+
+    public boolean isBookBorrowed(Long bookId) {
+        return visitorBookStorageRepository.existsByBookIdAndReturnDateIsNull(bookId);
     }
 }
