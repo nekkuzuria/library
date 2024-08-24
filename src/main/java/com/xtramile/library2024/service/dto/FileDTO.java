@@ -55,7 +55,6 @@ public class FileDTO implements Serializable {
     public String toString() {
         return "FileDTO{" +
             "id=" + getId() +
-            ", image='" + getImage() + "'" +
             "}";
     }
 }
