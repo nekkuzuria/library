@@ -24,9 +24,8 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     password: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    role: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     rememberMe: new FormControl(false, { nonNullable: true, validators: [Validators.required] }),
-    libraryId: new FormControl(0, { nonNullable: true, validators: [Validators.required] }),
+    libraryId: new FormControl(null, { nonNullable: true, validators: [Validators.required] }),
   });
 
   private accountService = inject(AccountService);
@@ -36,10 +35,9 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   constructor(private publicService: PublicService) {}
   ngOnInit(): void {
     this.loadLibraries();
-    // if already authenticated then navigate to home page
     this.accountService.identity().subscribe(() => {
       if (this.accountService.isAuthenticated()) {
-        this.router.navigate(['']);
+        this.router.navigate(['/dashboard']);
       }
     });
   }
@@ -65,7 +63,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
         }
       },
       error: err => {
-        if (err.status === 401) {
+        if (err.status === 403) {
           this.unauthorizedError.set(true);
         } else {
           this.authenticationError.set(true);

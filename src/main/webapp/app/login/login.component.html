@@ -16,6 +16,7 @@
             <div class="card-body">
               <h2 class="text-uppercase text-center">Welcome Back!</h2>
               <h4 class="text-center mb-5">Let's Get Reading!</h4>
+
               <div *ngIf="authenticationError()" class="alert alert-danger text-center mb-4">
                 <strong>Sign in failed!</strong> Please check your credentials and try again.
               </div>
@@ -23,6 +24,7 @@
               <div *ngIf="unauthorizedError()" class="alert alert-danger text-center mb-4">
                 <strong>Unauthorized!</strong> You do not have permission to access this resource.
               </div>
+
               <form class="form" (ngSubmit)="login()" [formGroup]="loginForm">
                 <div class="mb-3">
                   <label class="form-label" for="username">Username</label>
@@ -35,7 +37,11 @@
                     formControlName="username"
                     #username
                     data-cy="username"
+                    required
                   />
+                  <div *ngIf="loginForm.controls['username'].invalid && loginForm.controls['username'].touched" class="text-danger">
+                    Username is required
+                  </div>
                 </div>
 
                 <div class="mb-3">
@@ -48,7 +54,11 @@
                     placeholder="Enter your password"
                     formControlName="password"
                     data-cy="password"
+                    required
                   />
+                  <div *ngIf="loginForm.controls['password'].invalid && loginForm.controls['password'].touched" class="text-danger">
+                    Password is required
+                  </div>
                 </div>
 
                 <div class="col-12">
@@ -60,12 +70,18 @@
                       bindValue="id"
                       placeholder="Select a library"
                       formControlName="libraryId"
+                      required
                     ></ng-select>
+                  </div>
+                  <div *ngIf="loginForm.controls['libraryId'].invalid && loginForm.controls['libraryId'].touched" class="text-danger">
+                    Selecting a library is required
                   </div>
                 </div>
 
                 <div class="d-grid mt-5">
-                  <button type="submit" class="btn btn-primary w-100 rounded-5 mb-5" data-cy="submit">Sign in</button>
+                  <button type="submit" class="btn btn-primary w-100 rounded-5 mb-5" [disabled]="loginForm.invalid" data-cy="submit">
+                    Sign in
+                  </button>
                 </div>
               </form>
 

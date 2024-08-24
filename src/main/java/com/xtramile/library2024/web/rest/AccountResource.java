@@ -1,5 +1,6 @@
 package com.xtramile.library2024.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xtramile.library2024.domain.*;
 import com.xtramile.library2024.repository.*;
 import com.xtramile.library2024.security.AuthoritiesConstants;
@@ -9,6 +10,7 @@ import com.xtramile.library2024.service.dto.*;
 import com.xtramile.library2024.web.rest.errors.*;
 import com.xtramile.library2024.web.rest.errors.EmailAlreadyUsedException;
 import com.xtramile.library2024.web.rest.errors.InvalidPasswordException;
+import com.xtramile.library2024.web.rest.vm.BookVM;
 import com.xtramile.library2024.web.rest.vm.KeyAndPasswordVM;
 import com.xtramile.library2024.web.rest.vm.ManagedUserVM;
 import com.xtramile.library2024.web.rest.vm.RegisterVM;
@@ -53,6 +55,8 @@ public class AccountResource {
     private static final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
     private final FileService fileService;
+    private final ObjectMapper objectMapper;
+    private final SecurityUtils securityUtils;
 
     public AccountResource(
         UserRepository userRepository,
@@ -60,7 +64,9 @@ public class AccountResource {
         MailService mailService,
         LibrarianService librarianService,
         VisitorService visitorService,
-        FileService fileService
+        FileService fileService,
+        ObjectMapper objectMapper,
+        SecurityUtils securityUtils
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
@@ -68,6 +74,8 @@ public class AccountResource {
         this.librarianService = librarianService;
         this.visitorService = visitorService;
         this.fileService = fileService;
+        this.objectMapper = objectMapper;
+        this.securityUtils = securityUtils;
     }
 
     /**
@@ -123,8 +131,11 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
     @PostMapping("/account")
-    public void saveAccount(@RequestParam("user") AdminUserDTO userDTO, @RequestParam("file") MultipartFile file) throws IOException {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
+    public void saveAccount(@RequestPart("user") String userJson, @RequestPart(value = "file", required = false) MultipartFile file)
+        throws IOException {
+        AdminUserDTO userDTO = objectMapper.readValue(userJson, AdminUserDTO.class);
+        String userLogin = securityUtils
+            .getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
@@ -135,15 +146,17 @@ public class AccountResource {
             throw new AccountResourceException("User could not be found");
         }
 
-        fileService.saveImage(file);
+        if (!file.isEmpty()) {
+            File savedFile = fileService.saveImage(file);
+            userService.updateUserImage(savedFile);
+        }
 
         userService.updateUser(
             userDTO.getFirstName(),
             userDTO.getLastName(),
             userDTO.getEmail(),
             userDTO.getLangKey(),
-            userDTO.getImageUrl(),
-            userDTO.getFile()
+            userDTO.getImageUrl()
         );
     }
 

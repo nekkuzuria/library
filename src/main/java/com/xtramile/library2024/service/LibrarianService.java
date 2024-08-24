@@ -65,4 +65,6 @@ public interface LibrarianService {
     void delete(Long id);
 
     LibrarianDTO getLibrarianOfCurrentUser();
+
+    LibrarianDTO getLibrarianByUserId(Long userId);
 }

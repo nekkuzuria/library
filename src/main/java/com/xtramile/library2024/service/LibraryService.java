@@ -4,6 +4,7 @@ import com.xtramile.library2024.domain.Library;
 import com.xtramile.library2024.domain.User;
 import com.xtramile.library2024.repository.LibraryRepository;
 import com.xtramile.library2024.repository.UserRepository;
+import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.dto.LibraryDTO;
 import com.xtramile.library2024.service.dto.VisitorDTO;
@@ -11,6 +12,7 @@ import com.xtramile.library2024.service.mapper.LibraryMapper;
 import com.xtramile.library2024.web.rest.vm.LibraryVM;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.java.Log;
@@ -20,9 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,16 +47,23 @@ public class LibraryService {
 
     private final VisitorService visitorService;
 
+    private final JwtDecoder jwtDecoder;
+    private final SecurityUtils securityUtils;
+
     public LibraryService(
         LibraryRepository libraryRepository,
         LibraryMapper libraryMapper,
         LibrarianService librarianService,
-        VisitorService visitorService
+        VisitorService visitorService,
+        JwtDecoder jwtDecoder,
+        SecurityUtils securityUtils
     ) {
         this.libraryRepository = libraryRepository;
         this.libraryMapper = libraryMapper;
         this.librarianService = librarianService;
         this.visitorService = visitorService;
+        this.jwtDecoder = jwtDecoder;
+        this.securityUtils = securityUtils;
     }
 
     /**
@@ -168,23 +179,41 @@ public class LibraryService {
         throw new EntityNotFoundException("User is neither a librarian nor a visitor");
     }
 
-    public LibraryDTO getSelectedLibrary() {
-        Authentication authetication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authetication.getPrincipal();
+    public LibraryDTO getLibraryOfCurrentLibrarian(Long userId) {
+        log.debug("Request to get Library of current user");
 
-        Long libraryIdClaim = jwt.getClaim("libraryId");
-        if (libraryIdClaim != null) {
-            Optional<Library> libraryOptional = libraryRepository.findById(libraryIdClaim);
-            return libraryOptional.map(libraryMapper::toDto).orElse(null);
-        } else {
-            return null;
+        LibrarianDTO librarianDTO = librarianService.getLibrarianByUserId(userId);
+        if (librarianDTO != null) {
+            return librarianDTO.getLibrary();
         }
+        return null;
     }
 
-    public boolean isAdminLibraryValid() {
-        if (getSelectedLibrary() != null && getLibraryOfCurrentUser() != null) {
-            return getSelectedLibrary().getId().equals(getLibraryOfCurrentUser().getId());
+    public LibraryDTO getSelectedLibrary() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        Jwt jwt = (Jwt) principal;
+        return libraryMapper.toDto(libraryRepository.findById(jwt.getClaim("libraryId")).get());
+    }
+
+    public LibraryDTO getSelectedLibrary(String jwtToken) {
+        Jwt jwt = jwtDecoder.decode(jwtToken);
+        Long libraryId = jwt.getClaim("libraryId");
+        if (libraryId == 0) {
+            return null;
         }
-        return false;
+        return libraryRepository
+            .findById(libraryId)
+            .map(libraryMapper::toDto)
+            .orElseThrow(() -> new NoSuchElementException("Library with id " + libraryId + " not found"));
+    }
+
+    public boolean isAdminLibraryValid(String jwt) {
+        Long userId = securityUtils.getCurrentUserId(jwt);
+        LibraryDTO librarianLibrary = getLibraryOfCurrentLibrarian(userId);
+        if (librarianLibrary == null) {
+            return true; // Means user is visitor
+        }
+        return getSelectedLibrary(jwt).getId().equals(librarianLibrary.getId());
     }
 }

@@ -69,15 +69,15 @@ public class AuthenticateController {
             loginVM.getPassword()
         );
 
-        //        if (!libraryService.isAdminLibraryValid()) {
-        //            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        //        }
-
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = this.createToken(authentication, loginVM.isRememberMe(), loginVM.getLibraryId());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
+
+        if (!libraryService.isAdminLibraryValid(jwt)) {
+            return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.FORBIDDEN);
+        }
 
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }

@@ -1,8 +1,11 @@
 package com.xtramile.library2024.security;
 
+import com.xtramile.library2024.service.LibraryService;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -10,17 +13,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
 
 /**
  * Utility class for Spring Security.
  */
+@Service
 public final class SecurityUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityUtils.class);
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
     public static final String AUTHORITIES_KEY = "auth";
+    private final JwtDecoder jwtDecoder;
 
-    private SecurityUtils() {}
+    private SecurityUtils(JwtDecoder jwtDecoder) {
+        this.jwtDecoder = jwtDecoder;
+    }
 
     /**
      * Get the login of the current user.
@@ -105,8 +117,14 @@ public final class SecurityUtils {
     }
 
     public static Long getCurrentUserId() {
-        Authentication authetication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authetication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+        Jwt jwt = (Jwt) principal;
+        return jwt.getClaim("userId");
+    }
+
+    public Long getCurrentUserId(String jwtToken) {
+        Jwt jwt = jwtDecoder.decode(jwtToken);
         return jwt.getClaim("userId");
     }
 }
