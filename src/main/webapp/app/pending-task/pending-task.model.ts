@@ -16,9 +16,27 @@ export interface IPendingTaskVM {
   quantity?: number | null;
   reason?: string | null;
   createdDate?: dayjs.Dayjs | null;
+  visitorBookStorageId?: number | null;
 }
 
 export type NewPendingTask = Omit<
+  IPendingTaskVM,
+  | 'id'
+  | 'status'
+  | 'visitorId'
+  | 'visitorName'
+  | 'bookTitle'
+  | 'bookAuthor'
+  | 'librarianId'
+  | 'librarianName'
+  | 'reason'
+  | 'createdDate'
+  | 'visitorBookStorageId'
+> & {
+  id: null;
+};
+
+export type NewPendingTaskReturn = Omit<
   IPendingTaskVM,
   'id' | 'status' | 'visitorId' | 'visitorName' | 'bookTitle' | 'bookAuthor' | 'librarianId' | 'librarianName' | 'reason' | 'createdDate'
 > & {

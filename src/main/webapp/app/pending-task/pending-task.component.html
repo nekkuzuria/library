@@ -10,47 +10,39 @@
   }
   @if (pendingTasks && pendingTasks.length > 0) {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead class="text-center">
+      <table class="table table-striped text-center" aria-describedby="page-heading">
+        <thead>
           <tr jhiSort>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Type</span>
-              </div>
+              <span>No.</span>
             </th>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Book</span>
-              </div>
+              <span>Type</span>
+            </th>
+            <th scope="col">
+              <span>Book</span>
             </th>
             <th>
-              <div class="d-flex" class="text-center">
-                <span>Quantity</span>
-              </div>
+              <span>Quantity</span>
             </th>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Visitor</span>
-              </div>
+              <span>Visitor</span>
             </th>
             <th scope="col" jhiSortBy="createdDate">
-              <div class="d-flex" class="text-center">
-                <span>Date</span>
-              </div>
+              <span>Date</span>
             </th>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Status</span>
-              </div>
+              <span>Status</span>
             </th>
           </tr>
         </thead>
         <tbody class="text-center">
           @for (p of pendingTasks; track trackId) {
-            <tr data-cy="entityTable">
+            <tr>
+              <td class="text-center">{{ $index + 1 }}</td>
               <td>{{ p.type }}</td>
               <td>
-                <a [routerLink]="['/book', p.id, 'view']">{{ p.bookTitle }}</a
+                <a [routerLink]="['/book-detail', p.id]">{{ p.bookTitle }}</a
                 ><br />
                 by {{ p.bookAuthor }}
               </td>
@@ -110,7 +102,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <div *ngIf="isApproved; else deniedTemplate">
-            <button type="button" class="btn btn-success" (click)="updateTaskStatus()">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" (click)="updateTaskStatus()">
               <fa-icon icon="check"></fa-icon>
               Approve Request
             </button>
