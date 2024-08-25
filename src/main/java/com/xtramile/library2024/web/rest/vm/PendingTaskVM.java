@@ -37,4 +37,6 @@ public class PendingTaskVM {
     public String reason;
 
     public Instant createdDate;
+
+    public Long visitorBookStorageId;
 }

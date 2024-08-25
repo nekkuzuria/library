@@ -8,6 +8,7 @@ import com.xtramile.library2024.repository.BookRepository;
 import com.xtramile.library2024.repository.PendingTaskRepository;
 import com.xtramile.library2024.service.dto.*;
 import com.xtramile.library2024.service.mapper.*;
+import com.xtramile.library2024.web.rest.errors.PendingTaskAlreadyExistsException;
 import com.xtramile.library2024.web.rest.vm.PendingTaskVM;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -180,6 +181,30 @@ public class PendingTaskService {
         pendingTaskDTO.setVisitor(visitorService.getVisitorOfCurrentUser());
         pendingTaskDTO.setLibrary(libraryService.getSelectedLibrary());
 
+        if (pendingTaskVM.getVisitorBookStorageId() != null) {
+            Optional<VisitorBookStorageDTO> vbs = visitorBookStorageService.findOne(pendingTaskVM.getVisitorBookStorageId());
+            if (vbs.isPresent()) {
+                if (
+                    pendingTaskVM.getType() == PendingTaskType.RETURN &&
+                    pendingTaskRepository
+                        .findByVisitorBookStorageAndTypeAndStatus(
+                            visitorBookStorageMapper.toEntity(vbs.get()),
+                            PendingTaskType.RETURN,
+                            PendingTaskStatus.PENDING
+                        )
+                        .isPresent()
+                ) {
+                    throw new PendingTaskAlreadyExistsException("A request to return this book already exists.");
+                }
+
+                pendingTaskDTO.setVisitorBookStorage(vbs.get());
+            } else {
+                pendingTaskDTO.setVisitorBookStorage(null);
+            }
+        } else {
+            pendingTaskDTO.setVisitorBookStorage(null);
+        }
+
         PendingTask pendingTask = pendingTaskMapper.toEntity(pendingTaskDTO);
         pendingTask = pendingTaskRepository.save(pendingTask);
         return pendingTaskMapper.toVm(pendingTask);
@@ -265,5 +290,12 @@ public class PendingTaskService {
         log.debug("Request to get all PendingTasks");
         LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentLibrarian();
         return pendingTaskRepository.findByLibrary(libraryMapper.toEntity(libraryDTO), pageable).map(pendingTaskMapper::toVm);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<PendingTaskVM> findAllFromCurrentVisitor(Pageable pageable) {
+        log.debug("Request to get all PendingTasks of visitor");
+        VisitorDTO visitorDTO = visitorService.getVisitorOfCurrentUser();
+        return pendingTaskRepository.findByVisitor(visitorMapper.toEntity(visitorDTO), pageable).map(pendingTaskMapper::toVm);
     }
 }

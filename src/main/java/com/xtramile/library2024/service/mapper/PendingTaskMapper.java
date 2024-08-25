@@ -33,6 +33,7 @@ public interface PendingTaskMapper extends EntityMapper<PendingTaskDTO, PendingT
     @Mapping(source = "book.author", target = "bookAuthor")
     @Mapping(source = "librarian.id", target = "librarianId")
     @Mapping(source = "librarian.name", target = "librarianName")
+    @Mapping(source = "visitorBookStorage.id", target = "visitorBookStorageId")
     PendingTaskVM toVm(PendingTask pendingTask);
 
     @Mapping(source = "visitorId", target = "visitor.id")
@@ -42,5 +43,6 @@ public interface PendingTaskMapper extends EntityMapper<PendingTaskDTO, PendingT
     @Mapping(source = "bookAuthor", target = "book.author")
     @Mapping(source = "librarianId", target = "librarian.id")
     @Mapping(source = "librarianName", target = "librarian.name")
+    @Mapping(source = "visitorBookStorageId", target = "visitorBookStorage.id")
     PendingTaskDTO toDto(PendingTaskVM vm);
 }
