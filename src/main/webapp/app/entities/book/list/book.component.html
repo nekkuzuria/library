@@ -84,13 +84,6 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="cover">
-              <div class="d-flex">
-                <span>Cover</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="synopsis">
               <div class="d-flex">
                 <span>Synopsis</span>
@@ -99,19 +92,7 @@
               </div>
             </th>
             <th>
-              <div class="d-flex">
-                <span>Book Storage</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="file.id">
-              <div class="d-flex">
-                <span>File</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th>
-              <div class="d-flex">
+              <div class="d-flex text-center">
                 <span>Quantity</span>
               </div>
             </th>
@@ -170,25 +151,9 @@
               <td>{{ book.year }}</td>
               <td>{{ book.totalPage }}</td>
               <td>{{ book.author }}</td>
-              <td>{{ book.cover }}</td>
               <td>{{ book.synopsis }}</td>
               <td>
-                @if (book.bookStorageId) {
-                  <div>
-                    <a [routerLink]="['/book-storage', book.bookStorageId, 'view']">{{ book.bookStorageId }}</a>
-                  </div>
-                }
-              </td>
-
-              <td>
-                @if (book.file) {
-                  <div>
-                    <a [routerLink]="['/file', book.file.id, 'view']">{{ book.file.id }}</a>
-                  </div>
-                }
-              </td>
-              <td>
-                <div>
+                <div class="text-center">
                   {{ book.quantity }}
                 </div>
               </td>
