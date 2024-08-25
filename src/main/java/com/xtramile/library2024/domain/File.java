@@ -78,7 +78,6 @@ public class File implements Serializable {
     public String toString() {
         return "File{" +
             "id=" + getId() +
-            ", image='" + getImage() + "'" +
             "}";
     }
 }
