@@ -9,9 +9,11 @@ import NavbarComponent from './layouts/navbar/navbar.component';
 import LoginComponent from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { BookDetailComponent } from './book-detail/book-detail.component';
-import { PersonalStorageComponent } from './personal-storage/personal-storage.component';
+import { PersonalStorageComponent } from './visitor-pages/personal-storage/personal-storage.component';
 import { LibraryVisitComponent } from './library-visit/library-visit.component';
 import { PendingTaskComponent } from './pending-task/pending-task.component';
+import { BorrowHistoryComponent } from './visitor-pages/borrow-history/borrow-history.component';
+import { MyRequestsComponent } from './visitor-pages/my-requests/my-requests.component';
 
 const routes: Routes = [
   {
@@ -55,9 +57,21 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: 'personal-storage',
+    path: 'my-books',
     component: PersonalStorageComponent,
-    title: 'personal-storage.title',
+    title: 'My Books',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'borrow-history',
+    component: BorrowHistoryComponent,
+    title: 'Borrow History',
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: 'my-requests',
+    component: MyRequestsComponent,
+    title: 'My Requests',
     canActivate: [UserRouteAccessService],
   },
   {

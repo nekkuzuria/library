@@ -1,0 +1,58 @@
+<div class="container">
+  <h2 class="text-center mb-4">Borrow History</h2>
+  @if (visitorBookStorages?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No book has been returned</span>
+    </div>
+  }
+  @if (visitorBookStorages && visitorBookStorages.length > 0) {
+    <div class="table-responsive table-entities" id="borrow-history">
+      <table class="table table-striped text-center" aria-describedby="page-heading">
+        <thead>
+          <tr>
+            <th scope="col">
+              <div class="d-flex">
+                <span>No.</span>
+              </div>
+            </th>
+            <th scope="col" class="text-start">
+              <div class="d-flex">
+                <span>Book</span>
+              </div>
+            </th>
+            <th>
+              <div class="d-flex">
+                <span>Quantity</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span>Borrow Date</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span>Return Date</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (vbs of visitorBookStorages; track trackId) {
+            <tr>
+              <td class="text-center">{{ $index + 1 }}</td>
+              <td class="text-start">
+                <a [routerLink]="['/book-detail', vbs.bookId]">{{ vbs.title }}</a
+                ><br />
+                by {{ vbs.author }}
+              </td>
+              <td class="text-center">{{ vbs.quantity }}</td>
+              <td class="text-center">{{ convertDate(vbs.borrowDate) }}</td>
+              <td class="text-center">{{ convertDate(vbs.returnDate) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
