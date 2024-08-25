@@ -140,10 +140,10 @@ public class PendingTaskResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pendingTasks in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasks(
+    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasksOfCurrentLibrary(
         @org.springdoc.core.annotations.ParameterObject @PageableDefault(
             sort = "createdDate",
-            direction = Sort.Direction.ASC
+            direction = Sort.Direction.DESC
         ) Pageable pageable
     ) {
         log.debug("REST request to get a page of PendingTasks");
@@ -178,5 +178,18 @@ public class PendingTaskResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<PendingTaskVM>> getAllPendingTasksOfVisitor(
+        @org.springdoc.core.annotations.ParameterObject @PageableDefault(
+            sort = "createdDate",
+            direction = Sort.Direction.ASC
+        ) Pageable pageable
+    ) {
+        log.debug("REST request to get a page of PendingTasks");
+        Page<PendingTaskVM> page = pendingTaskService.findAllFromCurrentVisitor(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 }
