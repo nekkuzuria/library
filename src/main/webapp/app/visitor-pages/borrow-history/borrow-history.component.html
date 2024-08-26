@@ -1,5 +1,5 @@
 <div class="container">
-  <h2 class="text-center mb-4">Borrow History</h2>
+  <h2 class="text-center mb-5 mt-3">Borrow History</h2>
   @if (visitorBookStorages?.length === 0) {
     <div class="alert alert-warning" id="no-result">
       <span>No book has been returned</span>
@@ -11,9 +11,7 @@
         <thead>
           <tr>
             <th scope="col">
-              <div class="d-flex">
-                <span>No.</span>
-              </div>
+              <span>No.</span>
             </th>
             <th scope="col" class="text-start">
               <div class="d-flex">
@@ -21,19 +19,13 @@
               </div>
             </th>
             <th>
-              <div class="d-flex">
-                <span>Quantity</span>
-              </div>
+              <span>Quantity</span>
             </th>
             <th scope="col">
-              <div class="d-flex">
-                <span>Borrow Date</span>
-              </div>
+              <span>Borrow Date</span>
             </th>
             <th scope="col">
-              <div class="d-flex">
-                <span>Return Date</span>
-              </div>
+              <span>Return Date</span>
             </th>
           </tr>
         </thead>
