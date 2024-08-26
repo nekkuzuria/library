@@ -27,13 +27,13 @@ export class SettingsService {
     if (file) {
       formData.append('file', file);
     }
-    console.log(formData);
+    console.log(file);
     return this.http.post<any>(this.apiUrl, formData);
   }
 
   uploadImageFile(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<any>(`${this.resourceUrl}/upload`, formData);
+    return this.http.post<any>(`${this.resourceUrl}/upload-user-image`, formData);
   }
 }

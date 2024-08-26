@@ -5,9 +5,11 @@ import com.xtramile.library2024.service.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface UserCombinedMapper {
+    @Mapping(target = "id", source = "librarian.id")
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(target = "email", source = "user.email")
@@ -45,4 +47,44 @@ public interface UserCombinedMapper {
         LocationDTO location,
         FileDTO file
     );
+
+    @Mapping(target = "name", source = "userVisitorDTO", qualifiedByName = "combineNameVisitor")
+    @Mapping(target = "email", source = "userVisitorDTO.email")
+    @Mapping(target = "phoneNumber", source = "userVisitorDTO.phoneNumber")
+    @Mapping(target = "dateOfBirth", source = "userVisitorDTO.dateOfBirth")
+    VisitorDTO toVisitorDTO(UserVisitorDTO userVisitorDTO);
+
+    @Mapping(target = "name", source = "userLibrarianDTO", qualifiedByName = "combineNameLibrarian")
+    @Mapping(target = "email", source = "userLibrarianDTO.email")
+    @Mapping(target = "phoneNumber", source = "userLibrarianDTO.phoneNumber")
+    @Mapping(target = "dateOfBirth", source = "userLibrarianDTO.dateOfBirth")
+    LibrarianDTO toLibrarianDTO(UserLibrarianDTO userLibrarianDTO);
+
+    @Mapping(target = "streetAddress", source = "userVisitorDTO.streetAddress")
+    @Mapping(target = "posttalCode", source = "userVisitorDTO.postalCode")
+    @Mapping(target = "city", source = "userVisitorDTO.city")
+    @Mapping(target = "stateProvince", source = "userVisitorDTO.stateProvince")
+    LocationDTO toLocationDTO(UserVisitorDTO userVisitorDTO);
+
+    @Mapping(target = "streetAddress", source = "userLibrarianDTO.streetAddress")
+    @Mapping(target = "posttalCode", source = "userLibrarianDTO.postalCode")
+    @Mapping(target = "city", source = "userLibrarianDTO.city")
+    @Mapping(target = "stateProvince", source = "userLibrarianDTO.stateProvince")
+    LocationDTO toLocationDTO(UserLibrarianDTO userLibrarianDTO);
+
+    @Named("combineNameVisitor")
+    default String combineNameVisitor(UserVisitorDTO userVisitorDTO) {
+        if (userVisitorDTO == null) {
+            return null;
+        }
+        return userVisitorDTO.getFirstName() + " " + userVisitorDTO.getLastName();
+    }
+
+    @Named("combineNameLibrarian")
+    default String combineNameLibrarian(UserLibrarianDTO userLibrarianDTO) {
+        if (userLibrarianDTO == null) {
+            return null;
+        }
+        return userLibrarianDTO.getFirstName() + " " + userLibrarianDTO.getLastName();
+    }
 }

@@ -1,10 +1,15 @@
 package com.xtramile.library2024.service.impl;
 
-import com.xtramile.library2024.domain.Visitor;
+import com.xtramile.library2024.domain.*;
 import com.xtramile.library2024.repository.VisitorRepository;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.VisitorService;
+import com.xtramile.library2024.service.dto.AdminUserDTO;
+import com.xtramile.library2024.service.dto.LibrarianDTO;
 import com.xtramile.library2024.service.dto.VisitorDTO;
+import com.xtramile.library2024.service.mapper.LibraryMapper;
+import com.xtramile.library2024.service.mapper.LocationMapper;
+import com.xtramile.library2024.service.mapper.UserMapper;
 import com.xtramile.library2024.service.mapper.VisitorMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedList;
@@ -30,10 +35,22 @@ public class VisitorServiceImpl implements VisitorService {
     private final VisitorRepository visitorRepository;
 
     private final VisitorMapper visitorMapper;
+    private final LibraryMapper libraryMapper;
+    private final LocationMapper locationMapper;
+    private final UserMapper userMapper;
 
-    public VisitorServiceImpl(VisitorRepository visitorRepository, VisitorMapper visitorMapper) {
+    public VisitorServiceImpl(
+        VisitorRepository visitorRepository,
+        VisitorMapper visitorMapper,
+        LibraryMapper libraryMapper,
+        LocationMapper locationMapper,
+        UserMapper userMapper
+    ) {
         this.visitorRepository = visitorRepository;
         this.visitorMapper = visitorMapper;
+        this.libraryMapper = libraryMapper;
+        this.locationMapper = locationMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -48,6 +65,26 @@ public class VisitorServiceImpl implements VisitorService {
     public VisitorDTO update(VisitorDTO visitorDTO) {
         log.debug("Request to update Visitor : {}", visitorDTO);
         Visitor visitor = visitorMapper.toEntity(visitorDTO);
+        visitor = visitorRepository.save(visitor);
+        return visitorMapper.toDto(visitor);
+    }
+
+    @Override
+    public VisitorDTO update(VisitorDTO visitorDTO, User user, AdminUserDTO userDTO) {
+        log.debug("Request to update Visitor : {}", visitorDTO);
+        Long userId = user.getId();
+        Visitor visitor = visitorRepository.findByUserId(userId).get();
+        Long id = visitor.getId();
+        Library library = visitorRepository.findByUserId(userId).get().getLibrary();
+        Location location = visitorRepository.findByUserId(userId).get().getAddress();
+
+        visitorDTO.setId(id);
+        visitorDTO.setLibrary(libraryMapper.toDto(library));
+        visitorDTO.setAddress(locationMapper.toDto(location));
+        visitorDTO.setUser(userMapper.toDtoId(user));
+        visitorDTO.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
+
+        visitor = visitorMapper.toEntity(visitorDTO);
         visitor = visitorRepository.save(visitor);
         return visitorMapper.toDto(visitor);
     }

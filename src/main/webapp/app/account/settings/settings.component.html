@@ -122,10 +122,10 @@
               type="text"
               class="form-control rounded-start-5"
               name="dateOfBirth"
-              ngbDatepicker
-              #dateOfBirthDp="ngbDatepicker"
             />
-            <button type="button" class="btn btn-secondary" (click)="dateOfBirthDp.toggle()">
+            <!-- Invisible Input for DatePicker -->
+            <input #d="ngbDatepicker" ngbDatepicker class="visually-hidden" (dateSelect)="onDateSelect($event)" />
+            <button type="button" class="btn btn-secondary" (click)="d.toggle()">
               <fa-icon icon="calendar-alt"></fa-icon>
             </button>
           </div>

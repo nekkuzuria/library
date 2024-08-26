@@ -1,5 +1,7 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.User;
+import com.xtramile.library2024.service.dto.AdminUserDTO;
 import com.xtramile.library2024.service.dto.VisitorDTO;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ public interface VisitorService {
      * @return the persisted entity.
      */
     VisitorDTO update(VisitorDTO visitorDTO);
+    VisitorDTO update(VisitorDTO visitorDTO, User user, AdminUserDTO userDTO);
 
     /**
      * Partially updates a visitor.

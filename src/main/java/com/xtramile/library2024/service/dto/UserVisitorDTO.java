@@ -12,6 +12,10 @@ public class UserVisitorDTO implements Serializable {
     private String username;
     private String phoneNumber;
     private LocalDate dateOfBirth;
+    private String streetAddress;
+    private String postalCode;
+    private String city;
+    private String stateProvince;
 
     @Lob
     private String image;
@@ -31,11 +35,6 @@ public class UserVisitorDTO implements Serializable {
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
     }
-
-    private String streetAddress;
-    private String postalCode;
-    private String city;
-    private String stateProvince;
 
     public String getFirstName() {
         return firstName;

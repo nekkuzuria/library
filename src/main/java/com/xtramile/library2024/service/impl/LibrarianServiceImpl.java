@@ -1,12 +1,20 @@
 package com.xtramile.library2024.service.impl;
 
 import com.xtramile.library2024.domain.Librarian;
+import com.xtramile.library2024.domain.Library;
+import com.xtramile.library2024.domain.Location;
+import com.xtramile.library2024.domain.User;
 import com.xtramile.library2024.repository.LibrarianRepository;
 import com.xtramile.library2024.repository.UserRepository;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.LibrarianService;
+import com.xtramile.library2024.service.dto.AdminUserDTO;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
+import com.xtramile.library2024.service.dto.UserDTO;
 import com.xtramile.library2024.service.mapper.LibrarianMapper;
+import com.xtramile.library2024.service.mapper.LibraryMapper;
+import com.xtramile.library2024.service.mapper.LocationMapper;
+import com.xtramile.library2024.service.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,11 +39,24 @@ public class LibrarianServiceImpl implements LibrarianService {
     private final LibrarianRepository librarianRepository;
 
     private final LibrarianMapper librarianMapper;
+    private final LibraryMapper libraryMapper;
+    private final LocationMapper locationMapper;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    public LibrarianServiceImpl(LibrarianRepository librarianRepository, LibrarianMapper librarianMapper, UserRepository userRepository) {
+    public LibrarianServiceImpl(
+        LibrarianRepository librarianRepository,
+        LibrarianMapper librarianMapper,
+        LibraryMapper libraryMapper,
+        LocationMapper locationMapper,
+        UserMapper userMapper,
+        UserRepository userRepository
+    ) {
         this.librarianRepository = librarianRepository;
         this.librarianMapper = librarianMapper;
+        this.libraryMapper = libraryMapper;
+        this.locationMapper = locationMapper;
+        this.userMapper = userMapper;
         this.userRepository = userRepository;
     }
 
@@ -51,6 +72,26 @@ public class LibrarianServiceImpl implements LibrarianService {
     public LibrarianDTO update(LibrarianDTO librarianDTO) {
         log.debug("Request to update Librarian : {}", librarianDTO);
         Librarian librarian = librarianMapper.toEntity(librarianDTO);
+        librarian = librarianRepository.save(librarian);
+        return librarianMapper.toDto(librarian);
+    }
+
+    @Override
+    public LibrarianDTO update(LibrarianDTO librarianDTO, User user, AdminUserDTO userDTO) {
+        log.debug("Request to update Librarian : {}", librarianDTO);
+        Long userId = user.getId();
+        Librarian librarian = librarianRepository.findByUserId(userId).get();
+        Long id = librarian.getId();
+        Library library = librarianRepository.findByUserId(userId).get().getLibrary();
+        Location location = librarianRepository.findByUserId(userId).get().getLocation();
+
+        librarianDTO.setId(id);
+        librarianDTO.setLibrary(libraryMapper.toDto(library));
+        librarianDTO.setLocation(locationMapper.toDto(location));
+        librarianDTO.setUser(userMapper.toDtoId(user));
+        librarianDTO.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
+
+        librarian = librarianMapper.toEntity(librarianDTO);
         librarian = librarianRepository.save(librarian);
         return librarianMapper.toDto(librarian);
     }

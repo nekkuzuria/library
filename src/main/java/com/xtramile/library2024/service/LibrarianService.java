@@ -1,6 +1,9 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.User;
+import com.xtramile.library2024.service.dto.AdminUserDTO;
 import com.xtramile.library2024.service.dto.LibrarianDTO;
+import com.xtramile.library2024.service.dto.UserDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ public interface LibrarianService {
      * @return the persisted entity.
      */
     LibrarianDTO update(LibrarianDTO librarianDTO);
+    LibrarianDTO update(LibrarianDTO librarianDTO, User user, AdminUserDTO userDTO);
 
     /**
      * Partially updates a librarian.

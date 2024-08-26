@@ -1,9 +1,16 @@
 package com.xtramile.library2024.service;
 
+import com.xtramile.library2024.domain.Librarian;
 import com.xtramile.library2024.domain.Location;
+import com.xtramile.library2024.domain.User;
+import com.xtramile.library2024.domain.Visitor;
+import com.xtramile.library2024.repository.LibrarianRepository;
 import com.xtramile.library2024.repository.LocationRepository;
+import com.xtramile.library2024.repository.VisitorRepository;
+import com.xtramile.library2024.service.dto.AdminUserDTO;
 import com.xtramile.library2024.service.dto.LocationDTO;
 import com.xtramile.library2024.service.mapper.LocationMapper;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +31,19 @@ public class LocationService {
     private final LocationRepository locationRepository;
 
     private final LocationMapper locationMapper;
+    private final LibrarianRepository librarianRepository;
+    private final VisitorRepository visitorRepository;
 
-    public LocationService(LocationRepository locationRepository, LocationMapper locationMapper) {
+    public LocationService(
+        LocationRepository locationRepository,
+        LocationMapper locationMapper,
+        LibrarianRepository librarianRepository,
+        VisitorRepository visitorRepository
+    ) {
         this.locationRepository = locationRepository;
         this.locationMapper = locationMapper;
+        this.librarianRepository = librarianRepository;
+        this.visitorRepository = visitorRepository;
     }
 
     /**
@@ -54,6 +70,36 @@ public class LocationService {
         Location location = locationMapper.toEntity(locationDTO);
         location = locationRepository.save(location);
         return locationMapper.toDto(location);
+    }
+
+    public LocationDTO update(LocationDTO locationDTO, User user) {
+        Long userId = user.getId();
+        Location location = null;
+
+        try {
+            Librarian librarian = librarianRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Librarian not found for user id: " + userId));
+            location = librarian.getLocation();
+        } catch (EntityNotFoundException e) {
+            try {
+                Visitor visitor = visitorRepository
+                    .findByUserId(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Visitor not found for user id: " + userId));
+                location = visitor.getAddress();
+            } catch (EntityNotFoundException ex) {
+                throw new EntityNotFoundException("No Librarian or Visitor found for user id: " + userId);
+            }
+        }
+
+        if (location != null) {
+            locationDTO.setId(location.getId());
+            location = locationMapper.toEntity(locationDTO);
+            location = locationRepository.save(location);
+            return locationMapper.toDto(location);
+        }
+
+        throw new EntityNotFoundException("Location could not be updated because it was not found.");
     }
 
     /**

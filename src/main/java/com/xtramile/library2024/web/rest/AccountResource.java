@@ -7,6 +7,8 @@ import com.xtramile.library2024.security.AuthoritiesConstants;
 import com.xtramile.library2024.security.SecurityUtils;
 import com.xtramile.library2024.service.*;
 import com.xtramile.library2024.service.dto.*;
+import com.xtramile.library2024.service.mapper.LibrarianMapper;
+import com.xtramile.library2024.service.mapper.UserCombinedMapper;
 import com.xtramile.library2024.web.rest.errors.*;
 import com.xtramile.library2024.web.rest.errors.EmailAlreadyUsedException;
 import com.xtramile.library2024.web.rest.errors.InvalidPasswordException;
@@ -14,6 +16,7 @@ import com.xtramile.library2024.web.rest.vm.BookVM;
 import com.xtramile.library2024.web.rest.vm.KeyAndPasswordVM;
 import com.xtramile.library2024.web.rest.vm.ManagedUserVM;
 import com.xtramile.library2024.web.rest.vm.RegisterVM;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.*;
@@ -50,12 +53,16 @@ public class AccountResource {
     private final MailService mailService;
 
     private final LibrarianService librarianService;
+    private final LibrarianRepository librarianRepository;
+    private final LibrarianMapper librarianMapper;
     private final VisitorService visitorService;
 
     private static final Logger logger = LoggerFactory.getLogger(AccountResource.class);
 
     private final FileService fileService;
+    private final LocationService locationService;
     private final ObjectMapper objectMapper;
+    private final UserCombinedMapper userCombinedMapper;
     private final SecurityUtils securityUtils;
 
     public AccountResource(
@@ -63,18 +70,26 @@ public class AccountResource {
         UserService userService,
         MailService mailService,
         LibrarianService librarianService,
+        LibrarianRepository librarianRepository,
+        LibrarianMapper librarianMapper,
         VisitorService visitorService,
         FileService fileService,
+        LocationService locationService,
         ObjectMapper objectMapper,
+        UserCombinedMapper userCombinedMapper,
         SecurityUtils securityUtils
     ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.librarianService = librarianService;
+        this.librarianRepository = librarianRepository;
+        this.librarianMapper = librarianMapper;
         this.visitorService = visitorService;
         this.fileService = fileService;
+        this.locationService = locationService;
         this.objectMapper = objectMapper;
+        this.userCombinedMapper = userCombinedMapper;
         this.securityUtils = securityUtils;
     }
 
@@ -146,10 +161,21 @@ public class AccountResource {
             throw new AccountResourceException("User could not be found");
         }
 
-        if (!file.isEmpty()) {
+        if (file != null) {
             File savedFile = fileService.saveImage(file);
             userService.updateUserImage(savedFile);
         }
+
+        UserLibrarianDTO userLibrarianDTO = objectMapper.readValue(userJson, UserLibrarianDTO.class);
+        LocationDTO locationDTO = userCombinedMapper.toLocationDTO(userLibrarianDTO);
+        if (librarianService.getLibrarianByUserId(user.get().getId()) != null) {
+            LibrarianDTO librarianDTO = objectMapper.readValue(userJson, LibrarianDTO.class);
+            librarianService.update(librarianDTO, user.get(), userDTO);
+        } else {
+            VisitorDTO visitorDTO = objectMapper.readValue(userJson, VisitorDTO.class);
+            visitorService.update(visitorDTO, user.get(), userDTO);
+        }
+        locationService.update(locationDTO, user.get());
 
         userService.updateUser(
             userDTO.getFirstName(),

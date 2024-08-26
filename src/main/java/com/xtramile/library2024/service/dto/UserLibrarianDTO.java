@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public class UserLibrarianDTO implements Serializable {
 
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -106,5 +107,13 @@ public class UserLibrarianDTO implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
