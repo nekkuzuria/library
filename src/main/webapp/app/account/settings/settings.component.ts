@@ -116,4 +116,10 @@ export default class SettingsComponent implements OnInit {
       modal.show();
     }
   }
+
+  restrictNonNumeric(event: KeyboardEvent): void {
+    if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' || event.key === '.') {
+      event.preventDefault();
+    }
+  }
 }

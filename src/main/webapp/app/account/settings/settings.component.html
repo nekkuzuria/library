@@ -191,13 +191,14 @@
         <div class="mb-3">
           <label class="form-label" for="phoneNumber">Phone Number</label>
           <input
-            type="text"
+            type="number"
             class="form-control rounded-5"
             id="phoneNumber"
             name="phoneNumber"
             placeholder="Your phone number"
             formControlName="phoneNumber"
             data-cy="phoneNumber"
+            (keydown)="restrictNonNumeric($event)"
           />
           @if (
             settingsForm.get('phoneNumber')!.invalid && (settingsForm.get('phoneNumber')!.dirty || settingsForm.get('phoneNumber')!.touched)
@@ -343,7 +344,7 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" data-cy="submit">Save</button>
+        <button type="submit" class="btn btn-primary" data-cy="submit">Save</button>
       </form>
     </div>
   </div>
