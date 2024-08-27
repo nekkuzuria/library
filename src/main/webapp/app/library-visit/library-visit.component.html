@@ -12,9 +12,7 @@
         <thead>
           <tr>
             <th scope="col">
-              <div class="d-flex">
-                <span>No.</span>
-              </div>
+              <span>No.</span>
             </th>
             <th scope="col" jhiSortBy="createdDate">
               <span>Date</span>
@@ -22,7 +20,7 @@
             <th scope="col">
               <span>Type</span>
             </th>
-            <th scope="col" class="text-start">
+            <th scope="col">
               <span>Book</span>
             </th>
             <th scope="col">
@@ -39,17 +37,17 @@
         <tbody class="text-center">
           @for (visit of visits; track trackId) {
             <tr>
-              <td class="text-center">{{ $index + 1 }}</td>
-              <td>{{ convertDate(visit.createdDate) }}</td>
-              <td>{{ visit.type }}</td>
-              <td class="text-start">
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Date">{{ convertDate(visit.createdDate) }}</td>
+              <td data-label="Type">{{ visit.type }}</td>
+              <td data-label="Book">
                 <a [routerLink]="['/book', visit.bookId, 'view']">{{ visit.bookTitle }}</a
                 ><br />
                 by {{ visit.bookAuthor }}
               </td>
-              <td>{{ visit.quantity }}</td>
-              <td>{{ visit.visitorName }}</td>
-              <td>{{ visit.librarianName }}</td>
+              <td data-label="Quantity">{{ visit.quantity }}</td>
+              <td data-label="Visitor">{{ visit.visitorName }}</td>
+              <td data-label="Librarian">{{ visit.librarianName }}</td>
             </tr>
           }
         </tbody>
