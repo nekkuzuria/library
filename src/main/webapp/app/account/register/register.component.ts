@@ -55,7 +55,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
     address: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
     }),
     streetAddress: new FormControl('', {
       nonNullable: true,

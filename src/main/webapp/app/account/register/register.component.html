@@ -444,7 +444,9 @@
                   </div>
                 </div>
 
-                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit">Register</button>
+                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit" [disabled]="registerForm.invalid">
+                  Register
+                </button>
               </form>
             }
             <div class="row">
