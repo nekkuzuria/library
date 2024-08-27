@@ -24,6 +24,7 @@ export class DashboardComponent implements OnInit {
   filteredBooks: IBook[] = [];
   searchQuery: string = '';
   selectedGenre: string | null = null;
+  sortOrder: 'asc' | 'desc' = 'asc';
 
   totalItems = 0;
   isLoading = false;
@@ -62,9 +63,7 @@ export class DashboardComponent implements OnInit {
 
     this.filteredBooks = (this.books ?? []).filter(book => {
       const matchesSearchQuery = query ? book.title?.toLowerCase().includes(query) || book.author?.toLowerCase().includes(query) : true;
-
-      const matchesGenre = this.selectedGenre ? book.genre === this.selectedGenre : true;
-
+      const matchesGenre = this.selectedGenre!.length > 0 ? this.selectedGenre!.includes(book.genre!) : true;
       return matchesSearchQuery && matchesGenre;
     });
 
@@ -72,30 +71,30 @@ export class DashboardComponent implements OnInit {
   }
 
   sortBooks(): void {
+    if (!this.sortOption) return;
     const sortValue =
       typeof this.sortOption === 'string'
         ? this.sortOption
         : this.sortOption !== null
           ? (this.sortOption as { value: string }).value
           : null;
-    console.log(sortValue);
     if (sortValue === 'title') {
       this.filteredBooks.sort((a, b) => {
         const titleA = a.title ?? '';
         const titleB = b.title ?? '';
-        return titleA.localeCompare(titleB);
+        return this.sortOrder === 'asc' ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA);
       });
     } else if (sortValue === 'author') {
       this.filteredBooks.sort((a, b) => {
         const authorA = a.author ?? '';
         const authorB = b.author ?? '';
-        return authorA.localeCompare(authorB);
+        return this.sortOrder === 'asc' ? authorA.localeCompare(authorB) : authorB.localeCompare(authorA);
       });
     } else if (sortValue === 'year') {
       this.filteredBooks.sort((a, b) => {
         const yearA = a.year ?? 0;
         const yearB = b.year ?? 0;
-        return yearA - yearB;
+        return this.sortOrder === 'asc' ? yearA - yearB : yearB - yearA;
       });
     }
   }
@@ -133,5 +132,10 @@ export class DashboardComponent implements OnInit {
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     return this.bookService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+  }
+
+  setSortOrder(order: 'asc' | 'desc'): void {
+    this.sortOrder = order;
+    this.sortBooks();
   }
 }
