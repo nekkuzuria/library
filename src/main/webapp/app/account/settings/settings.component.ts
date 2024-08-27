@@ -4,6 +4,7 @@ import SharedModule from 'app/shared/shared.module';
 import { SettingsService } from './settings.component.service';
 import { NgbDatepickerModule, NgbDate, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 
+declare var bootstrap: any;
 @Component({
   standalone: true,
   selector: 'jhi-settings',
@@ -35,23 +36,21 @@ export default class SettingsComponent implements OnInit {
     this.settingsForm = this.formBuilder.group({
       firstName: [data.firstName || '', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       lastName: [data.lastName || '', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      email: [data.email || '', [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(254)]],
+      email: [data.email || '', [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(50)]],
       login: [data.username || ''],
-      phoneNumber: [data.phoneNumber || ''],
-      streetAddress: [data.streetAddress || ''],
-      postalCode: [data.postalCode || ''],
-      city: [data.city || ''],
-      stateProvince: [data.stateProvince || ''],
-      dateOfBirth: [data.dateOfBirth], // Initialize dateOfBirth control
+      phoneNumber: [
+        data.phoneNumber || '',
+        [Validators.required, Validators.minLength(5), Validators.maxLength(13), Validators.pattern('^\\+?[1-9][0-9]{4,13}$')],
+      ],
+      streetAddress: [data.streetAddress || '', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      postalCode: [data.postalCode || '', [Validators.required, Validators.pattern('^[0-9]{5}(-[0-9]{4})?$')]],
+      city: [data.city || '', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')]],
+      stateProvince: [
+        data.stateProvince || '',
+        [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')],
+      ],
+      dateOfBirth: [data.dateOfBirth, [Validators.required]],
     });
-
-    //     // Convert the date of birth
-    //     const dateOfBirthh = this.convertDate(data.dateOfBirth);
-    //
-    //     // Patch the dateOfBirth value into the form
-    //     this.settingsForm.patchValue({
-    //       dateOfBirth: dateOfBirthh
-    //     });
   }
 
   private convertDate(dateString: string): { year: number; month: number; day: number } | null {
@@ -108,5 +107,13 @@ export default class SettingsComponent implements OnInit {
   onDateSelect(date: any): void {
     const formattedDate = this.ngbDateParserFormatter.format(date);
     this.settingsForm!.get('dateOfBirth')?.setValue(formattedDate);
+  }
+
+  openImagePreview(): void {
+    const modalElement = document.getElementById('imagePreviewModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
   }
 }
