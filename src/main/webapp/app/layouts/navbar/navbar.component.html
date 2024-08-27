@@ -31,7 +31,7 @@
           <li *jhiHasAnyAuthority="'ROLE_USER'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link" routerLink="/my-books" (click)="collapseNavbar()">
               <span>
-                <fa-icon icon="fa fa-book"></fa-icon>
+                <i class="fa fa-book" aria-hidden="true"></i>
                 <span>My Books</span>
               </span>
             </a>
@@ -40,7 +40,7 @@
           <li *jhiHasAnyAuthority="'ROLE_USER'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link" routerLink="/borrow-history" (click)="collapseNavbar()">
               <span>
-                <fa-icon icon="fa fa-history"></fa-icon>
+                <i class="fa fa-history" aria-hidden="true"></i>
                 <span>Borrow History</span>
               </span>
             </a>
@@ -49,7 +49,7 @@
           <li *jhiHasAnyAuthority="'ROLE_USER'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link" routerLink="/my-requests" (click)="collapseNavbar()">
               <span>
-                <fa-icon icon="fa fa-history"></fa-icon>
+                <i class="fa fa-clock" aria-hidden="true"></i>
                 <span>My Requests</span>
               </span>
             </a>
