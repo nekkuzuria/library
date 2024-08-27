@@ -18,6 +18,7 @@ import { BookDeleteDialogComponent } from '../entities/book/delete/book-delete-d
 import SharedModule from 'app/shared/shared.module';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
 
+declare var bootstrap: any;
 @Component({
   selector: 'app-book-detail',
   templateUrl: './book-detail.component.html',
@@ -30,6 +31,8 @@ export class BookDetailComponent implements OnInit {
   quantity: number = 0;
   selectedQuantity: number = 1;
   protected modalService = inject(NgbModal);
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -99,18 +102,22 @@ export class BookDetailComponent implements OnInit {
         this.pendingTaskService.create(pendingTask).subscribe({
           next: response => {
             console.log('Pending task created successfully:', response);
-            alert('Borrow request created successfully');
+            this.successMessage = 'Borrow request created successfully';
+            this.showModal('successModal');
           },
           error: error => {
             console.error('Error creating pending task:', error);
-            alert('Borrow request created failed');
+            this.errorMessage = 'Borrow request creation failed';
+            this.showModal('errorModal');
           },
         });
       } else {
-        alert('Could not determine book ID');
+        this.errorMessage = 'Could not determine book ID';
+        this.showModal('errorModal');
       }
     } else {
-      alert('Selected quantity exceeds available stock.');
+      this.errorMessage = 'Selected quantity exceeds available stock.';
+      this.showModal('errorModal');
     }
   }
 
@@ -129,6 +136,14 @@ export class BookDetailComponent implements OnInit {
           this.router.navigate(['/dashboard']);
         }
       });
+    }
+  }
+
+  showModal(modalId: string) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
     }
   }
 }
