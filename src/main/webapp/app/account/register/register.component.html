@@ -70,7 +70,27 @@
                       placeholder="First Name"
                       required
                     />
+
+                    @if (
+                      registerForm.get('firstName')!.invalid &&
+                      (registerForm.get('firstName')!.dirty || registerForm.get('firstName')!.touched)
+                    ) {
+                      <div>
+                        @if (registerForm.get('firstName')?.errors?.required) {
+                          <small class="form-text text-danger">Your first name is required.</small>
+                        }
+
+                        @if (registerForm.get('firstName')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your first name must be at least 1 character.</small>
+                        }
+
+                        @if (registerForm.get('firstName')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your first name cannot be longer than 50 characters.</small>
+                        }
+                      </div>
+                    }
                   </div>
+
                   <div class="col-12 col-md-6">
                     <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                     <input
@@ -82,6 +102,24 @@
                       placeholder="Last Name"
                       required
                     />
+                    @if (
+                      registerForm.get('lastName')!.invalid &&
+                      (registerForm.get('lastName')!.dirty || registerForm.get('lastName')!.touched)
+                    ) {
+                      <div>
+                        @if (registerForm.get('lastName')?.errors?.required) {
+                          <small class="form-text text-danger">Your last name is required.</small>
+                        }
+
+                        @if (registerForm.get('lastName')?.errors?.minlength) {
+                          <small class="form-text text-danger">Your last name must be at least 1 character.</small>
+                        }
+
+                        @if (registerForm.get('lastName')?.errors?.maxlength) {
+                          <small class="form-text text-danger">Your last name cannot be longer than 50 characters.</small>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
 
@@ -97,11 +135,24 @@
                       ngbDatepicker
                       #dateOfBirthDp="ngbDatepicker"
                       formControlName="dateOfBirth"
+                      readonly
+                      placeholder="Your date of birth"
+                      (click)="dateOfBirthDp.toggle()"
                     />
                     <button type="button" class="btn btn-secondary" (click)="dateOfBirthDp.toggle()">
                       <fa-icon icon="calendar-alt"></fa-icon>
                     </button>
                   </div>
+                  @if (
+                    registerForm.get('dateOfBirth')!.invalid &&
+                    (registerForm.get('dateOfBirth')!.dirty || registerForm.get('dateOfBirth')!.touched)
+                  ) {
+                    <div>
+                      @if (registerForm.get('dateOfBirth')?.errors?.required) {
+                        <small class="form-text text-danger">Your date of birth is required.</small>
+                      }
+                    </div>
+                  }
                 </div>
 
                 <div class="mb-3">
@@ -114,7 +165,27 @@
                     placeholder="Your phone number"
                     formControlName="phoneNumber"
                     data-cy="phoneNumber"
+                    (keydown)="restrictNonNumeric($event)"
                   />
+                  @if (
+                    registerForm.get('phoneNumber')!.invalid &&
+                    (registerForm.get('phoneNumber')!.dirty || registerForm.get('phoneNumber')!.touched)
+                  ) {
+                    <div>
+                      @if (registerForm.get('phoneNumber')?.errors?.required) {
+                        <small class="form-text text-danger">Your phone number is required.</small>
+                      }
+                      @if (registerForm.get('phoneNumber')?.errors?.minlength) {
+                        <small class="form-text text-danger">Your phone number must be at least 5 characters long.</small>
+                      }
+                      @if (registerForm.get('phoneNumber')?.errors?.maxlength) {
+                        <small class="form-text text-danger">Your phone number cannot be longer than 13 characters.</small>
+                      }
+                      <!-- @if (registerForm.get('phoneNumber')?.errors?.pattern) {
+                        <small class="form-text text-danger">Your phone number is invalid. It should be a valid international phone number.</small>
+                      } -->
+                    </div>
+                  }
                 </div>
 
                 <div class="row mb-3">
@@ -129,18 +200,51 @@
                       formControlName="streetAddress"
                       data-cy="address"
                     />
+                    <div
+                      *ngIf="
+                        registerForm.get('streetAddress')!.invalid &&
+                        (registerForm.get('streetAddress')!.dirty || registerForm.get('streetAddress')!.touched)
+                      "
+                    >
+                      @if (registerForm.get('streetAddress')?.errors?.required) {
+                        <small class="form-text text-danger">Street address is required.</small>
+                      }
+                      @if (registerForm.get('streetAddress')?.errors?.minlength) {
+                        <small class="form-text text-danger">Street address must be at least 5 characters long.</small>
+                      }
+                      @if (registerForm.get('streetAddress')?.errors?.maxlength) {
+                        <small class="form-text text-danger">Street address cannot be longer than 100 characters.</small>
+                      }
+                      @if (registerForm.get('streetAddress')?.errors?.pattern) {
+                        <small class="form-text text-danger">Street address contains invalid characters.</small>
+                      }
+                    </div>
                   </div>
                   <div class="col-12 col-md-6">
                     <label class="form-label" for="address">Postal Code<span class="text-danger">*</span></label>
                     <input
-                      type="text"
+                      type="number"
                       class="form-control rounded-5"
                       id="address"
                       name="address"
-                      placeholder="Your address"
+                      placeholder="Your postal code"
                       formControlName="postalCode"
                       data-cy="address"
+                      (keydown)="restrictNonNumeric($event)"
                     />
+                    <div
+                      *ngIf="
+                        registerForm.get('postalCode')!.invalid &&
+                        (registerForm.get('postalCode')!.dirty || registerForm.get('postalCode')!.touched)
+                      "
+                    >
+                      @if (registerForm.get('postalCode')?.errors?.required) {
+                        <small class="form-text text-danger">Postal code is required.</small>
+                      }
+                      @if (registerForm.get('postalCode')?.errors?.pattern) {
+                        <small class="form-text text-danger">Postal code is invalid. Use 5 digits or 5 digits + hyphen + 4 digits.</small>
+                      }
+                    </div>
                   </div>
                 </div>
 
@@ -152,10 +256,26 @@
                       class="form-control rounded-5"
                       id="address"
                       name="address"
-                      placeholder="Your address"
+                      placeholder="Your city"
                       formControlName="city"
                       data-cy="address"
                     />
+                    <div
+                      *ngIf="registerForm.get('city')!.invalid && (registerForm.get('city')!.dirty || registerForm.get('city')!.touched)"
+                    >
+                      @if (registerForm.get('city')?.errors?.required) {
+                        <small class="form-text text-danger">City is required.</small>
+                      }
+                      @if (registerForm.get('city')?.errors?.minlength) {
+                        <small class="form-text text-danger">City must be at least 2 characters long.</small>
+                      }
+                      @if (registerForm.get('city')?.errors?.maxlength) {
+                        <small class="form-text text-danger">City cannot be longer than 50 characters.</small>
+                      }
+                      @if (registerForm.get('city')?.errors?.pattern) {
+                        <small class="form-text text-danger">City contains invalid characters.</small>
+                      }
+                    </div>
                   </div>
                   <div class="col-6 col-md-6 mb-3">
                     <label class="form-label" for="address">Province<span class="text-danger">*</span></label>
@@ -164,10 +284,29 @@
                       class="form-control rounded-5"
                       id="address"
                       name="address"
-                      placeholder="Your address"
+                      placeholder="Your province"
                       formControlName="stateProvince"
                       data-cy="address"
                     />
+                    <div
+                      *ngIf="
+                        registerForm.get('stateProvince')!.invalid &&
+                        (registerForm.get('stateProvince')!.dirty || registerForm.get('stateProvince')!.touched)
+                      "
+                    >
+                      @if (registerForm.get('stateProvince')?.errors?.required) {
+                        <small class="form-text text-danger">Province is required.</small>
+                      }
+                      @if (registerForm.get('stateProvince')?.errors?.minlength) {
+                        <small class="form-text text-danger">Province must be at least 2 characters long.</small>
+                      }
+                      @if (registerForm.get('stateProvince')?.errors?.maxlength) {
+                        <small class="form-text text-danger">Province cannot be longer than 50 characters.</small>
+                      }
+                      @if (registerForm.get('stateProvince')?.errors?.pattern) {
+                        <small class="form-text text-danger">Province contains invalid characters.</small>
+                      }
+                    </div>
                   </div>
                 </div>
 

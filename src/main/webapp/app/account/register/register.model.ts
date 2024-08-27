@@ -1,6 +1,6 @@
 export class Registration {
   constructor(
-    public roleChoice: string,
+    public roleChoice: string | null,
     public libraryId: number,
     public firstName: string,
     public lastName: string,

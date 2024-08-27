@@ -29,21 +29,21 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
   success = signal(false);
 
   registerForm = new FormGroup({
-    roleChoice: new FormControl('', {
+    roleChoice: new FormControl(null, {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    libraryId: new FormControl('', {
+    libraryId: new FormControl(null, {
       nonNullable: true,
       validators: [Validators.required],
     }),
     firstName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
     }),
     lastName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
     }),
     dateOfBirth: new FormControl('', {
       nonNullable: true,
@@ -51,7 +51,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
     phoneNumber: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.pattern('^\\+?[1-9]\\d{1,14}$')],
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(13), Validators.pattern('^\\+?[1-9][0-9]{4,13}$')],
     }),
     address: new FormControl('', {
       nonNullable: true,
@@ -59,19 +59,19 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
     streetAddress: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100), Validators.pattern('^[a-zA-Z0-9 ,.-/]+$')],
     }),
     postalCode: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern('^[0-9]{5}(-[0-9]{4})?$')],
     }),
     city: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')],
     }),
     stateProvince: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')],
     }),
     login: new FormControl('', {
       nonNullable: true,
@@ -142,6 +142,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
         login,
         email,
       } = this.registerForm.getRawValue();
+
       this.registerService
         .save({
           roleChoice,
@@ -170,6 +171,12 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
       this.errorEmailExists.set(true);
     } else {
       this.error.set(true);
+    }
+  }
+
+  restrictNonNumeric(event: KeyboardEvent): void {
+    if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' || event.key === '.') {
+      event.preventDefault();
     }
   }
 }
