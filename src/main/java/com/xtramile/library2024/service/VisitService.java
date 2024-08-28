@@ -119,6 +119,12 @@ public class VisitService {
 
     public Page<VisitVM> getVisitsForCurrentUserLibrary(LibraryDTO libraryDTO, Pageable pageable) {
         Library library = libraryMapper.toEntity(libraryDTO);
-        return visitRepository.findByLibrary(library, pageable).map(visitMapper::toVm);
+        log.debug("Fetching visits for library with ID: {}", library.getId());
+
+        Page<VisitVM> visits = visitRepository.findByLibrary(library, pageable).map(visitMapper::toVm);
+
+        log.debug("Found {} visits for library with ID: {}", visits.getTotalElements(), library.getId());
+
+        return visits;
     }
 }

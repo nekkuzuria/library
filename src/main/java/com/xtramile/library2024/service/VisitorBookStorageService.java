@@ -120,8 +120,18 @@ public class VisitorBookStorageService {
         visitorBookStorageRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     public Page<VisitorBookStorageVM> getVisitorBookStoragesForCurrentUser(VisitorDTO visitorDTO, Pageable pageable) {
+        log.debug("Request to get book storages for visitor with ID: {}", visitorDTO.getId());
+
         Visitor visitor = visitorMapper.toEntity(visitorDTO);
-        return visitorBookStorageRepository.findByVisitor(visitor, pageable).map(visitorBookStorageMapper::toVm);
+        log.debug("Converted VisitorDTO to Visitor entity: {}", visitor);
+
+        Page<VisitorBookStorageVM> bookStoragesPage = visitorBookStorageRepository
+            .findByVisitor(visitor, pageable)
+            .map(visitorBookStorageMapper::toVm);
+
+        log.debug("Retrieved {} book storages for visitor with ID: {}", bookStoragesPage.getTotalElements(), visitorDTO.getId());
+        return bookStoragesPage;
     }
 }

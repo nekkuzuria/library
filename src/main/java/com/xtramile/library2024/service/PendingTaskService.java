@@ -172,9 +172,12 @@ public class PendingTaskService {
 
     public PendingTaskVM createNew(PendingTaskVM pendingTaskVM) {
         log.debug("Request to save PendingTask : {}", pendingTaskVM);
+
         PendingTaskDTO pendingTaskDTO = pendingTaskMapper.toDto(pendingTaskVM);
 
         BookDTO bookDTO = bookService.findById(pendingTaskVM.getBookId());
+        log.debug("Book found: {}", bookDTO);
+
         pendingTaskDTO.setBook(bookDTO);
         pendingTaskDTO.setLibrarian(null);
         pendingTaskDTO.setStatus(PendingTaskStatus.PENDING);
@@ -184,6 +187,8 @@ public class PendingTaskService {
         if (pendingTaskVM.getVisitorBookStorageId() != null) {
             Optional<VisitorBookStorageDTO> vbs = visitorBookStorageService.findOne(pendingTaskVM.getVisitorBookStorageId());
             if (vbs.isPresent()) {
+                log.debug("VisitorBookStorage found: {}", vbs.get());
+
                 if (
                     pendingTaskVM.getType() == PendingTaskType.RETURN &&
                     pendingTaskRepository
@@ -194,46 +199,64 @@ public class PendingTaskService {
                         )
                         .isPresent()
                 ) {
+                    log.warn(
+                        "A pending return request already exists for VisitorBookStorage ID: {}",
+                        pendingTaskVM.getVisitorBookStorageId()
+                    );
                     throw new PendingTaskAlreadyExistsException("A request to return this book already exists.");
                 }
 
                 pendingTaskDTO.setVisitorBookStorage(vbs.get());
             } else {
+                log.debug("No VisitorBookStorage found for ID: {}", pendingTaskVM.getVisitorBookStorageId());
                 pendingTaskDTO.setVisitorBookStorage(null);
             }
         } else {
+            log.debug("No VisitorBookStorage ID provided");
             pendingTaskDTO.setVisitorBookStorage(null);
         }
 
         PendingTask pendingTask = pendingTaskMapper.toEntity(pendingTaskDTO);
+        log.debug("Saving PendingTask : {}", pendingTask);
         pendingTask = pendingTaskRepository.save(pendingTask);
+        log.debug("Saved PendingTask with ID: {}", pendingTask.getId());
+
         return pendingTaskMapper.toVm(pendingTask);
     }
 
     public Optional<PendingTaskVM> processPendingTask(PendingTaskDTO pendingTaskDTO) {
-        log.debug("Request to partially update PendingTask : {}", pendingTaskDTO);
+        log.debug("Request to process PendingTask : {}", pendingTaskDTO);
 
         Optional<PendingTaskVM> pendingTaskVM = pendingTaskRepository
             .findById(pendingTaskDTO.getId())
             .map(existingPendingTask -> {
+                log.debug("Found existing PendingTask : {}", existingPendingTask);
+
                 PendingTaskType type = existingPendingTask.getType();
                 PendingTaskStatus status = pendingTaskDTO.getStatus();
+                log.debug("Processing PendingTask with type: {} and status: {}", type, status);
 
                 LibrarianDTO currentLibrarian = librarianService.getLibrarianOfCurrentUser();
+                log.debug("Current Librarian: {}", currentLibrarian);
 
                 if (status == PendingTaskStatus.APPROVED) {
+                    log.debug("Processing approval for PendingTask");
                     VisitorBookStorageDTO newVbs = handleApproval(type, currentLibrarian, existingPendingTask);
                     pendingTaskDTO.setVisitorBookStorage(newVbs);
+                    log.debug("Updated VisitorBookStorage: {}", newVbs);
                 }
 
                 pendingTaskDTO.setLibrarian(currentLibrarian);
 
                 pendingTaskMapper.partialUpdate(existingPendingTask, pendingTaskDTO);
+                log.debug("PendingTask updated with new data: {}", existingPendingTask);
+
                 return existingPendingTask;
             })
             .map(pendingTaskRepository::save)
             .map(pendingTaskMapper::toVm);
 
+        log.debug("Processed PendingTaskVM: {}", pendingTaskVM);
         return pendingTaskVM;
     }
 
@@ -250,13 +273,21 @@ public class PendingTaskService {
      * @return VisitorBookStorageDTO The visitor book storage details after approval processing.
      */
     private VisitorBookStorageDTO handleApproval(PendingTaskType type, LibrarianDTO currentLibrarian, PendingTask existingPendingTask) {
+        log.debug("Handling approval for PendingTaskType: {} with existingPendingTask: {}", type, existingPendingTask);
+
         VisitorBookStorageDTO savedVbs = null;
         VisitorDTO visitorDTO = visitorMapper.toDto(existingPendingTask.getVisitor());
         BookDTO bookDTO = bookMapper.toDto(existingPendingTask.getBook());
         BookStorageDTO bookStorageDTO = bookStorageMapper.toDto(existingPendingTask.getBook().getBookStorage());
         Integer quantity = existingPendingTask.getQuantity();
 
+        log.debug("VisitorDTO: {}", visitorDTO);
+        log.debug("BookDTO: {}", bookDTO);
+        log.debug("BookStorageDTO before operation: {}", bookStorageDTO);
+        log.debug("Quantity: {}", quantity);
+
         if (type == PendingTaskType.BORROW) {
+            log.debug("Processing BORROW type");
             VisitorBookStorageDTO vbsDTO = new VisitorBookStorageDTO();
             vbsDTO.setBorrowDate(existingPendingTask.getCreatedDate().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDate());
             vbsDTO.setVisitor(visitorDTO);
@@ -265,15 +296,19 @@ public class PendingTaskService {
             savedVbs = visitorBookStorageService.save(vbsDTO);
 
             bookStorageDTO.setQuantity(bookStorageDTO.getQuantity() - quantity);
-            bookStorageService.save(bookStorageDTO);
+            bookStorageDTO = bookStorageService.save(bookStorageDTO);
+            log.debug("BookStorageDTO after BORROW operation: {}", bookStorageDTO);
         } else if (type == PendingTaskType.RETURN) {
+            log.debug("Processing RETURN type");
             VisitorBookStorage vbs = existingPendingTask.getVisitorBookStorage();
             vbs.setReturnDate(LocalDate.now());
             savedVbs = visitorBookStorageService.save(visitorBookStorageMapper.toDto(vbs));
 
             bookStorageDTO.setQuantity(bookStorageDTO.getQuantity() + quantity);
-            bookStorageService.save(bookStorageDTO);
+            bookStorageDTO = bookStorageService.save(bookStorageDTO);
+            log.debug("BookStorageDTO after RETURN operation: {}", bookStorageDTO);
         }
+
         VisitDTO visitDTO = new VisitDTO();
         visitDTO.setDate(LocalDate.now());
         visitDTO.setLibrary(libraryMapper.toDto(existingPendingTask.getLibrary()));
@@ -281,6 +316,9 @@ public class PendingTaskService {
         visitDTO.setVisitor(visitorDTO);
         visitDTO.setVisitorBookStorage(savedVbs);
         visitService.save(visitDTO);
+
+        log.debug("Created VisitDTO: {}", visitDTO);
+        log.debug("Saved VisitorBookStorageDTO: {}", savedVbs);
 
         return savedVbs;
     }

@@ -76,18 +76,25 @@ public class LocationService {
         Long userId = user.getId();
         Location location = null;
 
+        log.debug("Request to update Location for User ID: {}", userId);
+
         try {
             Librarian librarian = librarianRepository
                 .findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Librarian not found for user id: " + userId));
             location = librarian.getLocation();
+            log.debug("Found Location for Librarian with User ID: {}", userId);
         } catch (EntityNotFoundException e) {
+            log.warn("Librarian not found for User ID: {}. Trying to find Visitor.", userId);
+
             try {
                 Visitor visitor = visitorRepository
                     .findByUserId(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Visitor not found for user id: " + userId));
                 location = visitor.getAddress();
+                log.debug("Found Location for Visitor with User ID: {}", userId);
             } catch (EntityNotFoundException ex) {
+                log.error("No Librarian or Visitor found for User ID: {}", userId);
                 throw new EntityNotFoundException("No Librarian or Visitor found for user id: " + userId);
             }
         }
@@ -96,9 +103,11 @@ public class LocationService {
             locationDTO.setId(location.getId());
             location = locationMapper.toEntity(locationDTO);
             location = locationRepository.save(location);
+            log.debug("Updated Location with ID: {}", location.getId());
             return locationMapper.toDto(location);
         }
 
+        log.error("Location could not be updated because it was not found.");
         throw new EntityNotFoundException("Location could not be updated because it was not found.");
     }
 

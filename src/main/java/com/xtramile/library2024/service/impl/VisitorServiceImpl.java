@@ -71,22 +71,38 @@ public class VisitorServiceImpl implements VisitorService {
 
     @Override
     public VisitorDTO update(VisitorDTO visitorDTO, User user, AdminUserDTO userDTO) {
-        log.debug("Request to update Visitor : {}", visitorDTO);
-        Long userId = user.getId();
-        Visitor visitor = visitorRepository.findByUserId(userId).get();
-        Long id = visitor.getId();
-        Library library = visitorRepository.findByUserId(userId).get().getLibrary();
-        Location location = visitorRepository.findByUserId(userId).get().getAddress();
+        log.debug("Request to update Visitor with DTO: {}", visitorDTO);
 
+        Long userId = user.getId();
+
+        // Retrieve the existing Visitor entity
+        Visitor existingVisitor = visitorRepository
+            .findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("Visitor not found for user ID: " + userId));
+        log.debug("Retrieved existing Visitor: {}", existingVisitor);
+
+        Library library = existingVisitor.getLibrary();
+        Location location = existingVisitor.getAddress();
+        log.debug("Retrieved Library: {}", library);
+        log.debug("Retrieved Location: {}", location);
+
+        Long id = existingVisitor.getId();
         visitorDTO.setId(id);
         visitorDTO.setLibrary(libraryMapper.toDto(library));
         visitorDTO.setAddress(locationMapper.toDto(location));
         visitorDTO.setUser(userMapper.toDtoId(user));
         visitorDTO.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
 
-        visitor = visitorMapper.toEntity(visitorDTO);
-        visitor = visitorRepository.save(visitor);
-        return visitorMapper.toDto(visitor);
+        Visitor updatedVisitor = visitorMapper.toEntity(visitorDTO);
+        log.debug("Converted DTO to entity: {}", updatedVisitor);
+
+        updatedVisitor = visitorRepository.save(updatedVisitor);
+        log.debug("Saved updated Visitor: {}", updatedVisitor);
+
+        VisitorDTO resultDto = visitorMapper.toDto(updatedVisitor);
+        log.debug("Returning updated VisitorDTO: {}", resultDto);
+
+        return resultDto;
     }
 
     @Override
@@ -111,8 +127,17 @@ public class VisitorServiceImpl implements VisitorService {
         return visitorRepository.findAll().stream().map(visitorMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @Override
     public Page<VisitorDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return visitorRepository.findAllWithEagerRelationships(pageable).map(visitorMapper::toDto);
+        log.debug("Request to get all Visitors with eager relationships. Pageable: {}", pageable);
+
+        Page<Visitor> visitorsPage = visitorRepository.findAllWithEagerRelationships(pageable);
+        log.debug("Fetched {} Visitors from repository", visitorsPage.getTotalElements());
+
+        Page<VisitorDTO> visitorDTOPage = visitorsPage.map(visitorMapper::toDto);
+        log.debug("Mapped Visitors to DTOs. Total DTOs: {}", visitorDTOPage.getTotalElements());
+
+        return visitorDTOPage;
     }
 
     @Override
@@ -131,12 +156,35 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public Long getVisitorIdOfCurrentUser() {
         Long userId = SecurityUtils.getCurrentUserId();
-        return visitorRepository.findByUserId(userId).orElseThrow(() -> new EntityNotFoundException("Visitor not found for user")).getId();
+        log.debug("Fetching Visitor ID for current user with ID: {}", userId);
+
+        Visitor visitor = visitorRepository
+            .findByUserId(userId)
+            .orElseThrow(() -> {
+                log.error("Visitor not found for user with ID: {}", userId);
+                return new EntityNotFoundException("Visitor not found for user");
+            });
+
+        Long visitorId = visitor.getId();
+        log.debug("Found Visitor ID: {} for user with ID: {}", visitorId, userId);
+
+        return visitorId;
     }
 
     @Override
     public VisitorDTO getVisitorOfCurrentUser() {
         Long userId = SecurityUtils.getCurrentUserId();
-        return visitorRepository.findByUserId(userId).map(visitorMapper::toDto).orElse(null);
+        log.debug("Fetching Visitor for current user with ID: {}", userId);
+
+        return visitorRepository
+            .findByUserId(userId)
+            .map(visitor -> {
+                log.debug("Found Visitor with ID: {} for user with ID: {}", visitor.getId(), userId);
+                return visitorMapper.toDto(visitor);
+            })
+            .orElseGet(() -> {
+                log.warn("No Visitor found for user with ID: {}", userId);
+                return null;
+            });
     }
 }

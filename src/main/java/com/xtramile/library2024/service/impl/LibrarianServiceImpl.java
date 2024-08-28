@@ -78,21 +78,29 @@ public class LibrarianServiceImpl implements LibrarianService {
 
     @Override
     public LibrarianDTO update(LibrarianDTO librarianDTO, User user, AdminUserDTO userDTO) {
-        log.debug("Request to update Librarian : {}", librarianDTO);
-        Long userId = user.getId();
-        Librarian librarian = librarianRepository.findByUserId(userId).get();
-        Long id = librarian.getId();
-        Library library = librarianRepository.findByUserId(userId).get().getLibrary();
-        Location location = librarianRepository.findByUserId(userId).get().getLocation();
+        log.debug("Request to update Librarian with details: {}", librarianDTO);
 
-        librarianDTO.setId(id);
-        librarianDTO.setLibrary(libraryMapper.toDto(library));
-        librarianDTO.setLocation(locationMapper.toDto(location));
+        Long userId = user.getId();
+        Librarian librarian = librarianRepository
+            .findByUserId(userId)
+            .orElseThrow(() -> {
+                log.error("Librarian not found for User ID: {}", userId);
+                return new RuntimeException("Librarian not found");
+            });
+        log.debug("Retrieved Librarian: {}", librarian);
+
+        librarianDTO.setId(librarian.getId());
+        librarianDTO.setLibrary(libraryMapper.toDto(librarian.getLibrary()));
+        librarianDTO.setLocation(locationMapper.toDto(librarian.getLocation()));
         librarianDTO.setUser(userMapper.toDtoId(user));
         librarianDTO.setName(userDTO.getFirstName() + " " + userDTO.getLastName());
 
         librarian = librarianMapper.toEntity(librarianDTO);
         librarian = librarianRepository.save(librarian);
+
+        log.info("Librarian updated successfully with ID: {}", librarian.getId());
+        log.debug("Updated Librarian entity: {}", librarian);
+
         return librarianMapper.toDto(librarian);
     }
 
@@ -119,7 +127,12 @@ public class LibrarianServiceImpl implements LibrarianService {
     }
 
     public Page<LibrarianDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return librarianRepository.findAllWithEagerRelationships(pageable).map(librarianMapper::toDto);
+        log.debug("Request to get all Librarians with eager relationships, Pageable: {}", pageable);
+
+        Page<LibrarianDTO> result = librarianRepository.findAllWithEagerRelationships(pageable).map(librarianMapper::toDto);
+        log.debug("Retrieved {} Librarians with eager relationships", result.getTotalElements());
+
+        return result;
     }
 
     @Override
@@ -138,11 +151,33 @@ public class LibrarianServiceImpl implements LibrarianService {
     @Override
     public LibrarianDTO getLibrarianOfCurrentUser() {
         Long userId = SecurityUtils.getCurrentUserId();
-        return librarianRepository.findByUserId(userId).map(librarianMapper::toDto).orElse(null);
+        log.debug("Request to get Librarian for current User ID: {}", userId);
+
+        return librarianRepository
+            .findByUserId(userId)
+            .map(librarian -> {
+                log.debug("Found Librarian: {}", librarian);
+                return librarianMapper.toDto(librarian);
+            })
+            .orElseGet(() -> {
+                log.warn("No Librarian found for User ID: {}", userId);
+                return null;
+            });
     }
 
     @Override
     public LibrarianDTO getLibrarianByUserId(Long userId) {
-        return librarianRepository.findByUserId(userId).map(librarianMapper::toDto).orElse(null);
+        log.debug("Request to get Librarian for User ID: {}", userId);
+
+        return librarianRepository
+            .findByUserId(userId)
+            .map(librarian -> {
+                log.debug("Found Librarian: {}", librarian);
+                return librarianMapper.toDto(librarian);
+            })
+            .orElseGet(() -> {
+                log.warn("No Librarian found for User ID: {}", userId);
+                return null;
+            });
     }
 }

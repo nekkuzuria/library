@@ -198,30 +198,57 @@ public class BookService {
 
     @Transactional
     public BookVM createBook(BookVM bookVm) throws IOException {
+        log.debug("Request to create Book with details: {}", bookVm);
+
         BookStorageDTO bookStorage = new BookStorageDTO();
         bookStorage.setQuantity(bookVm.getQuantity());
+        log.debug("BookStorageDTO created with quantity: {}", bookVm.getQuantity());
+
         BookStorageDTO savedBookStorage = bookStorageService.save(bookStorage);
+        log.debug("BookStorage saved with id: {}", savedBookStorage.getId());
 
         bookVm.setBookStorageId(savedBookStorage.getId());
         Book book = bookMapper.toEntity(bookVm);
         Book savedBook = bookRepository.save(book);
+        log.debug("Book saved with id: {}", savedBook.getId());
 
         return bookMapper.toVM(savedBook);
     }
 
     public BookDTO findById(Long id) {
-        Book book = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        log.debug("Request to find Book by id: {}", id);
+
+        Book book = bookRepository
+            .findById(id)
+            .orElseThrow(() -> {
+                log.warn("Book not found with id: {}", id);
+                return new EntityNotFoundException("Book not found");
+            });
+
+        log.debug("Book found with id: {}", id);
         return bookMapper.toDto(book);
     }
 
     public void updateBookImage(Long bookId, File file) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        log.debug("Request to update image for Book with id: {}", bookId);
+
+        Book book = bookRepository
+            .findById(bookId)
+            .orElseThrow(() -> {
+                log.warn("Book not found with id: {}", bookId);
+                return new RuntimeException("Book not found");
+            });
+
         book.setFile(file);
-        log.info("BOOK=====" + book.toString());
         bookRepository.save(book);
+        log.info("Book updated with new image file: {}", file.getId());
     }
 
     public boolean isBookBorrowed(Long bookId) {
-        return visitorBookStorageRepository.existsByBookIdAndReturnDateIsNull(bookId);
+        log.debug("Checking if Book with id {} is borrowed", bookId);
+        boolean isBorrowed = visitorBookStorageRepository.existsByBookIdAndReturnDateIsNull(bookId);
+
+        log.debug("Book with id {} is borrowed: {}", bookId, isBorrowed);
+        return isBorrowed;
     }
 }

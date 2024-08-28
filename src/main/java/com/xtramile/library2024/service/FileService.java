@@ -123,6 +123,7 @@ public class FileService {
     }
 
     public File saveImage(MultipartFile file) throws IOException {
+        log.debug("Request to save image with file name: {}", file.getOriginalFilename());
         File fileEntity = new File();
         fileEntity.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
         File savedFileEntity = fileRepository.save(fileEntity);
@@ -130,11 +131,28 @@ public class FileService {
     }
 
     public byte[] getImage() {
-        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User is not logged in"));
+        log.debug("Request to get image");
 
-        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new RuntimeException("User not found"));
+        String login = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> {
+                log.error("Failed to get image: User is not logged in");
+                return new RuntimeException("User is not logged in");
+            });
+
+        User user = userRepository
+            .findOneByLogin(login)
+            .orElseThrow(() -> {
+                log.error("Failed to get image: User not found for login {}", login);
+                return new RuntimeException("User not found");
+            });
 
         File fileEntity = user.getFile();
+
+        if (fileEntity == null) {
+            log.error("Failed to get image: No file associated with user {}", login);
+            throw new RuntimeException("File not found");
+        }
+
         return Base64.getDecoder().decode(fileEntity.getImage());
     }
 }

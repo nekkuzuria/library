@@ -73,10 +73,25 @@ public class LibraryService {
      * @return the persisted entity.
      */
     public LibraryDTO save(LibraryDTO libraryDTO) {
-        log.debug("Request to save Library : {}", libraryDTO);
-        Library library = libraryMapper.toEntity(libraryDTO);
-        library = libraryRepository.save(library);
-        return libraryMapper.toDto(library);
+        if (libraryDTO == null) {
+            log.error("Attempted to save a null LibraryDTO");
+            throw new IllegalArgumentException("LibraryDTO cannot be null");
+        }
+
+        log.debug("Request to save Library: {}", libraryDTO);
+
+        try {
+            Library library = libraryMapper.toEntity(libraryDTO);
+            library = libraryRepository.save(library);
+            LibraryDTO result = libraryMapper.toDto(library);
+
+            log.debug("Successfully saved Library with ID: {}", library.getId());
+
+            return result;
+        } catch (Exception e) {
+            log.error("Error occurred while saving LibraryDTO: {}", libraryDTO, e);
+            throw new RuntimeException("Failed to save Library", e);
+        }
     }
 
     /**
@@ -86,10 +101,21 @@ public class LibraryService {
      * @return the persisted entity.
      */
     public LibraryDTO update(LibraryDTO libraryDTO) {
-        log.debug("Request to update Library : {}", libraryDTO);
-        Library library = libraryMapper.toEntity(libraryDTO);
-        library = libraryRepository.save(library);
-        return libraryMapper.toDto(library);
+        log.debug("Request to update Library: {}", libraryDTO);
+
+        if (libraryDTO == null) {
+            log.error("Attempted to update with a null LibraryDTO");
+            throw new IllegalArgumentException("LibraryDTO cannot be null");
+        }
+
+        try {
+            Library library = libraryMapper.toEntity(libraryDTO);
+            library = libraryRepository.save(library);
+            return libraryMapper.toDto(library);
+        } catch (Exception e) {
+            log.error("Error occurred while updating LibraryDTO: {}", libraryDTO, e);
+            throw new RuntimeException("Failed to update Library", e);
+        }
     }
 
     /**
@@ -99,17 +125,31 @@ public class LibraryService {
      * @return the persisted entity.
      */
     public Optional<LibraryDTO> partialUpdate(LibraryDTO libraryDTO) {
-        log.debug("Request to partially update Library : {}", libraryDTO);
+        log.debug("Request to partially update Library: {}", libraryDTO);
+
+        if (libraryDTO == null) {
+            log.error("Attempted to partially update with a null LibraryDTO");
+            throw new IllegalArgumentException("LibraryDTO cannot be null");
+        }
 
         return libraryRepository
             .findById(libraryDTO.getId())
             .map(existingLibrary -> {
-                libraryMapper.partialUpdate(existingLibrary, libraryDTO);
+                log.debug("Found existing Library with ID: {}", existingLibrary.getId());
 
-                return existingLibrary;
+                libraryMapper.partialUpdate(existingLibrary, libraryDTO);
+                log.debug("Updated existing Library with new data: {}", existingLibrary);
+
+                return libraryRepository.save(existingLibrary);
             })
-            .map(libraryRepository::save)
-            .map(libraryMapper::toDto);
+            .map(library -> {
+                log.debug("Saved updated Library with ID: {}", library.getId());
+                return libraryMapper.toDto(library);
+            })
+            .or(() -> {
+                log.warn("Library with ID {} not found for partial update", libraryDTO.getId());
+                return Optional.empty();
+            });
     }
 
     /**
@@ -190,30 +230,74 @@ public class LibraryService {
     }
 
     public LibraryDTO getSelectedLibrary() {
+        log.debug("Request to get Selected Library");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
         Jwt jwt = (Jwt) principal;
-        return libraryMapper.toDto(libraryRepository.findById(jwt.getClaim("libraryId")).get());
+
+        Long libraryId = jwt.getClaim("libraryId");
+        log.debug("Request to get Library with ID: {}", libraryId);
+
+        Library library = libraryRepository
+            .findById(libraryId)
+            .orElseThrow(() -> {
+                log.error("Library with ID {} not found", libraryId);
+                return new EntityNotFoundException("Library not found with ID " + libraryId);
+            });
+
+        log.debug("Successfully retrieved Library: {}", library);
+
+        return libraryMapper.toDto(library);
     }
 
     public LibraryDTO getSelectedLibrary(String jwtToken) {
+        log.debug("Request to get Library using JWT token");
+
         Jwt jwt = jwtDecoder.decode(jwtToken);
         Long libraryId = jwt.getClaim("libraryId");
+
+        log.debug("Extracted Library ID from JWT: {}", libraryId);
+
         if (libraryId == 0) {
-            return null;
+            log.warn("Invalid Library ID extracted from JWT: {}", libraryId);
+            throw new IllegalArgumentException("Invalid Library ID extracted from JWT: " + libraryId);
         }
+
         return libraryRepository
             .findById(libraryId)
             .map(libraryMapper::toDto)
-            .orElseThrow(() -> new NoSuchElementException("Library with id " + libraryId + " not found"));
+            .orElseThrow(() -> {
+                log.error("Library with ID {} not found", libraryId);
+                return new NoSuchElementException("Library with ID " + libraryId + " not found");
+            });
     }
 
     public boolean isAdminLibraryValid(String jwt) {
+        log.debug("Checking if the admin's library is valid using JWT");
+
         Long userId = securityUtils.getCurrentUserId(jwt);
+        log.debug("Extracted User ID from JWT: {}", userId);
+
         LibraryDTO librarianLibrary = getLibraryOfCurrentLibrarian(userId);
         if (librarianLibrary == null) {
-            return true; // Means user is visitor
+            log.debug("No library found for librarian with User ID: {}. Assuming user is a visitor.", userId);
+            return true; // Means user is a visitor
         }
-        return getSelectedLibrary(jwt).getId().equals(librarianLibrary.getId());
+
+        LibraryDTO selectedLibrary = getSelectedLibrary(jwt);
+        if (selectedLibrary == null) {
+            log.error("Selected library is null for JWT: {}", jwt);
+            return false;
+        }
+
+        boolean isValid = selectedLibrary.getId().equals(librarianLibrary.getId());
+        log.debug(
+            "Selected Library ID: {} matches Librarian's Library ID: {}: {}",
+            selectedLibrary.getId(),
+            librarianLibrary.getId(),
+            isValid
+        );
+
+        return isValid;
     }
 }
