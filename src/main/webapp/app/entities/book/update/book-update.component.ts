@@ -130,12 +130,6 @@ export class BookUpdateComponent implements OnInit {
         ),
       )
       .subscribe((bookStorages: IBookStorage[]) => (this.bookStoragesSharedCollection = bookStorages));
-
-    this.fileService
-      .query({ filter: 'book-is-null' })
-      .pipe(map((res: HttpResponse<IFile[]>) => res.body ?? []))
-      .pipe(map((files: IFile[]) => this.fileService.addFileToCollectionIfMissing<IFile>(files, this.book?.file)))
-      .subscribe((files: IFile[]) => (this.filesCollection = files));
   }
 
   onImageChange(event: any): void {
