@@ -297,6 +297,14 @@ app-dashboard {
 .navbar {
   height: 50px !important;
 }
+
+@media (min-width: 766px) {
+  .full-width-link {
+    display: block;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .book-item {
     display: flex;

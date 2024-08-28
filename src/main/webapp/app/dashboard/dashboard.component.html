@@ -52,7 +52,7 @@
     <div class="row g-5 mt-2">
       @for (book of filteredBooks; track trackId) {
         <div class="col-12 col-md-2 d-flex justify-content-center book-item">
-          <a [routerLink]="['/book-detail', book.id]" class="text-decoration-none">
+          <a [routerLink]="['/book-detail', book.id]" class="text-decoration-none d-block full-width-link">
             <div class="card border-0 rounded-4 shadow-lg h-100 book-card">
               <img
                 [src]="book.cover"
