@@ -242,7 +242,7 @@
                         <small class="form-text text-danger">Postal code is required.</small>
                       }
                       @if (registerForm.get('postalCode')?.errors?.pattern) {
-                        <small class="form-text text-danger">Postal code is invalid. Use 5 digits or 5 digits + hyphen + 4 digits.</small>
+                        <small class="form-text text-danger">Postal code cannot be longer than 5 characters.</small>
                       }
                     </div>
                   </div>
@@ -444,9 +444,7 @@
                   </div>
                 </div>
 
-                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit" [disabled]="registerForm.invalid">
-                  Register
-                </button>
+                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit">Register</button>
               </form>
             }
             <div class="row">

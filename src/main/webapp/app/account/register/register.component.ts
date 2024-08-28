@@ -63,7 +63,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
     postalCode: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern('^[0-9]{5}(-[0-9]{4})?$')],
+      validators: [Validators.required, Validators.pattern('^[0-9]{1,5}$')],
     }),
     city: new FormControl('', {
       nonNullable: true,

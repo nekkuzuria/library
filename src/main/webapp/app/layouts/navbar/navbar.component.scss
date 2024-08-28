@@ -35,3 +35,8 @@ Logo styles
     no-repeat center center;
   background-size: contain;
 }
+
+.navbar-collapse {
+  z-index: 1;
+  background: white;
+}
