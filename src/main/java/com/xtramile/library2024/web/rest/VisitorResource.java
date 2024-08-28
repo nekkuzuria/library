@@ -52,9 +52,11 @@ public class VisitorResource {
     public ResponseEntity<VisitorDTO> createVisitor(@RequestBody VisitorDTO visitorDTO) throws URISyntaxException {
         log.debug("REST request to save Visitor : {}", visitorDTO);
         if (visitorDTO.getId() != null) {
+            log.warn("Attempted to create a new visitor with an existing ID: {}", visitorDTO.getId());
             throw new BadRequestAlertException("A new visitor cannot already have an ID", ENTITY_NAME, "idexists");
         }
         visitorDTO = visitorService.save(visitorDTO);
+        log.info("Visitor created successfully with ID: {}", visitorDTO.getId());
         return ResponseEntity.created(new URI("/api/visitors/" + visitorDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, visitorDTO.getId().toString()))
             .body(visitorDTO);
@@ -76,18 +78,24 @@ public class VisitorResource {
         @RequestBody VisitorDTO visitorDTO
     ) throws URISyntaxException {
         log.debug("REST request to update Visitor : {}, {}", id, visitorDTO);
+
         if (visitorDTO.getId() == null) {
+            log.warn("Invalid ID: Visitor ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitorDTO.getId())) {
+            log.warn("ID mismatch: Path variable ID {} does not match Visitor ID {}", id, visitorDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitorRepository.existsById(id)) {
+            log.warn("Entity not found: No Visitor exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         visitorDTO = visitorService.update(visitorDTO);
+        log.info("Visitor updated successfully with ID: {}", visitorDTO.getId());
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, visitorDTO.getId().toString()))
             .body(visitorDTO);
@@ -110,18 +118,23 @@ public class VisitorResource {
         @RequestBody VisitorDTO visitorDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update Visitor partially : {}, {}", id, visitorDTO);
+
         if (visitorDTO.getId() == null) {
+            log.warn("Invalid ID: Visitor ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitorDTO.getId())) {
+            log.warn("ID mismatch: Path variable ID {} does not match Visitor ID {}", id, visitorDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitorRepository.existsById(id)) {
+            log.warn("Entity not found: No Visitor exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<VisitorDTO> result = visitorService.partialUpdate(visitorDTO);
+        log.info("Partial update result for Visitor ID {}: {}", visitorDTO.getId(), result);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -151,6 +164,11 @@ public class VisitorResource {
     public ResponseEntity<VisitorDTO> getVisitor(@PathVariable("id") Long id) {
         log.debug("REST request to get Visitor : {}", id);
         Optional<VisitorDTO> visitorDTO = visitorService.findOne(id);
+        if (visitorDTO.isPresent()) {
+            log.info("Visitor found with ID: {}", id);
+        } else {
+            log.warn("Visitor not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(visitorDTO);
     }
 
@@ -163,18 +181,27 @@ public class VisitorResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVisitor(@PathVariable("id") Long id) {
         log.debug("REST request to delete Visitor : {}", id);
-        visitorService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (visitorService.findOne(id).isPresent()) {
+            visitorService.delete(id);
+            log.info("Visitor deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.warn("Visitor not found for deletion with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/visitor-id")
     public ResponseEntity<Long> getVisitorId() {
+        log.info("REST request to get visitorId of current user");
         Long visitorId = visitorService.getVisitorIdOfCurrentUser();
         if (visitorId != null) {
+            log.info("Visitor ID found: {}", visitorId);
             return ResponseEntity.ok(visitorId);
         } else {
+            log.info("Visitor ID not found for the current user.");
             return ResponseEntity.notFound().build();
         }
     }

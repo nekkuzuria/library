@@ -68,9 +68,12 @@ public class VisitResource {
     public ResponseEntity<VisitDTO> createVisit(@RequestBody VisitDTO visitDTO) throws URISyntaxException {
         log.debug("REST request to save Visit : {}", visitDTO);
         if (visitDTO.getId() != null) {
+            log.error("Attempted to create a new visit with an existing ID: {}", visitDTO.getId());
             throw new BadRequestAlertException("A new visit cannot already have an ID", ENTITY_NAME, "idexists");
         }
         visitDTO = visitService.save(visitDTO);
+        log.info("Visit created successfully with ID: {}", visitDTO.getId());
+
         return ResponseEntity.created(new URI("/api/visits/" + visitDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, visitDTO.getId().toString()))
             .body(visitDTO);
@@ -92,18 +95,24 @@ public class VisitResource {
         @RequestBody VisitDTO visitDTO
     ) throws URISyntaxException {
         log.debug("REST request to update Visit : {}, {}", id, visitDTO);
+
         if (visitDTO.getId() == null) {
+            log.error("Invalid ID: Visit ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match Visit ID {}", id, visitDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitRepository.existsById(id)) {
+            log.error("Entity not found: No Visit exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         visitDTO = visitService.update(visitDTO);
+        log.info("Visit updated successfully with ID: {}", visitDTO.getId());
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, visitDTO.getId().toString()))
             .body(visitDTO);
@@ -127,17 +136,21 @@ public class VisitResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update Visit partially : {}, {}", id, visitDTO);
         if (visitDTO.getId() == null) {
+            log.error("Invalid ID: Visit ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match Visit ID {}", id, visitDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitRepository.existsById(id)) {
+            log.error("Entity not found: No Visit exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<VisitDTO> result = visitService.partialUpdate(visitDTO);
+        log.info("Partial update result for Visit ID {}: {}", visitDTO.getId(), result);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -156,16 +169,29 @@ public class VisitResource {
         log.debug("REST request to get a page of Visits");
         Page<VisitDTO> page = visitService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        log.info("Returning {} Visits with total elements: {}", page.getContent().size(), page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     @GetMapping("/my-library")
     public ResponseEntity<List<VisitVM>> getCurrentUserLibraryVisits(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get a page of Visits of current user's library");
+
         LibraryDTO libraryDTO = libraryService.getLibraryOfCurrentLibrarian();
+        if (libraryDTO == null) {
+            log.error("No library found for the current librarian");
+            return ResponseEntity.notFound().build();
+        }
 
         Page<VisitVM> page = visitService.getVisitsForCurrentUserLibrary(libraryDTO, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        log.info(
+            "Returning {} Visits for current user's library with total elements: {}",
+            page.getContent().size(),
+            page.getTotalElements()
+        );
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -179,6 +205,13 @@ public class VisitResource {
     public ResponseEntity<VisitDTO> getVisit(@PathVariable("id") Long id) {
         log.debug("REST request to get Visit : {}", id);
         Optional<VisitDTO> visitDTO = visitService.findOne(id);
+
+        if (visitDTO.isPresent()) {
+            log.info("Found Visit with ID: {}", id);
+        } else {
+            log.warn("Visit with ID: {} not found", id);
+        }
+
         return ResponseUtil.wrapOrNotFound(visitDTO);
     }
 
@@ -191,9 +224,16 @@ public class VisitResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVisit(@PathVariable("id") Long id) {
         log.debug("REST request to delete Visit : {}", id);
-        visitService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+
+        if (visitService.findOne(id).isPresent()) {
+            visitService.delete(id);
+            log.info("Successfully deleted Visit with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent Visit with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

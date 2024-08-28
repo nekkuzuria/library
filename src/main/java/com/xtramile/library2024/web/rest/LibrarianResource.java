@@ -51,9 +51,11 @@ public class LibrarianResource {
     public ResponseEntity<LibrarianDTO> createLibrarian(@RequestBody LibrarianDTO librarianDTO) throws URISyntaxException {
         log.debug("REST request to save Librarian : {}", librarianDTO);
         if (librarianDTO.getId() != null) {
+            log.error("Attempted to create a new librarian with an existing ID: {}", librarianDTO.getId());
             throw new BadRequestAlertException("A new librarian cannot already have an ID", ENTITY_NAME, "idexists");
         }
         librarianDTO = librarianService.save(librarianDTO);
+        log.info("Librarian created successfully with ID: {}", librarianDTO.getId());
         return ResponseEntity.created(new URI("/api/librarians/" + librarianDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, librarianDTO.getId().toString()))
             .body(librarianDTO);
@@ -76,17 +78,21 @@ public class LibrarianResource {
     ) throws URISyntaxException {
         log.debug("REST request to update Librarian : {}, {}", id, librarianDTO);
         if (librarianDTO.getId() == null) {
+            log.error("Invalid ID: LibrarianDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, librarianDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match LibrarianDTO ID {}", id, librarianDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!librarianRepository.existsById(id)) {
+            log.error("Entity not found: No Librarian exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         librarianDTO = librarianService.update(librarianDTO);
+        log.info("Librarian updated successfully with ID: {}", librarianDTO.getId());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, librarianDTO.getId().toString()))
             .body(librarianDTO);
@@ -110,17 +116,25 @@ public class LibrarianResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update Librarian partially : {}, {}", id, librarianDTO);
         if (librarianDTO.getId() == null) {
+            log.error("Invalid ID: LibrarianDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, librarianDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match LibrarianDTO ID {}", id, librarianDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!librarianRepository.existsById(id)) {
+            log.error("Entity not found: No Librarian exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<LibrarianDTO> result = librarianService.partialUpdate(librarianDTO);
+        if (result.isPresent()) {
+            log.info("Librarian partially updated with ID: {}", librarianDTO.getId());
+        } else {
+            log.warn("No Librarian updated with ID: {}", librarianDTO.getId());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -139,7 +153,9 @@ public class LibrarianResource {
         @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
     ) {
         log.debug("REST request to get all Librarians");
-        return librarianService.findAll();
+        List<LibrarianDTO> librarians = librarianService.findAll();
+        log.info("Retrieved {} Librarians", librarians.size());
+        return librarians;
     }
 
     /**
@@ -152,6 +168,11 @@ public class LibrarianResource {
     public ResponseEntity<LibrarianDTO> getLibrarian(@PathVariable("id") Long id) {
         log.debug("REST request to get Librarian : {}", id);
         Optional<LibrarianDTO> librarianDTO = librarianService.findOne(id);
+        if (librarianDTO.isPresent()) {
+            log.info("Librarian found with ID: {}", id);
+        } else {
+            log.warn("Librarian not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(librarianDTO);
     }
 
@@ -164,9 +185,15 @@ public class LibrarianResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLibrarian(@PathVariable("id") Long id) {
         log.debug("REST request to delete Librarian : {}", id);
-        librarianService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (librarianService.findOne(id).isPresent()) {
+            librarianService.delete(id);
+            log.info("Librarian deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent Librarian with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

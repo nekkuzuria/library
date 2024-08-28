@@ -64,7 +64,7 @@ public class BookResource {
     /**
      * {@code POST  /books} : Create a new book.
      *
-     * @param bookVm the bookVm to create.
+     * @param bookJson the bookJson to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new bookDTO, or with status {@code 400 (Bad Request)} if the book has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
@@ -73,16 +73,19 @@ public class BookResource {
         @RequestPart("book") String bookJson,
         @RequestPart(value = "file", required = false) MultipartFile file
     ) throws URISyntaxException, IOException {
-        //        log.debug("REST request to save Book : {}", bookVm);
+        log.debug("REST request to save Book with data: {}", bookJson);
         BookVM bookVm = objectMapper.readValue(bookJson, BookVM.class);
         if (bookVm.getId() != null) {
+            log.error("Attempted to create a new Book with an existing ID: {}", bookVm.getId());
             throw new BadRequestAlertException("A new book cannot already have an ID", ENTITY_NAME, "idexists");
         }
         if (!file.isEmpty()) {
             File savedFile = fileService.saveImage(file);
             bookVm.setFile(savedFile);
+            log.debug("Uploaded file saved with ID: {}", savedFile.getId());
         }
         BookVM savedBookVM = bookService.createBook(bookVm);
+        log.info("Book created successfully with ID: {}", savedBookVM.getId());
 
         return ResponseEntity.created(new URI("/api/books/" + savedBookVM.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, savedBookVM.getId().toString()))
@@ -93,7 +96,7 @@ public class BookResource {
      * {@code PUT  /books/:id} : Updates an existing book.
      *
      * @param id the id of the bookDTO to save.
-     * @param bookVM the bookVM to update.
+     * @param bookJson the bookJson to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated bookDTO,
      * or with status {@code 400 (Bad Request)} if the bookDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the bookDTO couldn't be updated.
@@ -108,13 +111,16 @@ public class BookResource {
         BookVM bookVM = objectMapper.readValue(bookJson, BookVM.class);
         log.debug("REST request to update Book : {}, {}", id, bookVM);
         if (bookVM.getId() == null) {
+            log.error("Invalid ID: BookVM ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, bookVM.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match BookVM ID {}", id, bookVM.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!bookRepository.existsById(id)) {
+            log.error("Entity not found: No Book exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
@@ -123,8 +129,10 @@ public class BookResource {
         if (file != null && !file.isEmpty()) {
             File savedFile = fileService.saveImage(file);
             bookService.updateBookImage(id, savedFile);
+            log.debug("Updated book image saved with ID: {}", savedFile.getId());
         }
 
+        log.info("Book updated successfully with ID: {}", bookDTO.getId());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookDTO.getId().toString()))
             .body(bookDTO);
@@ -148,17 +156,25 @@ public class BookResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update Book partially : {}, {}", id, bookVM);
         if (bookVM.getId() == null) {
+            log.error("Invalid ID: BookVM ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, bookVM.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match BookVM ID {}", id, bookVM.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!bookRepository.existsById(id)) {
+            log.error("Entity not found: No Book exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<BookDTO> result = bookService.partialUpdate(bookVM);
+        if (result.isPresent()) {
+            log.info("Book partially updated with ID: {}", bookVM.getId());
+        } else {
+            log.warn("No Book updated with ID: {}", bookVM.getId());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -180,6 +196,7 @@ public class BookResource {
         log.debug("REST request to get a page of Books");
         Page<BookVM> page = bookService.getBooksForCurrentUserLibrary(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        log.info("Retrieved {} Books for the current library", page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -193,6 +210,11 @@ public class BookResource {
     public ResponseEntity<BookVM> getBook(@PathVariable("id") Long id) {
         log.debug("REST request to get Book : {}", id);
         Optional<BookVM> bookVM = bookService.findOne(id);
+        if (bookVM.isPresent()) {
+            log.info("Book found with ID: {}", id);
+        } else {
+            log.warn("Book not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(bookVM);
     }
 
@@ -209,6 +231,7 @@ public class BookResource {
         try {
             // Check if the book is being borrowed
             if (bookService.isBookBorrowed(id)) {
+                log.warn("Attempted to delete a borrowed Book with ID: {}", id);
                 return ResponseEntity.badRequest()
                     .headers(
                         HeaderUtil.createFailureAlert(
@@ -223,6 +246,7 @@ public class BookResource {
             }
 
             bookService.delete(id);
+            log.info("Book deleted successfully with ID: {}", id);
             return ResponseEntity.noContent()
                 .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
                 .build();

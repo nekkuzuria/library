@@ -56,9 +56,11 @@ public class LibraryResource {
     public ResponseEntity<LibraryDTO> createLibrary(@RequestBody LibraryDTO libraryDTO) throws URISyntaxException {
         log.debug("REST request to save Library : {}", libraryDTO);
         if (libraryDTO.getId() != null) {
+            log.error("Attempted to create a new library with an existing ID: {}", libraryDTO.getId());
             throw new BadRequestAlertException("A new library cannot already have an ID", ENTITY_NAME, "idexists");
         }
         libraryDTO = libraryService.save(libraryDTO);
+        log.info("Library created successfully with ID: {}", libraryDTO.getId());
         return ResponseEntity.created(new URI("/api/libraries/" + libraryDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, libraryDTO.getId().toString()))
             .body(libraryDTO);
@@ -81,17 +83,21 @@ public class LibraryResource {
     ) throws URISyntaxException {
         log.debug("REST request to update Library : {}, {}", id, libraryDTO);
         if (libraryDTO.getId() == null) {
+            log.error("Invalid ID: LibraryDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, libraryDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match LibraryDTO ID {}", id, libraryDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!libraryRepository.existsById(id)) {
+            log.error("Entity not found: No Library exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         libraryDTO = libraryService.update(libraryDTO);
+        log.info("Library updated successfully with ID: {}", libraryDTO.getId());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, libraryDTO.getId().toString()))
             .body(libraryDTO);
@@ -115,17 +121,25 @@ public class LibraryResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update Library partially : {}, {}", id, libraryDTO);
         if (libraryDTO.getId() == null) {
+            log.error("Invalid ID: LibraryDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, libraryDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match LibraryDTO ID {}", id, libraryDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!libraryRepository.existsById(id)) {
+            log.error("Entity not found: No Library exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<LibraryDTO> result = libraryService.partialUpdate(libraryDTO);
+        if (result.isPresent()) {
+            log.info("Library partially updated with ID: {}", libraryDTO.getId());
+        } else {
+            log.warn("No Library updated with ID: {}", libraryDTO.getId());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -144,6 +158,8 @@ public class LibraryResource {
         log.debug("REST request to get a page of Libraries");
         Page<LibraryDTO> page = libraryService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        log.info("Retrieved {} Libraries", page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -157,6 +173,11 @@ public class LibraryResource {
     public ResponseEntity<LibraryDTO> getLibrary(@PathVariable("id") Long id) {
         log.debug("REST request to get Library : {}", id);
         Optional<LibraryDTO> libraryDTO = libraryService.findOne(id);
+        if (libraryDTO.isPresent()) {
+            log.info("Library found with ID: {}", id);
+        } else {
+            log.warn("Library not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(libraryDTO);
     }
 
@@ -169,9 +190,15 @@ public class LibraryResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLibrary(@PathVariable("id") Long id) {
         log.debug("REST request to delete Library : {}", id);
-        libraryService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (libraryService.findOne(id).isPresent()) {
+            libraryService.delete(id);
+            log.info("Library deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent Library with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

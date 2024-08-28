@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -64,21 +65,31 @@ public class AuthenticateController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
+        log.debug("REST request to authenticate user: {}", loginVM.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
             loginVM.getUsername(),
             loginVM.getPassword()
         );
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication;
+        try {
+            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("User authenticated successfully: {}", loginVM.getUsername());
+        } catch (BadCredentialsException e) {
+            log.error("Authentication failed for user: {}", loginVM.getUsername(), e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         String jwt = this.createToken(authentication, loginVM.isRememberMe(), loginVM.getLibraryId());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
 
         if (!libraryService.isAdminLibraryValid(jwt)) {
+            log.warn("Library ID validation failed for JWT: {}", jwt);
             return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.FORBIDDEN);
         }
 
+        log.info("JWT generated and library validated for user: {}", loginVM.getUsername());
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
@@ -91,10 +102,13 @@ public class AuthenticateController {
     @GetMapping("/authenticate")
     public String isAuthenticated(HttpServletRequest request) {
         log.debug("REST request to check if the current user is authenticated");
-        return request.getRemoteUser();
+        String remoteUser = request.getRemoteUser();
+        log.info("User authentication check result: {}", remoteUser != null ? remoteUser : "No user authenticated");
+        return remoteUser;
     }
 
     public String createToken(Authentication authentication, boolean rememberMe, Long libraryId) {
+        log.debug("Creating token for user: {}", authentication.getName());
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" "));
 
         //obtain userid
@@ -110,6 +124,8 @@ public class AuthenticateController {
             validity = now.plus(this.tokenValidityInSeconds, ChronoUnit.SECONDS);
         }
 
+        log.debug("Token validity set to: {}", validity);
+
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
@@ -121,7 +137,10 @@ public class AuthenticateController {
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+        String token = this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+
+        log.info("Token created successfully for user: {}", username);
+        return token;
     }
 
     /**

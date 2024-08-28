@@ -68,9 +68,12 @@ public class VisitorBookStorageResource {
         throws URISyntaxException {
         log.debug("REST request to save VisitorBookStorage : {}", visitorBookStorageDTO);
         if (visitorBookStorageDTO.getId() != null) {
+            log.error("Attempted to create a new VisitorBookStorage with an existing ID: {}", visitorBookStorageDTO.getId());
             throw new BadRequestAlertException("A new visitorBookStorage cannot already have an ID", ENTITY_NAME, "idexists");
         }
         visitorBookStorageDTO = visitorBookStorageService.save(visitorBookStorageDTO);
+        log.info("VisitorBookStorage created successfully with ID: {}", visitorBookStorageDTO.getId());
+
         return ResponseEntity.created(new URI("/api/visitor-book-storages/" + visitorBookStorageDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, visitorBookStorageDTO.getId().toString()))
             .body(visitorBookStorageDTO);
@@ -93,17 +96,22 @@ public class VisitorBookStorageResource {
     ) throws URISyntaxException {
         log.debug("REST request to update VisitorBookStorage : {}, {}", id, visitorBookStorageDTO);
         if (visitorBookStorageDTO.getId() == null) {
+            log.error("Invalid ID: VisitorBookStorage ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitorBookStorageDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match VisitorBookStorage ID {}", id, visitorBookStorageDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitorBookStorageRepository.existsById(id)) {
+            log.error("Entity not found: No VisitorBookStorage exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         visitorBookStorageDTO = visitorBookStorageService.update(visitorBookStorageDTO);
+        log.info("VisitorBookStorage updated successfully with ID: {}", visitorBookStorageDTO.getId());
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, visitorBookStorageDTO.getId().toString()))
             .body(visitorBookStorageDTO);
@@ -127,17 +135,21 @@ public class VisitorBookStorageResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update VisitorBookStorage partially : {}, {}", id, visitorBookStorageDTO);
         if (visitorBookStorageDTO.getId() == null) {
+            log.error("Invalid ID: VisitorBookStorage ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, visitorBookStorageDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match VisitorBookStorage ID {}", id, visitorBookStorageDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!visitorBookStorageRepository.existsById(id)) {
+            log.error("Entity not found: No VisitorBookStorage exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<VisitorBookStorageDTO> result = visitorBookStorageService.partialUpdate(visitorBookStorageDTO);
+        log.info("Partial update result for VisitorBookStorage ID {}: {}", visitorBookStorageDTO.getId(), result);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -158,6 +170,8 @@ public class VisitorBookStorageResource {
         log.debug("REST request to get a page of VisitorBookStorages");
         Page<VisitorBookStorageDTO> page = visitorBookStorageService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        log.info("Returning {} VisitorBookStorages with total elements: {}", page.getContent().size(), page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -166,10 +180,21 @@ public class VisitorBookStorageResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
         log.debug("REST request to get a page of VisitorBookStorages of current user");
+
         VisitorDTO visitorDTO = visitorService.getVisitorOfCurrentUser();
+        if (visitorDTO == null) {
+            log.error("No Visitor found for the current user");
+            return ResponseEntity.notFound().build();
+        }
 
         Page<VisitorBookStorageVM> page = visitorBookStorageService.getVisitorBookStoragesForCurrentUser(visitorDTO, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        log.info(
+            "Returning {} VisitorBookStorages for current user with total elements: {}",
+            page.getContent().size(),
+            page.getTotalElements()
+        );
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -183,6 +208,13 @@ public class VisitorBookStorageResource {
     public ResponseEntity<VisitorBookStorageDTO> getVisitorBookStorage(@PathVariable("id") Long id) {
         log.debug("REST request to get VisitorBookStorage : {}", id);
         Optional<VisitorBookStorageDTO> visitorBookStorageDTO = visitorBookStorageService.findOne(id);
+
+        if (visitorBookStorageDTO.isPresent()) {
+            log.info("Found VisitorBookStorage with ID: {}", id);
+        } else {
+            log.warn("VisitorBookStorage with ID: {} not found", id);
+        }
+
         return ResponseUtil.wrapOrNotFound(visitorBookStorageDTO);
     }
 
@@ -195,9 +227,15 @@ public class VisitorBookStorageResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVisitorBookStorage(@PathVariable("id") Long id) {
         log.debug("REST request to delete VisitorBookStorage : {}", id);
-        visitorBookStorageService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (visitorBookStorageService.findOne(id).isPresent()) {
+            visitorBookStorageService.delete(id);
+            log.info("Successfully deleted VisitorBookStorage with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Visitor not found for deletion with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

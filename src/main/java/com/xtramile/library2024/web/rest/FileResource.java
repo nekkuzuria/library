@@ -61,9 +61,11 @@ public class FileResource {
     public ResponseEntity<FileDTO> createFile(@RequestBody FileDTO fileDTO) throws URISyntaxException {
         log.debug("REST request to save File : {}", fileDTO);
         if (fileDTO.getId() != null) {
+            log.error("Attempted to create a new file with an existing ID: {}", fileDTO.getId());
             throw new BadRequestAlertException("A new file cannot already have an ID", ENTITY_NAME, "idexists");
         }
         fileDTO = fileService.save(fileDTO);
+        log.info("File created successfully with ID: {}", fileDTO.getId());
         return ResponseEntity.created(new URI("/api/files/" + fileDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, fileDTO.getId().toString()))
             .body(fileDTO);
@@ -84,17 +86,21 @@ public class FileResource {
         throws URISyntaxException {
         log.debug("REST request to update File : {}, {}", id, fileDTO);
         if (fileDTO.getId() == null) {
+            log.error("Invalid ID: FileDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, fileDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match FileDTO ID {}", id, fileDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!fileRepository.existsById(id)) {
+            log.error("Entity not found: No File exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         fileDTO = fileService.update(fileDTO);
+        log.info("File updated successfully with ID: {}", fileDTO.getId());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, fileDTO.getId().toString()))
             .body(fileDTO);
@@ -118,17 +124,25 @@ public class FileResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update File partially : {}, {}", id, fileDTO);
         if (fileDTO.getId() == null) {
+            log.error("Invalid ID: FileDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, fileDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match FileDTO ID {}", id, fileDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!fileRepository.existsById(id)) {
+            log.error("Entity not found: No File exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<FileDTO> result = fileService.partialUpdate(fileDTO);
+        if (result.isPresent()) {
+            log.info("File partially updated with ID: {}", fileDTO.getId());
+        } else {
+            log.warn("No File updated with ID: {}", fileDTO.getId());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -144,7 +158,9 @@ public class FileResource {
     @GetMapping("")
     public List<FileDTO> getAllFiles() {
         log.debug("REST request to get all Files");
-        return fileService.findAll();
+        List<FileDTO> files = fileService.findAll();
+        log.info("Retrieved {} Files", files.size());
+        return files;
     }
 
     /**
@@ -157,6 +173,11 @@ public class FileResource {
     public ResponseEntity<FileDTO> getFile(@PathVariable("id") Long id) {
         log.debug("REST request to get File : {}", id);
         Optional<FileDTO> fileDTO = fileService.findOne(id);
+        if (fileDTO.isPresent()) {
+            log.info("File found with ID: {}", id);
+        } else {
+            log.warn("File not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(fileDTO);
     }
 
@@ -169,29 +190,41 @@ public class FileResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFile(@PathVariable("id") Long id) {
         log.debug("REST request to delete File : {}", id);
-        fileService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (fileService.findOne(id).isPresent()) {
+            fileService.delete(id);
+            log.info("File deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent File with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/upload-user-image")
     public ResponseEntity<File> uploadUserImage(@RequestParam("file") MultipartFile file) throws IOException {
+        log.debug("REST request to upload user image");
         File savedFile = fileService.saveImage(file);
         userService.updateUserImage(savedFile);
+        log.info("User image uploaded successfully with id: {}", savedFile.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFile);
     }
 
     @PostMapping("/upload-book-image")
     public ResponseEntity<File> uploadBookImage(@RequestParam("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        log.debug("REST request to upload book image for ID: {}", id);
         File savedFile = fileService.saveImage(file);
         bookService.updateBookImage(id, savedFile);
+        log.info("Book image uploaded successfully for book ID: {}", id);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFile);
     }
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> getUserImage() {
+        log.debug("REST request to get user image");
         byte[] imageData = fileService.getImage();
+        log.info("User image retrieved successfully");
         return ResponseEntity.ok().header("Content-Type", "image/jpeg").body(imageData);
     }
 }

@@ -56,9 +56,11 @@ public class PendingTaskResource {
     public ResponseEntity<PendingTaskVM> createPendingTask(@RequestBody PendingTaskVM pendingTaskVM) throws URISyntaxException {
         log.debug("REST request to save PendingTask : {}", pendingTaskVM);
         if (pendingTaskVM.getId() != null) {
+            log.warn("Attempt to create a new pendingTask with an existing ID: {}", pendingTaskVM.getId());
             throw new BadRequestAlertException("A new pendingTask cannot already have an ID", ENTITY_NAME, "idexists");
         }
         pendingTaskVM = pendingTaskService.createNew(pendingTaskVM);
+        log.info("PendingTask created with ID: {}", pendingTaskVM.getId());
         return ResponseEntity.created(new URI("/api/pending-task/" + pendingTaskVM.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, pendingTaskVM.getId().toString()))
             .body(pendingTaskVM);
@@ -80,18 +82,24 @@ public class PendingTaskResource {
         @RequestBody PendingTaskDTO pendingTaskDTO
     ) throws URISyntaxException {
         log.debug("REST request to update PendingTask : {}, {}", id, pendingTaskDTO);
+
         if (pendingTaskDTO.getId() == null) {
+            log.error("Invalid ID: PendingTask ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, pendingTaskDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match PendingTask ID {}", id, pendingTaskDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!pendingTaskRepository.existsById(id)) {
+            log.error("Entity not found: No PendingTask exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         pendingTaskDTO = pendingTaskService.update(pendingTaskDTO);
+        log.info("PendingTask updated successfully with ID: {}", pendingTaskDTO.getId());
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, pendingTaskDTO.getId().toString()))
             .body(pendingTaskDTO);
@@ -115,17 +123,21 @@ public class PendingTaskResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update PendingTask partially : {}, {}", id, pendingTaskDTO);
         if (pendingTaskDTO.getId() == null) {
+            log.error("Invalid ID: PendingTask ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, pendingTaskDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match PendingTask ID {}", id, pendingTaskDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!pendingTaskRepository.existsById(id)) {
+            log.error("Entity not found: No PendingTask exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<PendingTaskVM> result = pendingTaskService.processPendingTask(pendingTaskDTO);
+        log.info("PendingTask partially updated with ID: {}", pendingTaskDTO.getId());
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -148,6 +160,11 @@ public class PendingTaskResource {
     ) {
         log.debug("REST request to get a page of PendingTasks");
         Page<PendingTaskVM> page = pendingTaskService.findAllFromCurrentLibrary(pageable);
+        if (page.hasContent()) {
+            log.info("Retrieved {} pending tasks for the current library", page.getTotalElements());
+        } else {
+            log.warn("No pending tasks found for the current library");
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -162,6 +179,11 @@ public class PendingTaskResource {
     public ResponseEntity<PendingTaskDTO> getPendingTask(@PathVariable("id") Long id) {
         log.debug("REST request to get PendingTask : {}", id);
         Optional<PendingTaskDTO> pendingTaskDTO = pendingTaskService.findOne(id);
+        if (pendingTaskDTO.isPresent()) {
+            log.info("Retrieved PendingTask with ID: {}", id);
+        } else {
+            log.warn("PendingTask not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(pendingTaskDTO);
     }
 
@@ -174,10 +196,16 @@ public class PendingTaskResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePendingTask(@PathVariable("id") Long id) {
         log.debug("REST request to delete PendingTask : {}", id);
-        pendingTaskService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (pendingTaskRepository.existsById(id)) {
+            pendingTaskService.delete(id);
+            log.info("PendingTask deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.warn("PendingTask not found for deletion with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/my")
@@ -189,6 +217,11 @@ public class PendingTaskResource {
     ) {
         log.debug("REST request to get a page of PendingTasks");
         Page<PendingTaskVM> page = pendingTaskService.findAllFromCurrentVisitor(pageable);
+        if (page.hasContent()) {
+            log.info("Retrieved {} pending tasks for the current visitor", page.getTotalElements());
+        } else {
+            log.warn("No pending tasks found for the current visitor");
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

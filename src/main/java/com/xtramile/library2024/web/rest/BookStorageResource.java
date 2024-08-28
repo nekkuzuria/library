@@ -56,9 +56,11 @@ public class BookStorageResource {
     public ResponseEntity<BookStorageDTO> createBookStorage(@RequestBody BookStorageDTO bookStorageDTO) throws URISyntaxException {
         log.debug("REST request to save BookStorage : {}", bookStorageDTO);
         if (bookStorageDTO.getId() != null) {
+            log.error("Attempted to create a new BookStorage with an existing ID: {}", bookStorageDTO.getId());
             throw new BadRequestAlertException("A new bookStorage cannot already have an ID", ENTITY_NAME, "idexists");
         }
         bookStorageDTO = bookStorageService.save(bookStorageDTO);
+        log.info("BookStorage created successfully with ID: {}", bookStorageDTO.getId());
         return ResponseEntity.created(new URI("/api/book-storages/" + bookStorageDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, bookStorageDTO.getId().toString()))
             .body(bookStorageDTO);
@@ -81,17 +83,22 @@ public class BookStorageResource {
     ) throws URISyntaxException {
         log.debug("REST request to update BookStorage : {}, {}", id, bookStorageDTO);
         if (bookStorageDTO.getId() == null) {
+            log.error("Invalid ID: BookStorageDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, bookStorageDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match BookStorageDTO ID {}", id, bookStorageDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!bookStorageRepository.existsById(id)) {
+            log.error("Entity not found: No BookStorage exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         bookStorageDTO = bookStorageService.update(bookStorageDTO);
+        log.info("BookStorage updated successfully with ID: {}", bookStorageDTO.getId());
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, bookStorageDTO.getId().toString()))
             .body(bookStorageDTO);
@@ -115,17 +122,25 @@ public class BookStorageResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update BookStorage partially : {}, {}", id, bookStorageDTO);
         if (bookStorageDTO.getId() == null) {
+            log.error("Invalid ID: BookStorageDTO ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, bookStorageDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match BookStorageDTO ID {}", id, bookStorageDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!bookStorageRepository.existsById(id)) {
+            log.error("Entity not found: No BookStorage exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<BookStorageDTO> result = bookStorageService.partialUpdate(bookStorageDTO);
+        if (result.isPresent()) {
+            log.info("BookStorage partially updated with ID: {}", bookStorageDTO.getId());
+        } else {
+            log.warn("No BookStorage updated with ID: {}", bookStorageDTO.getId());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -144,6 +159,7 @@ public class BookStorageResource {
         log.debug("REST request to get a page of BookStorages");
         Page<BookStorageDTO> page = bookStorageService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        log.info("Retrieved {} BookStorages", page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -157,6 +173,11 @@ public class BookStorageResource {
     public ResponseEntity<BookStorageDTO> getBookStorage(@PathVariable("id") Long id) {
         log.debug("REST request to get BookStorage : {}", id);
         Optional<BookStorageDTO> bookStorageDTO = bookStorageService.findOne(id);
+        if (bookStorageDTO.isPresent()) {
+            log.info("BookStorage found with ID: {}", id);
+        } else {
+            log.warn("BookStorage not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(bookStorageDTO);
     }
 
@@ -169,9 +190,15 @@ public class BookStorageResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBookStorage(@PathVariable("id") Long id) {
         log.debug("REST request to delete BookStorage : {}", id);
-        bookStorageService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (bookStorageService.findOne(id).isPresent()) {
+            bookStorageService.delete(id);
+            log.info("BookStorage deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent BookStorage with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

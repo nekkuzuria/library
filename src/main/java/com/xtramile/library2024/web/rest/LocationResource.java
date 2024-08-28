@@ -58,11 +58,13 @@ public class LocationResource {
     public ResponseEntity<LocationDTO> createLocation(@Valid @RequestBody LocationDTO locationDTO) throws URISyntaxException {
         log.debug("REST request to save Location : {}", locationDTO);
         if (locationDTO.getId() != null) {
+            log.error("Attempted to create a new Location with an existing ID: {}", locationDTO.getId());
             throw new BadRequestAlertException("A new location cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        locationDTO = locationService.save(locationDTO);
-        return ResponseEntity.created(new URI("/api/locations/" + locationDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, locationDTO.getId().toString()))
+        LocationDTO savedLocationDTO = locationService.save(locationDTO);
+        log.info("Location created successfully with ID: {}", savedLocationDTO.getId());
+        return ResponseEntity.created(new URI("/api/locations/" + savedLocationDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, savedLocationDTO.getId().toString()))
             .body(locationDTO);
     }
 
@@ -83,19 +85,23 @@ public class LocationResource {
     ) throws URISyntaxException {
         log.debug("REST request to update Location : {}, {}", id, locationDTO);
         if (locationDTO.getId() == null) {
+            log.error("Invalid ID: Location ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, locationDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match Location ID {}", id, locationDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!locationRepository.existsById(id)) {
+            log.error("Entity not found: No Location exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        locationDTO = locationService.update(locationDTO);
+        LocationDTO updatedLocationDTO = locationService.update(locationDTO);
+        log.info("Location updated successfully with ID: {}", updatedLocationDTO.getId());
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, locationDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, updatedLocationDTO.getId().toString()))
             .body(locationDTO);
     }
 
@@ -117,17 +123,25 @@ public class LocationResource {
     ) throws URISyntaxException {
         log.debug("REST request to partial update Location partially : {}, {}", id, locationDTO);
         if (locationDTO.getId() == null) {
+            log.error("Invalid ID: Location ID is null");
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, locationDTO.getId())) {
+            log.error("ID mismatch: Path variable ID {} does not match Location ID {}", id, locationDTO.getId());
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
         if (!locationRepository.existsById(id)) {
+            log.error("Entity not found: No Location exists with ID {}", id);
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<LocationDTO> result = locationService.partialUpdate(locationDTO);
+        if (result.isPresent()) {
+            log.info("Location partially updated with ID: {}", result.get().getId());
+        } else {
+            log.warn("Partial update failed: No Location found with ID {}", id);
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -146,6 +160,7 @@ public class LocationResource {
         log.debug("REST request to get a page of Locations");
         Page<LocationDTO> page = locationService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        log.info("Retrieved {} Locations", page.getTotalElements());
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -159,6 +174,11 @@ public class LocationResource {
     public ResponseEntity<LocationDTO> getLocation(@PathVariable("id") Long id) {
         log.debug("REST request to get Location : {}", id);
         Optional<LocationDTO> locationDTO = locationService.findOne(id);
+        if (locationDTO.isPresent()) {
+            log.info("Location found with ID: {}", id);
+        } else {
+            log.warn("Location not found with ID: {}", id);
+        }
         return ResponseUtil.wrapOrNotFound(locationDTO);
     }
 
@@ -171,9 +191,15 @@ public class LocationResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable("id") Long id) {
         log.debug("REST request to delete Location : {}", id);
-        locationService.delete(id);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        if (locationService.findOne(id).isPresent()) {
+            locationService.delete(id);
+            log.info("Location deleted with ID: {}", id);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        } else {
+            log.error("Attempted to delete non-existent Location with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }

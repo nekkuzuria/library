@@ -111,14 +111,19 @@ public class UserResource {
         log.debug("REST request to save User : {}", userDTO);
 
         if (userDTO.getId() != null) {
+            log.error("Attempted to create a new user with an existing ID: {}", userDTO.getId());
             throw new BadRequestAlertException("A new user cannot already have an ID", "userManagement", "idexists");
             // Lowercase the user login before comparing with database
         } else if (userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).isPresent()) {
+            log.error("Login already used: {}", userDTO.getLogin());
             throw new LoginAlreadyUsedException();
         } else if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
+            log.error("Email already used: {}", userDTO.getEmail());
             throw new EmailAlreadyUsedException();
         } else {
             User newUser = userService.createUser(userDTO);
+            log.info("User created successfully: {}", newUser.getLogin());
+
             mailService.sendCreationEmail(newUser);
             return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin()))
                 .headers(
@@ -145,13 +150,21 @@ public class UserResource {
         log.debug("REST request to update User : {}", userDTO);
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getId().equals(userDTO.getId()))) {
+            log.error("Email already used by another user: {}", userDTO.getEmail());
             throw new EmailAlreadyUsedException();
         }
         existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
         if (existingUser.isPresent() && (!existingUser.orElseThrow().getId().equals(userDTO.getId()))) {
+            log.error("Login already used by another user: {}", userDTO.getLogin());
             throw new LoginAlreadyUsedException();
         }
         Optional<AdminUserDTO> updatedUser = userService.updateUser(userDTO);
+
+        if (updatedUser.isPresent()) {
+            log.info("User updated successfully: {}", userDTO.getLogin());
+        } else {
+            log.error("Failed to update user: {}", userDTO.getLogin());
+        }
 
         return ResponseUtil.wrapOrNotFound(
             updatedUser,
@@ -169,11 +182,18 @@ public class UserResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<List<AdminUserDTO>> getAllUsers(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all User for an admin");
+
         if (!onlyContainsAllowedProperties(pageable)) {
+            log.error(
+                "Request contains disallowed sorting properties: {}",
+                pageable.getSort().stream().map(Sort.Order::getProperty).toList()
+            );
             return ResponseEntity.badRequest().build();
         }
 
         final Page<AdminUserDTO> page = userService.getAllManagedUsers(pageable);
+        log.info("Successfully retrieved {} users", page.getTotalElements());
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -192,7 +212,16 @@ public class UserResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<AdminUserDTO> getUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to get User : {}", login);
-        return ResponseUtil.wrapOrNotFound(userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new));
+
+        Optional<AdminUserDTO> userDTO = userService.getUserWithAuthoritiesByLogin(login).map(AdminUserDTO::new);
+
+        if (userDTO.isPresent()) {
+            log.info("User found: {}", login);
+        } else {
+            log.error("User not found: {}", login);
+        }
+
+        return ResponseUtil.wrapOrNotFound(userDTO);
     }
 
     /**
@@ -205,10 +234,16 @@ public class UserResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         log.debug("REST request to delete User: {}", login);
-        userService.deleteUser(login);
-        return ResponseEntity.noContent()
-            .headers(HeaderUtil.createAlert(applicationName, "A user is deleted with identifier " + login, login))
-            .build();
+        try {
+            userService.deleteUser(login);
+            log.info("User deleted successfully: {}", login);
+            return ResponseEntity.noContent()
+                .headers(HeaderUtil.createAlert(applicationName, "A user is deleted with identifier " + login, login))
+                .build();
+        } catch (UserNotFoundException ex) {
+            log.error("User not found when trying to delete: {}", login);
+            throw ex;
+        }
     }
 
     public static class UserNotFoundException extends RuntimeException {

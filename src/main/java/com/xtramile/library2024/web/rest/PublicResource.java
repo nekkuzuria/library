@@ -25,6 +25,13 @@ public class PublicResource {
     public ResponseEntity<List<LibraryVM>> getAllPublicLibraries() {
         log.debug("REST request to get public Libraries");
         List<LibraryVM> libraries = libraryService.getAllPublicLibraries();
+
+        if (libraries.isEmpty()) {
+            log.info("No public libraries found");
+        } else {
+            log.info("Found {} public libraries", libraries.size());
+        }
+
         return ResponseEntity.ok().body(libraries);
     }
 }
