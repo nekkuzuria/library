@@ -12,7 +12,7 @@ export enum Genre {
   POETRY = 'Poetry',
   DRAMA = 'Drama',
   ADVENTURE = 'Adventure',
-  CHILDRENS = "Children's",
+  CHILDRENS = 'Childrens',
   YOUNG_ADULT = 'Young Adult',
   SELF_HELP = 'Self-Help',
   RELIGION = 'Religion',

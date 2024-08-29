@@ -19,17 +19,23 @@
       <div class="d-flex align-items-center flex-grow-1">
         <div class="form-control shadow-lg">
           <ng-select
-            [items]="sortedGenres"
+            [items]="displayGenres"
             placeholder="Filter by Genre"
             (change)="onSearch()"
             [(ngModel)]="selectedGenre"
             [multiple]="true"
+            [groupBy]="'category'"
+            [bindLabel]="'name'"
+            [bindValue]="'name'"
           >
+            <ng-option *ngFor="let item of displayGenres" [value]="item.name" [disabled]="item.disabled">
+              {{ item.name }}
+            </ng-option>
           </ng-select>
         </div>
       </div>
       <div class="form-control shadow-lg p-3">
-        <ng-select [items]="sortOptions" placeholder="Sort by" (change)="sortBooks()" [(ngModel)]="sortOption" class="mb-2"> </ng-select>
+        <ng-select [items]="sortOptions" placeholder="Sort by" (change)="onSearch()" [(ngModel)]="sortOption" class="mb-2"> </ng-select>
 
         <div class="btn-group">
           <button class="btn btn-outline-primary" [ngClass]="{ active: sortOrder === 'asc' }" (click)="setSortOrder('asc')">

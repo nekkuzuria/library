@@ -442,3 +442,7 @@ app-dashboard {
 .container {
   padding: 20px;
 }
+
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-disabled {
+  color: gray !important;
+}

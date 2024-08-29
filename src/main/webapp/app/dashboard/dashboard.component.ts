@@ -6,7 +6,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { combineLatest, filter, Observable, Subscription, tap } from 'rxjs';
 import { sortStateSignal, SortDirective, SortByDirective, type SortState, SortService } from 'app/shared/sort';
 import { Genre } from '../entities/enumerations/genre.model';
-import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective } from '@ng-select/ng-select';
+import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective, NgSelectModule } from '@ng-select/ng-select';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -19,18 +19,29 @@ import { PersonalStorageService } from '../visitor-pages/personal-storage/person
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective, CommonModule, FormsModule, RouterModule],
+  imports: [
+    NgSelectComponent,
+    NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NgSelectModule,
+  ],
 })
 export class DashboardComponent implements OnInit {
   books?: IBook[];
   genres: string[] = [];
   filteredBooks: IBook[] = [];
   searchQuery: string = '';
-  selectedGenre: string | null = null;
-  sortOrder: 'asc' | 'desc' = 'asc';
+  selectedGenre: string[] = [];
+  sortOrder: 'asc' | 'desc' | '' = '';
   visitorBookStorages?: IPersonalStorage[];
   genreCounts: { [genre: string]: number } = {};
   sortedGenres: { name: string; count: number }[] = [];
+  personalStorages?: IPersonalStorage[];
+  displayGenres: { name: string; disabled: boolean }[] = [];
+  groupedGenres: { name: string; category: string }[] = [];
 
   totalItems = 0;
   isLoading = false;
@@ -56,20 +67,16 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.load();
     this.loadCurrentUserBookStorage();
-    this.genres = Object.values(Genre).map(genre => {
-      return genre
-        .toLowerCase()
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, char => char.toUpperCase());
-    });
   }
 
   loadCurrentUserBookStorage(): void {
+    this.displayGenres = this.getGenres();
+
     this.personalStorageService.query().subscribe(response => {
       this.visitorBookStorages = response.body || [];
       this.visitorBookStorages = this.visitorBookStorages.filter(vbs => vbs.returnDate !== null);
+      this.countGenres();
     });
-    this.countGenres();
   }
 
   load(): void {
@@ -83,9 +90,13 @@ export class DashboardComponent implements OnInit {
   onSearch(): void {
     const query = this.searchQuery.toLowerCase();
 
+    this.filteredBooks = [...(this.books ?? [])];
+
     this.filteredBooks = (this.books ?? []).filter(book => {
       const matchesSearchQuery = query ? book.title?.toLowerCase().includes(query) || book.author?.toLowerCase().includes(query) : true;
-      const matchesGenre = this.selectedGenre!.length > 0 ? this.selectedGenre!.includes(book.genre!) : true;
+      const matchesGenre = this.selectedGenre.length
+        ? this.selectedGenre.map((genre: string) => genre.toLowerCase()).includes(book.genre?.toLowerCase() || '')
+        : true;
       return matchesSearchQuery && matchesGenre;
     });
 
@@ -93,13 +104,22 @@ export class DashboardComponent implements OnInit {
   }
 
   sortBooks(): void {
-    if (!this.sortOption) return;
+    if (!this.sortOption) {
+      this.sortOrder = '';
+      return;
+    }
+
+    if (!this.sortOrder) {
+      this.sortOrder = 'asc';
+    }
+
     const sortValue =
       typeof this.sortOption === 'string'
         ? this.sortOption
         : this.sortOption !== null
           ? (this.sortOption as { value: string }).value
           : null;
+    console.log('sortOrder2', this.sortOrder);
     if (sortValue === 'title') {
       this.filteredBooks.sort((a, b) => {
         const titleA = a.title ?? '';
@@ -164,34 +184,55 @@ export class DashboardComponent implements OnInit {
 
   private countGenres(): void {
     const genreCounts: { [key: string]: number } = {};
-    console.log('AAAAAAAAAAAAAAAAA', this.visitorBookStorages);
-    // Count occurrences
+
     this.visitorBookStorages!.forEach(book => {
       const genre = book.genre;
-      console.log(genre);
-
       if (genre) {
-        // Ensure genre is not null or undefined
-        if (genreCounts[genre]) {
-          genreCounts[genre]++;
-        } else {
-          genreCounts[genre] = 1;
-        }
+        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
       }
     });
-    // Create an array of genre objects with name and count
+
     this.sortedGenres = Object.entries(genreCounts)
-      .map(([genre, count]) => ({ name: genre, count }))
+      .map(([genre, count]) => ({
+        name: genre
+          .toLowerCase()
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, char => char.toUpperCase()),
+        count,
+      }))
       .sort((a, b) => {
-        // Sort primarily by count in descending order
         if (b.count !== a.count) {
           return b.count - a.count;
         }
-        // Sort secondarily by name in alphabetical order
         return a.name.localeCompare(b.name);
       });
 
-    // Log sorted genres by frequency and name
-    console.log('Sorted genres by frequency and name:', this.sortedGenres);
+    this.displayGenres = [];
+
+    this.displayGenres.push({ name: '--- Most Borrowed ---', disabled: true });
+    this.displayGenres.push(...this.sortedGenres.map(genre => ({ name: genre.name, disabled: false })));
+
+    const otherGenres = this.getGenres().filter(genre => !this.sortedGenres.some(g => g.name.toLowerCase() === genre.name.toLowerCase()));
+
+    this.displayGenres.push({ name: '--- Other Genres ---', disabled: true });
+    this.displayGenres.push(...otherGenres.map(genre => ({ name: genre.name, disabled: false })));
+
+    console.log('haaaaaa', this.displayGenres);
+  }
+
+  private getGenres(): { name: string; disabled: boolean }[] {
+    return Object.values(Genre)
+      .map(genre => ({
+        name: genre
+          .toLowerCase()
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, char => char.toUpperCase()),
+        disabled: false,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  isCategory(item: string): boolean {
+    return item === '--- Most Popular ---' || item === '--- Other Genres ---';
   }
 }
