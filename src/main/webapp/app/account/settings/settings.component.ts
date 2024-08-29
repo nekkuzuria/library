@@ -43,7 +43,7 @@ export default class SettingsComponent implements OnInit {
         [Validators.required, Validators.minLength(5), Validators.maxLength(13), Validators.pattern('^\\+?[1-9][0-9]{4,13}$')],
       ],
       streetAddress: [data.streetAddress || '', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
-      postalCode: [data.postalCode || '', [Validators.required, Validators.pattern('^[0-9]{5}(-[0-9]{4})?$')]],
+      postalCode: [data.postalCode || '', [Validators.required, Validators.pattern('^[0-9]{1,5}$')]],
       city: [data.city || '', [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')]],
       stateProvince: [
         data.stateProvince || '',

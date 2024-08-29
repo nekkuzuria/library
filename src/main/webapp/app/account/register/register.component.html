@@ -158,7 +158,7 @@
                 <div class="mb-3">
                   <label class="form-label" for="phoneNumber">Phone Number<span class="text-danger">*</span></label>
                   <input
-                    type="number  "
+                    type="number"
                     class="form-control rounded-5"
                     id="phoneNumber"
                     name="phoneNumber"
@@ -175,15 +175,9 @@
                       @if (registerForm.get('phoneNumber')?.errors?.required) {
                         <small class="form-text text-danger">Your phone number is required.</small>
                       }
-                      @if (registerForm.get('phoneNumber')?.errors?.minlength) {
-                        <small class="form-text text-danger">Your phone number must be at least 5 characters long.</small>
+                      @if (registerForm.get('phoneNumber')?.errors?.pattern) {
+                        <small class="form-text text-danger">Your phone number is invalid</small>
                       }
-                      @if (registerForm.get('phoneNumber')?.errors?.maxlength) {
-                        <small class="form-text text-danger">Your phone number cannot be longer than 13 characters.</small>
-                      }
-                      <!-- @if (registerForm.get('phoneNumber')?.errors?.pattern) {
-                        <small class="form-text text-danger">Your phone number is invalid. It should be a valid international phone number.</small>
-                      } -->
                     </div>
                   }
                 </div>
@@ -444,7 +438,9 @@
                   </div>
                 </div>
 
-                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit">Register</button>
+                <button type="submit" class="mb-3 mt-3 btn btn-primary w-100 rounded-5" data-cy="submit" [disabled]="registerForm.invalid">
+                  Register
+                </button>
               </form>
             }
             <div class="row">

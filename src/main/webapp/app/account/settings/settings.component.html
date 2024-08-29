@@ -258,7 +258,7 @@
           <div class="col-12 col-md-6">
             <label class="form-label" for="postalCode">Postal Code</label>
             <input
-              type="text"
+              type="number"
               class="form-control rounded-5"
               id="postalCode"
               name="postalCode"
@@ -276,7 +276,7 @@
                 <small class="form-text text-danger">Postal code is required.</small>
               }
               @if (settingsForm.get('postalCode')?.errors?.pattern) {
-                <small class="form-text text-danger">Postal code is invalid. Use 5 digits or 5 digits + hyphen + 4 digits.</small>
+                <small class="form-text text-danger">Postal code cannot be longer than 5 characters.</small>
               }
             </div>
           </div>
@@ -344,7 +344,7 @@
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary" data-cy="submit">Save</button>
+        <button type="submit" class="btn btn-primary" data-cy="submit" [disabled]="settingsForm.invalid">Save</button>
       </form>
     </div>
   </div>

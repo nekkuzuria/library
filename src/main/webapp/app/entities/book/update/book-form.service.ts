@@ -51,15 +51,31 @@ export class BookFormService {
       title: new FormControl(bookRawValue.title, {
         validators: [Validators.required],
       }),
-      type: new FormControl(bookRawValue.type),
-      genre: new FormControl(bookRawValue.genre),
-      year: new FormControl(bookRawValue.year),
-      totalPage: new FormControl(bookRawValue.totalPage),
-      author: new FormControl(bookRawValue.author),
-      cover: new FormControl(bookRawValue.cover),
-      synopsis: new FormControl(bookRawValue.synopsis),
+      type: new FormControl(bookRawValue.type, {
+        validators: [Validators.required],
+      }),
+      genre: new FormControl(bookRawValue.genre, {
+        validators: [Validators.required],
+      }),
+      year: new FormControl(bookRawValue.year, {
+        validators: [Validators.required],
+      }),
+      totalPage: new FormControl(bookRawValue.totalPage, {
+        validators: [Validators.required],
+      }),
+      author: new FormControl(bookRawValue.author, {
+        validators: [Validators.required],
+      }),
+      cover: new FormControl(bookRawValue.cover, {
+        validators: [Validators.required],
+      }),
+      synopsis: new FormControl(bookRawValue.synopsis, {
+        validators: [Validators.required],
+      }),
       bookStorageId: new FormControl(bookRawValue.bookStorageId),
-      quantity: new FormControl(bookRawValue.quantity),
+      quantity: new FormControl(bookRawValue.quantity, {
+        validators: [Validators.required],
+      }),
       file: new FormControl(bookRawValue.file),
     });
   }

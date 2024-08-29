@@ -47,6 +47,13 @@
               </option>
             }
           </select>
+          @if (editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)) {
+            <div>
+              @if (editForm.get('type')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -58,46 +65,82 @@
                 {{
                   {
                     null: '',
-                    FICTION: 'FICTION',
-                    NONFICTION: 'NONFICTION',
-                    SCIENCE_FICTION: 'SCIENCE_FICTION',
-                    FANTASY: 'FANTASY',
-                    BIOGRAPHY: 'BIOGRAPHY',
-                    MYSTERY: 'MYSTERY',
-                    THRILLER: 'THRILLER',
-                    ROMANCE: 'ROMANCE',
-                    HORROR: 'HORROR',
-                    HISTORY: 'HISTORY',
-                    POETRY: 'POETRY',
-                    DRAMA: 'DRAMA',
-                    ADVENTURE: 'ADVENTURE',
-                    CHILDRENS: 'CHILDRENS',
-                    YOUNG_ADULT: 'YOUNG_ADULT',
-                    SELF_HELP: 'SELF_HELP',
-                    RELIGION: 'RELIGION',
-                    COOKING: 'COOKING',
-                    ART: 'ART',
-                    TRAVEL: 'TRAVEL',
+                    FICTION: 'Fiction',
+                    NONFICTION: 'Nonfiction',
+                    SCIENCE_FICTION: 'Science Fiction',
+                    FANTASY: 'Fantasy',
+                    BIOGRAPHY: 'Biography',
+                    MYSTERY: 'Mystery',
+                    THRILLER: 'Thriller',
+                    ROMANCE: 'Romance',
+                    HORROR: 'Horror',
+                    HISTORY: 'History',
+                    POETRY: 'Poetry',
+                    DRAMA: 'Drama',
+                    ADVENTURE: 'Adventure',
+                    CHILDRENS: 'Childrens',
+                    YOUNG_ADULT: 'Young Adult',
+                    SELF_HELP: 'Self Help',
+                    RELIGION: 'Religion',
+                    COOKING: 'Cooking',
+                    ART: 'Art',
+                    TRAVEL: 'Travel',
                   }[genre]
                 }}
               </option>
             }
           </select>
+          @if (editForm.get('genre')!.invalid && (editForm.get('genre')!.dirty || editForm.get('genre')!.touched)) {
+            <div>
+              @if (editForm.get('genre')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
           <label class="form-label" for="field_year">Year</label>
           <input type="number" class="form-control" name="year" id="field_year" data-cy="year" formControlName="year" />
+          @if (editForm.get('year')!.invalid && (editForm.get('year')!.dirty || editForm.get('year')!.touched)) {
+            <div>
+              @if (editForm.get('year')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
           <label class="form-label" for="field_totalPage">Total Page</label>
-          <input type="number" class="form-control" name="totalPage" id="field_totalPage" data-cy="totalPage" formControlName="totalPage" />
+          <input
+            type="number"
+            class="form-control"
+            name="totalPage"
+            id="field_totalPage"
+            data-cy="totalPage"
+            formControlName="totalPage"
+            (keydown)="restrictNonNumeric($event)"
+          />
+          @if (editForm.get('totalPage')!.invalid && (editForm.get('totalPage')!.dirty || editForm.get('totalPage')!.touched)) {
+            <div>
+              @if (editForm.get('totalPage')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
           <label class="form-label" for="field_author">Author</label>
           <input type="text" class="form-control" name="author" id="field_author" data-cy="author" formControlName="author" />
+          @if (editForm.get('author')!.invalid && (editForm.get('author')!.dirty || editForm.get('author')!.touched)) {
+            <div>
+              @if (editForm.get('author')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -113,6 +156,13 @@
             formenctype="multipart/form-data"
             (change)="onImageChange($event)"
           />
+          @if (editForm.get('cover')!.invalid && (editForm.get('cover')!.dirty || editForm.get('cover')!.touched)) {
+            <div>
+              @if (editForm.get('cover')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
         <div *ngIf="imagePreview">
           <img [src]="imagePreview" alt="Image preview" class="img-fluid mt-2" />
@@ -121,6 +171,13 @@
         <div class="mb-3">
           <label class="form-label" for="field_synopsis">Synopsis</label>
           <input type="text" class="form-control" name="synopsis" id="field_synopsis" data-cy="synopsis" formControlName="synopsis" />
+          @if (editForm.get('synopsis')!.invalid && (editForm.get('synopsis')!.dirty || editForm.get('synopsis')!.touched)) {
+            <div>
+              @if (editForm.get('synopsis')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
@@ -128,7 +185,22 @@
         </div>
         <div class="mb-3">
           <label class="form-label" for="field_year">Quantity</label>
-          <input type="number" class="form-control" name="quantity" id="field_quantity" data-cy="quantity" formControlName="quantity" />
+          <input
+            type="number"
+            class="form-control"
+            name="quantity"
+            id="field_quantity"
+            data-cy="quantity"
+            formControlName="quantity"
+            (keydown)="restrictNonNumeric($event)"
+          />
+          @if (editForm.get('quantity')!.invalid && (editForm.get('quantity')!.dirty || editForm.get('quantity')!.touched)) {
+            <div>
+              @if (editForm.get('quantity')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
       </div>
 

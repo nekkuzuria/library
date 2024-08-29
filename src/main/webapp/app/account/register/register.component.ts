@@ -51,11 +51,7 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     }),
     phoneNumber: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(13), Validators.pattern('^\\+?[1-9][0-9]{4,13}$')],
-    }),
-    address: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100)],
+      validators: [Validators.required, Validators.pattern('^[0-9]{4,13}$')],
     }),
     streetAddress: new FormControl('', {
       nonNullable: true,
@@ -119,6 +115,11 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     });
   }
   register(): void {
+    if (this.registerForm.invalid) {
+      this.checkInvalidControls();
+      return;
+    }
+
     this.doNotMatch.set(false);
     this.error.set(false);
     this.errorEmailExists.set(false);
@@ -178,5 +179,24 @@ export default class RegisterComponent implements OnInit, AfterViewInit {
     if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' || event.key === '.') {
       event.preventDefault();
     }
+  }
+
+  checkInvalidControls() {
+    const invalidControls: { controlName: string; errors: any }[] = [];
+    const controls = this.registerForm.controls;
+
+    // Object.keys ensures that TypeScript recognizes the keys
+    Object.keys(controls).forEach(name => {
+      const control = controls[name as keyof typeof controls];
+
+      if (control.invalid) {
+        invalidControls.push({
+          controlName: name,
+          errors: control.errors,
+        });
+      }
+    });
+
+    console.log(invalidControls);
   }
 }
