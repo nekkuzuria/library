@@ -18,14 +18,27 @@
     <div class="col-md-8 col-lg-6 d-flex gap-3 filter-book">
       <div class="d-flex align-items-center flex-grow-1">
         <div class="form-control shadow-lg">
-          <ng-select [items]="genres" placeholder="Filter by Genre" (change)="onSearch()" [(ngModel)]="selectedGenre" [multiple]="true">
+          <ng-select
+            [items]="sortedGenres"
+            placeholder="Filter by Genre"
+            (change)="onSearch()"
+            [(ngModel)]="selectedGenre"
+            [multiple]="true"
+          >
           </ng-select>
         </div>
       </div>
-      <div class="form-control shadow-lg">
-        <ng-select [items]="sortOptions" placeholder="Sort by" (change)="sortBooks()" [(ngModel)]="sortOption"> </ng-select>
-        <button class="btn btn-outline-primary" (click)="setSortOrder('asc')">Ascending</button>
-        <button class="btn btn-outline-primary ms-2" (click)="setSortOrder('desc')">Descending</button>
+      <div class="form-control shadow-lg p-3">
+        <ng-select [items]="sortOptions" placeholder="Sort by" (change)="sortBooks()" [(ngModel)]="sortOption" class="mb-2"> </ng-select>
+
+        <div class="btn-group">
+          <button class="btn btn-outline-primary" [ngClass]="{ active: sortOrder === 'asc' }" (click)="setSortOrder('asc')">
+            Ascending
+          </button>
+          <button class="btn btn-outline-primary ms-2" [ngClass]="{ active: sortOrder === 'desc' }" (click)="setSortOrder('desc')">
+            Descending
+          </button>
+        </div>
       </div>
     </div>
   </div>

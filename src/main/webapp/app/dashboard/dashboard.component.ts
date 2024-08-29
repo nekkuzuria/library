@@ -10,6 +10,9 @@ import { NgSelectComponent, NgOptionTemplateDirective, NgLabelTemplateDirective 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { DashboardService } from './dashboard.service';
+import { IPersonalStorage } from '../visitor-pages/personal-storage/personal-storage.model';
+import { PersonalStorageService } from '../visitor-pages/personal-storage/personal-storage.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,6 +28,9 @@ export class DashboardComponent implements OnInit {
   searchQuery: string = '';
   selectedGenre: string | null = null;
   sortOrder: 'asc' | 'desc' = 'asc';
+  visitorBookStorages?: IPersonalStorage[];
+  genreCounts: { [genre: string]: number } = {};
+  sortedGenres: { name: string; count: number }[] = [];
 
   totalItems = 0;
   isLoading = false;
@@ -41,13 +47,29 @@ export class DashboardComponent implements OnInit {
     { value: 'year', label: 'Sort by Year' },
   ];
 
-  constructor(private bookService: BookService) {}
+  constructor(
+    private personalStorageService: PersonalStorageService,
+    private bookService: BookService,
+  ) {}
 
   trackId = (_index: number, item: IBook): number => this.bookService.getBookIdentifier(item);
   ngOnInit(): void {
     this.load();
-    this.genres = Object.values(Genre);
-    console.log(this.genres);
+    this.loadCurrentUserBookStorage();
+    this.genres = Object.values(Genre).map(genre => {
+      return genre
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, char => char.toUpperCase());
+    });
+  }
+
+  loadCurrentUserBookStorage(): void {
+    this.personalStorageService.query().subscribe(response => {
+      this.visitorBookStorages = response.body || [];
+      this.visitorBookStorages = this.visitorBookStorages.filter(vbs => vbs.returnDate !== null);
+    });
+    this.countGenres();
   }
 
   load(): void {
@@ -135,7 +157,41 @@ export class DashboardComponent implements OnInit {
   }
 
   setSortOrder(order: 'asc' | 'desc'): void {
+    console.log(order);
     this.sortOrder = order;
     this.sortBooks();
+  }
+
+  private countGenres(): void {
+    const genreCounts: { [key: string]: number } = {};
+    console.log('AAAAAAAAAAAAAAAAA', this.visitorBookStorages);
+    // Count occurrences
+    this.visitorBookStorages!.forEach(book => {
+      const genre = book.genre;
+      console.log(genre);
+
+      if (genre) {
+        // Ensure genre is not null or undefined
+        if (genreCounts[genre]) {
+          genreCounts[genre]++;
+        } else {
+          genreCounts[genre] = 1;
+        }
+      }
+    });
+    // Create an array of genre objects with name and count
+    this.sortedGenres = Object.entries(genreCounts)
+      .map(([genre, count]) => ({ name: genre, count }))
+      .sort((a, b) => {
+        // Sort primarily by count in descending order
+        if (b.count !== a.count) {
+          return b.count - a.count;
+        }
+        // Sort secondarily by name in alphabetical order
+        return a.name.localeCompare(b.name);
+      });
+
+    // Log sorted genres by frequency and name
+    console.log('Sorted genres by frequency and name:', this.sortedGenres);
   }
 }

@@ -284,6 +284,33 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   border-radius: 20px;
 }
 
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-group .btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.btn-group .btn:not(.active):hover {
+  background-color: #e2e6ea;
+  color: #495057;
+}
+
+.btn-group .btn:last-child {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.btn-group .btn:not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
 jhi-login {
   height: 100vh;
 }
