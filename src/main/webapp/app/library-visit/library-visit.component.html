@@ -41,7 +41,7 @@
               <td data-label="Date">{{ convertDate(visit.createdDate) }}</td>
               <td data-label="Type">{{ visit.type }}</td>
               <td data-label="Book">
-                <a [routerLink]="['/book', visit.bookId, 'view']">{{ visit.bookTitle }}</a
+                <a [routerLink]="['/book-detail', visit.bookId]">{{ visit.bookTitle }}</a
                 ><br />
                 by {{ visit.bookAuthor }}
               </td>

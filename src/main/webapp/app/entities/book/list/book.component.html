@@ -77,13 +77,6 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="author">
-              <div class="d-flex">
-                <span>Author</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="synopsis">
               <div class="d-flex">
                 <span>Synopsis</span>
@@ -102,11 +95,11 @@
         <tbody>
           @for (book of books; track trackId) {
             <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/book', book.id, 'view']">{{ book.title }}</a>
+              <td data-label="Title">
+                <a [routerLink]="['/book-detail', book.id]">{{ book.title }}</a>
               </td>
-              <td>{{ book.author }}</td>
-              <td>
+              <td data-label="Author">{{ book.author }}</td>
+              <td data-label="Type">
                 {{
                   {
                     null: '',
@@ -121,7 +114,7 @@
                   }[book.type ?? 'null']
                 }}
               </td>
-              <td>
+              <td data-label="Genre">
                 {{
                   {
                     null: '',
@@ -148,29 +141,24 @@
                   }[book.genre ?? 'null']
                 }}
               </td>
-              <td>{{ book.year }}</td>
-              <td>{{ book.totalPage }}</td>
-              <td>{{ book.author }}</td>
-              <td>{{ book.synopsis }}</td>
-              <td>
-                <div class="text-center">
-                  {{ book.quantity }}
-                </div>
-              </td>
+              <td data-label="Year">{{ book.year }}</td>
+              <td data-label="Total Page">{{ book.totalPage }}</td>
+              <td data-label="Synopsis">{{ book.synopsis }}</td>
+              <td data-label="Quantity">{{ book.quantity }}</td>
 
-              <td class="text-end">
+              <td class="text-center">
                 <div class="btn-group">
-                  <a [routerLink]="['/book-detail', book.id]" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                  <a [routerLink]="['/book-detail', book.id]" class="btn btn-info" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline">View</span>
                   </a>
 
-                  <a [routerLink]="['/book', book.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a [routerLink]="['/book', book.id, 'edit']" class="btn btn-primary" data-cy="entityEditButton">
                     <fa-icon icon="pencil-alt"></fa-icon>
                     <span class="d-none d-md-inline">Edit</span>
                   </a>
 
-                  <button type="submit" (click)="delete(book)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button type="submit" (click)="delete(book)" class="btn btn-danger" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>
                     <span class="d-none d-md-inline">Delete</span>
                   </button>

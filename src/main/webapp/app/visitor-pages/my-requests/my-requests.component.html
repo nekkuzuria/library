@@ -9,7 +9,7 @@
   @if (pendingTasks && pendingTasks.length > 0) {
     <div class="table-responsive table-entities" id="pending-task">
       <table class="table table-striped text-center" aria-describedby="page-heading">
-        <thead>
+        <thead class="text-center">
           <tr>
             <th scope="col">
               <span>No.</span>
@@ -17,7 +17,7 @@
             <th scope="col">
               <span>Type</span>
             </th>
-            <th scope="col" class="text-start">
+            <th scope="col">
               <span>Book</span>
             </th>
             <th scope="col">
@@ -34,28 +34,28 @@
         <tbody class="text-center">
           @for (p of pendingTasks; track trackId) {
             <tr>
-              <td>{{ $index + 1 }}</td>
-              <td>{{ p.type }}</td>
-              <td class="text-start">
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Type">{{ p.type }}</td>
+              <td data-label="Book">
                 <a [routerLink]="['/book-detail', p.bookId]">{{ p.bookTitle }}</a
                 ><br />
                 by {{ p.bookAuthor }}
               </td>
-              <td>{{ p.quantity }}</td>
-              <td>{{ convertDate(p.createdDate) }}</td>
-              <td class="text-center">
+              <td data-label="Quantity">{{ p.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(p.createdDate) }}</td>
+              <td data-label="Status">
                 {{ p.status }}<br />
                 <div *ngIf="p.status === PendingTaskStatus.DENIED">
                   <div class="btn-group">
                     <button
                       type="button"
                       (click)="updateSelected(p)"
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-primary"
                       data-cy="approveBorrowRequestButton"
                       data-bs-toggle="modal"
                       data-bs-target="#modal"
                     >
-                      <span class="d-none d-md-inline">SEE WHY</span>
+                      <span>SEE WHY</span>
                     </button>
                   </div>
                 </div>

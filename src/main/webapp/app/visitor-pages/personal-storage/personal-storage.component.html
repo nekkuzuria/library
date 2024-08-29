@@ -15,45 +15,35 @@
         <thead class="text-center">
           <tr>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>No.</span>
-              </div>
+              <span>No.</span>
             </th>
             <th scope="col">
-              <div class="d-flex">
-                <span>Book</span>
-              </div>
+              <span>Book</span>
             </th>
             <th>
-              <div class="d-flex" class="text-center">
-                <span>Quantity</span>
-              </div>
+              <span>Quantity</span>
             </th>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Borrow Date</span>
-              </div>
+              <span>Borrow Date</span>
             </th>
             <th scope="col">
-              <div class="d-flex" class="text-center">
-                <span>Expected Return Date</span>
-              </div>
+              <span>Expected Return Date</span>
             </th>
             <th scope="col"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
           @for (vbs of visitorBookStorages; track trackId) {
             <tr>
-              <td class="text-center">{{ $index + 1 }}</td>
-              <td>
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Book">
                 <a [routerLink]="['/book-detail', vbs.bookId]">{{ vbs.title }}</a
                 ><br />
                 by {{ vbs.author }}
               </td>
-              <td class="text-center">{{ vbs.quantity }}</td>
-              <td class="text-center">{{ convertDate(vbs.borrowDate) }}</td>
-              <td class="text-center">{{ getExpectedDate(vbs.borrowDate) }}</td>
+              <td data-label="Quantity">{{ vbs.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(vbs.borrowDate) }}</td>
+              <td data-label="Expected Return Date">{{ getExpectedDate(vbs.borrowDate) }}</td>
               <td class="text-center">
                 <button
                   type="button"
@@ -63,7 +53,7 @@
                   data-bs-toggle="modal"
                   data-bs-target="#modal"
                 >
-                  <span class="d-none d-md-inline">RETURN BOOK</span>
+                  <span>RETURN BOOK</span>
                 </button>
               </td>
             </tr>

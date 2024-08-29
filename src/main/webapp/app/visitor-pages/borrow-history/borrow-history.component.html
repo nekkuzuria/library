@@ -8,17 +8,15 @@
   @if (visitorBookStorages && visitorBookStorages.length > 0) {
     <div class="table-responsive table-entities" id="borrow-history">
       <table class="table table-striped text-center" aria-describedby="page-heading">
-        <thead>
+        <thead class="text-center">
           <tr>
             <th scope="col">
               <span>No.</span>
             </th>
-            <th scope="col" class="text-start">
-              <div class="d-flex">
-                <span>Book</span>
-              </div>
+            <th scope="col">
+              <span>Book</span>
             </th>
-            <th>
+            <th scope="col">
               <span>Quantity</span>
             </th>
             <th scope="col">
@@ -29,18 +27,18 @@
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
           @for (vbs of visitorBookStorages; track trackId) {
             <tr>
-              <td class="text-center">{{ $index + 1 }}</td>
-              <td class="text-start">
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Book">
                 <a [routerLink]="['/book-detail', vbs.bookId]">{{ vbs.title }}</a
                 ><br />
                 by {{ vbs.author }}
               </td>
-              <td class="text-center">{{ vbs.quantity }}</td>
-              <td class="text-center">{{ convertDate(vbs.borrowDate) }}</td>
-              <td class="text-center">{{ convertDate(vbs.returnDate) }}</td>
+              <td data-label="Quantity">{{ vbs.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(vbs.borrowDate) }}</td>
+              <td data-label="Return Date">{{ convertDate(vbs.returnDate) }}</td>
             </tr>
           }
         </tbody>

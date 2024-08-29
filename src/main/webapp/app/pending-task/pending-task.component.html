@@ -37,23 +37,23 @@
         <tbody class="text-center">
           @for (p of pendingTasks; track trackId) {
             <tr>
-              <td class="text-center">{{ $index + 1 }}</td>
-              <td>{{ p.type }}</td>
-              <td>
-                <a [routerLink]="['/book-detail', p.id]">{{ p.bookTitle }}</a
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Type">{{ p.type }}</td>
+              <td data-label="Book">
+                <a [routerLink]="['/book-detail', p.bookId]">{{ p.bookTitle }}</a
                 ><br />
                 by {{ p.bookAuthor }}
               </td>
-              <td>{{ p.quantity }}</td>
-              <td>{{ p.visitorName }}</td>
-              <td>{{ p.createdDate ? p.createdDate.format('DD-MM-YYYY') : '' }}</td>
+              <td data-label="Quantity">{{ p.quantity }}</td>
+              <td data-label="Visitor">{{ p.visitorName }}</td>
+              <td data-label="Date">{{ p.createdDate ? p.createdDate.format('DD-MM-YYYY') : '' }}</td>
               <td class="text-center">
                 <div *ngIf="p.status === PendingTaskStatus.PENDING; else notPending">
                   <div class="btn-group">
                     <button
                       type="button"
                       (click)="updateSelected(true, p)"
-                      class="btn btn-success btn-sm"
+                      class="btn btn-success"
                       data-cy="approveBorrowRequestButton"
                       data-bs-toggle="modal"
                       data-bs-target="#modal"
@@ -64,7 +64,7 @@
                     <button
                       type="button"
                       (click)="updateSelected(false, p)"
-                      class="btn btn-danger btn-sm"
+                      class="btn btn-danger"
                       data-cy="denyBorrowRequestButton"
                       data-bs-toggle="modal"
                       data-bs-target="#modal"
