@@ -46,17 +46,33 @@
               <td data-label="Status">
                 {{ p.status }}<br />
                 <div *ngIf="p.status === PendingTaskStatus.DENIED">
-                  <div class="btn-group">
-                    <button
-                      type="button"
-                      (click)="updateSelected(p)"
-                      class="btn btn-primary"
-                      data-cy="approveBorrowRequestButton"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modal"
-                    >
-                      <span>SEE WHY</span>
-                    </button>
+                  <div class="d-block d-sm-none mt-4 mb-2">
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        (click)="updateSelected(p)"
+                        class="btn btn-primary"
+                        data-cy="approveBorrowRequestButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                      >
+                        <span>SEE WHY</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-none d-sm-block">
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        (click)="updateSelected(p)"
+                        class="btn btn-primary"
+                        data-cy="approveBorrowRequestButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                      >
+                        <span>SEE WHY</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </td>
