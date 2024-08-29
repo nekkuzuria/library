@@ -1,17 +1,10 @@
 export enum BookType {
-  HARDCOVER = 'HARDCOVER',
-
-  PAPERBACK = 'PAPERBACK',
-
-  EBOOK = 'EBOOK',
-
-  AUDIOBOOK = 'AUDIOBOOK',
-
-  MAGAZINE = 'MAGAZINE',
-
-  JOURNAL = 'JOURNAL',
-
-  COMIC = 'COMIC',
-
-  NEWSPAPER = 'NEWSPAPER',
+  HARDCOVER = 'Hardcover',
+  PAPERBACK = 'Paperback',
+  EBOOK = 'E-Book',
+  AUDIOBOOK = 'Audiobook',
+  MAGAZINE = 'Magazine',
+  JOURNAL = 'Journal',
+  COMIC = 'Comic',
+  NEWSPAPER = 'Newspaper',
 }

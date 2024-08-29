@@ -17,6 +17,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BookDeleteDialogComponent } from '../entities/book/delete/book-delete-dialog.component';
 import SharedModule from 'app/shared/shared.module';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
+import { BookType } from 'app/entities/enumerations/book-type.model';
+import { Genre } from 'app/entities/enumerations/genre.model';
 
 declare var bootstrap: any;
 @Component({
@@ -145,5 +147,13 @@ export class BookDetailComponent implements OnInit {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
     }
+  }
+
+  getBookTypeLabel(type: string): string {
+    return BookType[type as keyof typeof BookType];
+  }
+
+  getBookGenreLabel(type: string): string {
+    return Genre[type as keyof typeof Genre];
   }
 }

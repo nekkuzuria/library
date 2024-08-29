@@ -10,7 +10,8 @@
           <h2 class="card-title text-dark mb-4">{{ book.title }}</h2>
           <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
           <p class="card-text"><strong>Year:</strong> {{ book.year }}</p>
-          <p class="card-text"><strong>Genre:</strong> {{ book.genre }}</p>
+          <p class="card-text"><strong>Genre:</strong> {{ getBookGenreLabel(book.genre!) }}</p>
+          <p class="card-text"><strong>Type:</strong> {{ getBookTypeLabel(book.type!) }}</p>
           <p class="card-text"><strong>Total Pages:</strong> {{ book.totalPage }}</p>
           <p class="card-text"><strong>Quantity:</strong> {{ quantity }}</p>
           <p class="card-text"><strong>Synopsis:</strong></p>
