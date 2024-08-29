@@ -2,8 +2,8 @@
 <div *ngIf="book" class="container my-5">
   <div class="card shadow-lg border-0 rounded-5">
     <div class="row g-0">
-      <div class="col-md-4">
-        <img [src]="book.cover" class="img-fluid h-100 object-fit-cover rounded-5" alt="{{ book.title }} Cover" />
+      <div class="col-12 col-md-4">
+        <img [src]="book.cover" class="img-fluid h-100 object-fit-cover rounded-5" id="book-detail-image" alt="{{ book.title }} Cover" />
       </div>
       <div class="col-md-8">
         <div class="card-body p-5">
