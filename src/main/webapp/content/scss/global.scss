@@ -454,3 +454,7 @@ app-dashboard {
 .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-disabled {
   color: gray !important;
 }
+
+.ng-select .ng-select-container {
+  border-radius: 20px;
+}
