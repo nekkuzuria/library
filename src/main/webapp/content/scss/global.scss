@@ -256,17 +256,25 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   background-color: #fff;
   width: 100%;
   border-radius: 20px;
+  height: 35px;
+  padding-right: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
 
-  .ng-select {
-    width: 100%;
-    align-items: center;
+.form-sortby {
+  height: 100px;
+}
 
-    .ng-select-container {
-      height: auto;
-      border: none;
-      min-height: 0;
-      position: static;
-    }
+.ng-select {
+  margin-top: 0;
+  width: 100%;
+  align-items: center;
+
+  .ng-select-container {
+    height: auto;
+    border: none;
+    min-height: 0;
+    position: static;
   }
 }
 

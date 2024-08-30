@@ -209,12 +209,12 @@ export class DashboardComponent implements OnInit {
 
     this.displayGenres = [];
 
-    this.displayGenres.push({ name: '--- Most Borrowed ---', disabled: true });
+    this.displayGenres.push({ name: 'Most Borrowed', disabled: true });
     this.displayGenres.push(...this.sortedGenres.map(genre => ({ name: genre.name, disabled: false })));
 
     const otherGenres = this.getGenres().filter(genre => !this.sortedGenres.some(g => g.name.toLowerCase() === genre.name.toLowerCase()));
 
-    this.displayGenres.push({ name: '--- Other Genres ---', disabled: true });
+    this.displayGenres.push({ name: 'Other Genres', disabled: true });
     this.displayGenres.push(...otherGenres.map(genre => ({ name: genre.name, disabled: false })));
 
     console.log('haaaaaa', this.displayGenres);
