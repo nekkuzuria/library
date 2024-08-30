@@ -1,0 +1,19 @@
+{
+  "annotations": {
+    "changelogDate": "20240821042440"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "image",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "File",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="20240819113500-1" author="aminhnh">
+
+        <addColumn tableName="visit">
+            <column name="visitor_book_storage_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint baseColumnNames="visitor_book_storage_id"
+                                 baseTableName="visit"
+                                 constraintName="fk_visit__visitor_book_strorage_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="visitor_book_storage"
+        />
+
+    </changeSet>
+</databaseChangeLog>

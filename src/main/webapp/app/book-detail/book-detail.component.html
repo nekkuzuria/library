@@ -1,0 +1,91 @@
+<!-- Main Content -->
+<div *ngIf="book" class="container my-5">
+  <div class="card shadow-lg border-0 rounded-5">
+    <div class="row g-0">
+      <div class="col-12 col-md-4">
+        <img [src]="book.cover" class="img-fluid h-100 object-fit-cover rounded-5" id="book-detail-image" alt="{{ book.title }} Cover" />
+      </div>
+      <div class="col-md-8">
+        <div class="card-body p-5">
+          <h2 class="card-title text-dark mb-4">{{ book.title }}</h2>
+          <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+          <p class="card-text"><strong>Year:</strong> {{ book.year }}</p>
+          <p class="card-text"><strong>Genre:</strong> {{ getBookGenreLabel(book.genre!) }}</p>
+          <p class="card-text"><strong>Type:</strong> {{ getBookTypeLabel(book.type!) }}</p>
+          <p class="card-text"><strong>Total Pages:</strong> {{ book.totalPage }}</p>
+          <p class="card-text"><strong>Quantity:</strong> {{ quantity }}</p>
+          <p class="card-text"><strong>Synopsis:</strong></p>
+          <p class="card-text text-muted">{{ book.synopsis }}</p>
+
+          <!-- Quantity Selection and Borrow Button for ROLE_USER -->
+          <div *jhiHasAnyAuthority="'ROLE_USER'" class="mt-4">
+            <form (ngSubmit)="onBorrow()">
+              <div class="d-flex align-items-center mb-3">
+                <input
+                  type="number"
+                  id="quantity"
+                  name="quantity"
+                  [(ngModel)]="selectedQuantity"
+                  min="1"
+                  max="{{ quantity }}"
+                  class="form-control w-25 me-2"
+                  placeholder="Quantity"
+                  required
+                />
+                <button type="submit" class="btn btn-primary">Borrow</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Edit and Delete Buttons for ROLE_ADMIN -->
+          <div *jhiHasAnyAuthority="'ROLE_ADMIN'" class="mt-4">
+            <button class="btn btn-warning me-2" (click)="onEdit()">Edit</button>
+            <button class="btn btn-danger" (click)="onDelete()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!book" class="container my-5 text-center">
+  <div class="alert alert-warning" role="alert">
+    <p>No book details available.</p>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ successMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="errorModalLabel">Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {{ errorMessage }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

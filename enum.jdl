@@ -1,0 +1,33 @@
+enum Genre {
+	FICTION,
+	NONFICTION,
+	SCIENCE_FICTION,
+	FANTASY,
+	BIOGRAPHY,
+    MYSTERY,
+    THRILLER,
+    ROMANCE,
+    HORROR,
+    HISTORY,
+    POETRY,
+    DRAMA,
+    ADVENTURE,
+    CHILDRENS,
+    YOUNG_ADULT,
+    SELF_HELP,
+    RELIGION,
+    COOKING,
+    ART,
+    TRAVEL
+}
+
+enum BookType {
+	HARDCOVER,
+    PAPERBACK,
+    EBOOK,
+    AUDIOBOOK,
+    MAGAZINE,
+    JOURNAL,
+    COMIC,
+    NEWSPAPER
+}

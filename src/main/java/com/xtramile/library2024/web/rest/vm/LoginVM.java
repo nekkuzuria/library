@@ -17,6 +17,7 @@ public class LoginVM {
     private String password;
 
     private boolean rememberMe;
+    private Long libraryId;
 
     public String getUsername() {
         return username;
@@ -49,5 +50,13 @@ public class LoginVM {
             "username='" + username + '\'' +
             ", rememberMe=" + rememberMe +
             '}';
+    }
+
+    public Long getLibraryId() {
+        return libraryId;
+    }
+
+    public void setLibraryId(Long libraryId) {
+        this.libraryId = libraryId;
     }
 }

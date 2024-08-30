@@ -1,0 +1,145 @@
+<div>
+  <h2 id="page-heading" data-cy="LibrarianHeading">
+    <span>Librarians</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-librarian"
+        [routerLink]="['/librarian/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Librarian</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (librarians?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Librarians found</span>
+    </div>
+  }
+
+  @if (librarians && librarians.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="name">
+              <div class="d-flex">
+                <span>Name</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="email">
+              <div class="d-flex">
+                <span>Email</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="phoneNumber">
+              <div class="d-flex">
+                <span>Phone Number</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateOfBirth">
+              <div class="d-flex">
+                <span>Date Of Birth</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="library.id">
+              <div class="d-flex">
+                <span>Library</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="location.id">
+              <div class="d-flex">
+                <span>Location</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (librarian of librarians; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/librarian', librarian.id, 'view']">{{ librarian.id }}</a>
+              </td>
+              <td>{{ librarian.name }}</td>
+              <td>{{ librarian.email }}</td>
+              <td>{{ librarian.phoneNumber }}</td>
+              <td>{{ librarian.dateOfBirth | formatMediumDate }}</td>
+              <td>
+                @if (librarian.library) {
+                  <div>
+                    <a [routerLink]="['/library', librarian.library.id, 'view']">{{ librarian.library.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (librarian.location) {
+                  <div>
+                    <a [routerLink]="['/location', librarian.location.id, 'view']">{{ librarian.location.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                {{ librarian.user?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/librarian', librarian.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/librarian', librarian.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(librarian)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

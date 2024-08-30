@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="20240823134200-1" author="aminhnh">
+        <addColumn tableName="pending_task">
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="pending_task">
+            <column name="librarian_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="pending_task">
+            <column name="visitor_book_storage_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="pending_task">
+            <column name="reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+            baseTableName="pending_task"
+            baseColumnNames="librarian_id"
+            constraintName="fk_pending_task_librarian"
+            referencedTableName="librarian"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="pending_task"
+            baseColumnNames="visitor_book_storage_id"
+            constraintName="fk_pending_task_visitor_book_storage"
+            referencedTableName="visitor_book_storage"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

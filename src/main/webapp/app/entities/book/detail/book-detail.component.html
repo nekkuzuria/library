@@ -1,0 +1,114 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (book()) {
+      <div>
+        <h2 data-cy="bookDetailsHeading"><span>Book</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ book()!.id }}</span>
+          </dd>
+          <dt><span>Title</span></dt>
+          <dd>
+            <span>{{ book()!.title }}</span>
+          </dd>
+          <dt><span>Type</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                HARDCOVER: 'HARDCOVER',
+                PAPERBACK: 'PAPERBACK',
+                EBOOK: 'EBOOK',
+                AUDIOBOOK: 'AUDIOBOOK',
+                MAGAZINE: 'MAGAZINE',
+                JOURNAL: 'JOURNAL',
+                COMIC: 'COMIC',
+                NEWSPAPER: 'NEWSPAPER',
+              }[book()!.type ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Genre</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                FICTION: 'FICTION',
+                NONFICTION: 'NONFICTION',
+                SCIENCE_FICTION: 'SCIENCE_FICTION',
+                FANTASY: 'FANTASY',
+                BIOGRAPHY: 'BIOGRAPHY',
+                MYSTERY: 'MYSTERY',
+                THRILLER: 'THRILLER',
+                ROMANCE: 'ROMANCE',
+                HORROR: 'HORROR',
+                HISTORY: 'HISTORY',
+                POETRY: 'POETRY',
+                DRAMA: 'DRAMA',
+                ADVENTURE: 'ADVENTURE',
+                CHILDRENS: 'CHILDRENS',
+                YOUNG_ADULT: 'YOUNG_ADULT',
+                SELF_HELP: 'SELF_HELP',
+                RELIGION: 'RELIGION',
+                COOKING: 'COOKING',
+                ART: 'ART',
+                TRAVEL: 'TRAVEL',
+              }[book()!.genre ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Year</span></dt>
+          <dd>
+            <span>{{ book()!.year }}</span>
+          </dd>
+          <dt><span>Total Page</span></dt>
+          <dd>
+            <span>{{ book()!.totalPage }}</span>
+          </dd>
+          <dt><span>Author</span></dt>
+          <dd>
+            <span>{{ book()!.author }}</span>
+          </dd>
+          <dt><span>Cover</span></dt>
+          <dd>
+            <span>{{ book()!.cover }}</span>
+          </dd>
+          <dt><span>Synopsis</span></dt>
+          <dd>
+            <span>{{ book()!.synopsis }}</span>
+          </dd>
+          <dt><span>Book Storage</span></dt>
+          <dd>
+            @if (book()!.bookStorageId) {
+              <div>
+                <a [routerLink]="['/book-storage', book()!.bookStorageId, 'view']">{{ book()!.bookStorageId }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>File</span></dt>
+          <dd>
+            @if (book()!.file) {
+              <div>
+                <a [routerLink]="['/file', book()!.file?.id, 'view']">{{ book()!.file?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/book', book()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

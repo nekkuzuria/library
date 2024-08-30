@@ -1,0 +1,99 @@
+<div class="container">
+  <h2 class="text-center mb-5 mt-3">My Borrow & Return Request</h2>
+
+  @if (pendingTasks?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No requests</span>
+    </div>
+  }
+  @if (pendingTasks && pendingTasks.length > 0) {
+    <div class="table-responsive table-entities" id="pending-task">
+      <table class="table table-striped text-center" aria-describedby="page-heading">
+        <thead class="text-center">
+          <tr>
+            <th scope="col">
+              <span>No.</span>
+            </th>
+            <th scope="col">
+              <span>Type</span>
+            </th>
+            <th scope="col">
+              <span>Book</span>
+            </th>
+            <th scope="col">
+              <span>Quantity</span>
+            </th>
+            <th scope="col" jhiSortBy="createdDate">
+              <span>Date</span>
+            </th>
+            <th scope="col">
+              <span>Status</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          @for (p of pendingTasks; track trackId) {
+            <tr>
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Type">{{ p.type }}</td>
+              <td data-label="Book">
+                <a [routerLink]="['/book-detail', p.bookId]">{{ p.bookTitle }}</a
+                ><br />
+                by {{ p.bookAuthor }}
+              </td>
+              <td data-label="Quantity">{{ p.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(p.createdDate) }}</td>
+              <td data-label="Status">
+                {{ p.status }}<br />
+                <div *ngIf="p.status === PendingTaskStatus.DENIED">
+                  <div class="d-block d-sm-none mt-4 mb-2">
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        (click)="updateSelected(p)"
+                        class="btn btn-primary"
+                        data-cy="approveBorrowRequestButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                      >
+                        <span>SEE WHY</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-none d-sm-block">
+                    <div class="btn-group">
+                      <button
+                        type="button"
+                        (click)="updateSelected(p)"
+                        class="btn btn-primary"
+                        data-cy="approveBorrowRequestButton"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                      >
+                        <span>SEE WHY</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Request to {{ selectedPendingTask.type?.toLowerCase() }} book was denied.</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Reason:</p>
+          {{ selectedPendingTask.reason ? selectedPendingTask.reason : '-' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

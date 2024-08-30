@@ -1,0 +1,224 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-book-heading" data-cy="BookCreateUpdateHeading">Create or edit a Book</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_title">Title</label>
+          <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
+          @if (editForm.get('title')!.invalid && (editForm.get('title')!.dirty || editForm.get('title')!.touched)) {
+            <div>
+              @if (editForm.get('title')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_type">Type</label>
+          <select class="form-control" name="type" formControlName="type" id="field_type" data-cy="type">
+            <option [ngValue]="null"></option>
+            @for (bookType of bookTypeValues; track $index) {
+              <option [value]="bookType">
+                {{
+                  {
+                    null: '',
+                    HARDCOVER: 'Hardcover',
+                    PAPERBACK: 'Paperback',
+                    EBOOK: 'E-Book',
+                    AUDIOBOOK: 'Audiobook',
+                    MAGAZINE: 'Magazine',
+                    JOURNAL: 'Journal',
+                    COMIC: 'Comic',
+                    NEWSPAPER: 'Newspaper',
+                  }[bookType]
+                }}
+              </option>
+            }
+          </select>
+          @if (editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)) {
+            <div>
+              @if (editForm.get('type')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_genre">Genre</label>
+          <select class="form-control" name="genre" formControlName="genre" id="field_genre" data-cy="genre">
+            <option [ngValue]="null"></option>
+            @for (genre of genreValues; track $index) {
+              <option [value]="genre">
+                {{
+                  {
+                    null: '',
+                    FICTION: 'Fiction',
+                    NONFICTION: 'Nonfiction',
+                    SCIENCE_FICTION: 'Science Fiction',
+                    FANTASY: 'Fantasy',
+                    BIOGRAPHY: 'Biography',
+                    MYSTERY: 'Mystery',
+                    THRILLER: 'Thriller',
+                    ROMANCE: 'Romance',
+                    HORROR: 'Horror',
+                    HISTORY: 'History',
+                    POETRY: 'Poetry',
+                    DRAMA: 'Drama',
+                    ADVENTURE: 'Adventure',
+                    CHILDRENS: 'Childrens',
+                    YOUNG_ADULT: 'Young Adult',
+                    SELF_HELP: 'Self Help',
+                    RELIGION: 'Religion',
+                    COOKING: 'Cooking',
+                    ART: 'Art',
+                    TRAVEL: 'Travel',
+                  }[genre]
+                }}
+              </option>
+            }
+          </select>
+          @if (editForm.get('genre')!.invalid && (editForm.get('genre')!.dirty || editForm.get('genre')!.touched)) {
+            <div>
+              @if (editForm.get('genre')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_year">Year</label>
+          <input type="number" class="form-control" name="year" id="field_year" data-cy="year" formControlName="year" />
+          @if (editForm.get('year')!.invalid && (editForm.get('year')!.dirty || editForm.get('year')!.touched)) {
+            <div>
+              @if (editForm.get('year')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_totalPage">Total Page</label>
+          <input
+            type="number"
+            class="form-control"
+            name="totalPage"
+            id="field_totalPage"
+            data-cy="totalPage"
+            formControlName="totalPage"
+            (keydown)="restrictNonNumeric($event)"
+          />
+          @if (editForm.get('totalPage')!.invalid && (editForm.get('totalPage')!.dirty || editForm.get('totalPage')!.touched)) {
+            <div>
+              @if (editForm.get('totalPage')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_author">Author</label>
+          <input type="text" class="form-control" name="author" id="field_author" data-cy="author" formControlName="author" />
+          @if (editForm.get('author')!.invalid && (editForm.get('author')!.dirty || editForm.get('author')!.touched)) {
+            <div>
+              @if (editForm.get('author')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_cover">Cover</label>
+          <input
+            type="file"
+            class="form-control"
+            name="file"
+            id="field_cover"
+            data-cy="cover"
+            formControlName="cover"
+            accept="image/*"
+            formenctype="multipart/form-data"
+            (change)="onImageChange($event)"
+          />
+          @if (editForm.get('cover')!.invalid && (editForm.get('cover')!.dirty || editForm.get('cover')!.touched)) {
+            <div>
+              @if (editForm.get('cover')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+        <div *ngIf="imagePreview">
+          <img [src]="imagePreview" alt="Image preview" class="img-fluid mt-2" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_synopsis">Synopsis</label>
+          <input type="text" class="form-control" name="synopsis" id="field_synopsis" data-cy="synopsis" formControlName="synopsis" />
+          @if (editForm.get('synopsis')!.invalid && (editForm.get('synopsis')!.dirty || editForm.get('synopsis')!.touched)) {
+            <div>
+              @if (editForm.get('synopsis')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <input type="hidden" id="field_bookStorageId" data-cy="bookStorageId" name="bookStorageId" formControlName="bookStorageId" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="field_year">Quantity</label>
+          <input
+            type="number"
+            class="form-control"
+            name="quantity"
+            id="field_quantity"
+            data-cy="quantity"
+            formControlName="quantity"
+            (keydown)="restrictNonNumeric($event)"
+          />
+          @if (editForm.get('quantity')!.invalid && (editForm.get('quantity')!.dirty || editForm.get('quantity')!.touched)) {
+            <div>
+              @if (editForm.get('quantity')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

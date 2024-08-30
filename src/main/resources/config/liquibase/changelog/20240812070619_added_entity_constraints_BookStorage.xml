@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity BookStorage.
+    -->
+    <changeSet id="20240812070619-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="library_id"
+                                 baseTableName="book_storage"
+                                 constraintName="fk_book_storage__library_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="library"
+                                 />
+    </changeSet>
+</databaseChangeLog>

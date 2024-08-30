@@ -1,0 +1,48 @@
+<div class="container">
+  <h2 class="text-center mb-5 mt-3">Borrow History</h2>
+  @if (visitorBookStorages?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No book has been returned</span>
+    </div>
+  }
+  @if (visitorBookStorages && visitorBookStorages.length > 0) {
+    <div class="table-responsive table-entities" id="borrow-history">
+      <table class="table table-striped text-center" aria-describedby="page-heading">
+        <thead class="text-center">
+          <tr>
+            <th scope="col">
+              <span>No.</span>
+            </th>
+            <th scope="col">
+              <span>Book</span>
+            </th>
+            <th scope="col">
+              <span>Quantity</span>
+            </th>
+            <th scope="col">
+              <span>Borrow Date</span>
+            </th>
+            <th scope="col">
+              <span>Return Date</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          @for (vbs of visitorBookStorages; track trackId) {
+            <tr>
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Book">
+                <a [routerLink]="['/book-detail', vbs.bookId]">{{ vbs.title }}</a
+                ><br />
+                by {{ vbs.author }}
+              </td>
+              <td data-label="Quantity">{{ vbs.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(vbs.borrowDate) }}</td>
+              <td data-label="Return Date">{{ convertDate(vbs.returnDate) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,57 @@
+<div class="container">
+  <h2 class="text-center mb-5 mt-3">Library Visits History</h2>
+
+  @if (visits?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No requests</span>
+    </div>
+  }
+  @if (visits && visits.length > 0) {
+    <div class="table-responsive table-entities" id="pending-task">
+      <table class="table table-striped text-center" aria-describedby="page-heading">
+        <thead>
+          <tr>
+            <th scope="col">
+              <span>No.</span>
+            </th>
+            <th scope="col" jhiSortBy="createdDate">
+              <span>Date</span>
+            </th>
+            <th scope="col">
+              <span>Type</span>
+            </th>
+            <th scope="col">
+              <span>Book</span>
+            </th>
+            <th scope="col">
+              <span>Quantity</span>
+            </th>
+            <th scope="col">
+              <span>Visitor</span>
+            </th>
+            <th scope="col">
+              <span>Librarian</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          @for (visit of visits; track trackId) {
+            <tr>
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Date">{{ convertDate(visit.createdDate) }}</td>
+              <td data-label="Type">{{ visit.type }}</td>
+              <td data-label="Book">
+                <a [routerLink]="['/book-detail', visit.bookId]">{{ visit.bookTitle }}</a
+                ><br />
+                by {{ visit.bookAuthor }}
+              </td>
+              <td data-label="Quantity">{{ visit.quantity }}</td>
+              <td data-label="Visitor">{{ visit.visitorName }}</td>
+              <td data-label="Librarian">{{ visit.librarianName }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

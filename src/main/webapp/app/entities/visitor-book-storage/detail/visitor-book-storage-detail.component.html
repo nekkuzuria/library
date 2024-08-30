@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (visitorBookStorage()) {
+      <div>
+        <h2 data-cy="visitorBookStorageDetailsHeading"><span>Visitor Book Storage</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ visitorBookStorage()!.id }}</span>
+          </dd>
+          <dt><span>Borrow Date</span></dt>
+          <dd>
+            <span>{{ visitorBookStorage()!.borrowDate | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Return Date</span></dt>
+          <dd>
+            <span>{{ visitorBookStorage()!.returnDate | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Visitor</span></dt>
+          <dd>
+            @if (visitorBookStorage()!.visitor) {
+              <div>
+                <a [routerLink]="['/visitor', visitorBookStorage()!.visitor?.id, 'view']">{{ visitorBookStorage()!.visitor?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Book</span></dt>
+          <dd>
+            @if (visitorBookStorage()!.book) {
+              <div>
+                <a [routerLink]="['/book', visitorBookStorage()!.book?.id, 'view']">{{ visitorBookStorage()!.book?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/visitor-book-storage', visitorBookStorage()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

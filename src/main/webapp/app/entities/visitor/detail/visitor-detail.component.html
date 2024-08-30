@@ -1,0 +1,70 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (visitor()) {
+      <div>
+        <h2 data-cy="visitorDetailsHeading"><span>Visitor</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ visitor()!.id }}</span>
+          </dd>
+          <dt><span>Name</span></dt>
+          <dd>
+            <span>{{ visitor()!.name }}</span>
+          </dd>
+          <dt><span>Email</span></dt>
+          <dd>
+            <span>{{ visitor()!.email }}</span>
+          </dd>
+          <dt><span>Phone Number</span></dt>
+          <dd>
+            <span>{{ visitor()!.phoneNumber }}</span>
+          </dd>
+          <dt><span>Date Of Birth</span></dt>
+          <dd>
+            <span>{{ visitor()!.dateOfBirth | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Membership Status</span></dt>
+          <dd>
+            <span>{{ visitor()!.membershipStatus }}</span>
+          </dd>
+          <dt><span>Address</span></dt>
+          <dd>
+            @if (visitor()!.address) {
+              <div>
+                <a [routerLink]="['/location', visitor()!.address?.id, 'view']">{{ visitor()!.address?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (visitor()!.library) {
+              <div>
+                <a [routerLink]="['/library', visitor()!.library?.id, 'view']">{{ visitor()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ visitor()!.user?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/visitor', visitor()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

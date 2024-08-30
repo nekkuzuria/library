@@ -1,7 +1,10 @@
-import { Component, AfterViewInit, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, inject, signal, viewChild, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PublicService } from 'app/core/public-service/public.service';
+import { IPublicLibrary } from 'app/core/public-service/public.library.model';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/error.constants';
 import SharedModule from 'app/shared/shared.module';
@@ -11,11 +14,13 @@ import { RegisterService } from './register.service';
 @Component({
   standalone: true,
   selector: 'jhi-register',
-  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
+  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, NgSelectModule],
   templateUrl: './register.component.html',
 })
-export default class RegisterComponent implements AfterViewInit {
-  login = viewChild.required<ElementRef>('login');
+export default class RegisterComponent implements OnInit, AfterViewInit {
+  // login = viewChild.required<ElementRef>('login');
+  libraries: IPublicLibrary[] = [];
+  roles: string[] = [];
 
   doNotMatch = signal(false);
   error = signal(false);
@@ -24,6 +29,46 @@ export default class RegisterComponent implements AfterViewInit {
   success = signal(false);
 
   registerForm = new FormGroup({
+    roleChoice: new FormControl(null, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    libraryId: new FormControl(null, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    firstName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
+    }),
+    lastName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(1), Validators.maxLength(50)],
+    }),
+    dateOfBirth: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    phoneNumber: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern('^[0-9]{4,13}$')],
+    }),
+    streetAddress: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(100), Validators.pattern('^[a-zA-Z0-9 ,.-/]+$')],
+    }),
+    postalCode: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern('^[0-9]{1,5}$')],
+    }),
+    city: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')],
+    }),
+    stateProvince: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern('^[a-zA-Z ]+$')],
+    }),
     login: new FormControl('', {
       nonNullable: true,
       validators: [
@@ -47,13 +92,34 @@ export default class RegisterComponent implements AfterViewInit {
     }),
   });
 
+  constructor(private publicService: PublicService) {}
   private registerService = inject(RegisterService);
-
-  ngAfterViewInit(): void {
-    this.login().nativeElement.focus();
+  ngOnInit(): void {
+    this.loadLibraries();
+    this.roles = ['Visitor', 'Librarian'];
   }
-
+  ngAfterViewInit(): void {
+    // this.login().nativeElement.focus();
+  }
+  loadLibraries(): void {
+    this.publicService.query().subscribe({
+      next: response => {
+        this.libraries = response.body || [];
+      },
+      error: error => {
+        console.error('Error fetching libraries:', error);
+      },
+      complete: () => {
+        console.log('Library fetch complete');
+      },
+    });
+  }
   register(): void {
+    if (this.registerForm.invalid) {
+      this.checkInvalidControls();
+      return;
+    }
+
     this.doNotMatch.set(false);
     this.error.set(false);
     this.errorEmailExists.set(false);
@@ -63,9 +129,38 @@ export default class RegisterComponent implements AfterViewInit {
     if (password !== confirmPassword) {
       this.doNotMatch.set(true);
     } else {
-      const { login, email } = this.registerForm.getRawValue();
+      const {
+        roleChoice,
+        libraryId,
+        firstName,
+        lastName,
+        dateOfBirth,
+        phoneNumber,
+        streetAddress,
+        postalCode,
+        city,
+        stateProvince,
+        login,
+        email,
+      } = this.registerForm.getRawValue();
+
       this.registerService
-        .save({ login, email, password, langKey: 'en' })
+        .save({
+          roleChoice,
+          libraryId: Number(libraryId),
+          firstName,
+          lastName,
+          dateOfBirth,
+          phoneNumber,
+          streetAddress,
+          postalCode,
+          city,
+          stateProvince,
+          login,
+          email,
+          password,
+          langKey: 'en',
+        })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
     }
   }
@@ -78,5 +173,30 @@ export default class RegisterComponent implements AfterViewInit {
     } else {
       this.error.set(true);
     }
+  }
+
+  restrictNonNumeric(event: KeyboardEvent): void {
+    if (event.key === 'e' || event.key === 'E' || event.key === '-' || event.key === '+' || event.key === '.') {
+      event.preventDefault();
+    }
+  }
+
+  checkInvalidControls() {
+    const invalidControls: { controlName: string; errors: any }[] = [];
+    const controls = this.registerForm.controls;
+
+    // Object.keys ensures that TypeScript recognizes the keys
+    Object.keys(controls).forEach(name => {
+      const control = controls[name as keyof typeof controls];
+
+      if (control.invalid) {
+        invalidControls.push({
+          controlName: name,
+          errors: control.errors,
+        });
+      }
+    });
+
+    console.log(invalidControls);
   }
 }

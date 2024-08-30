@@ -51,9 +51,12 @@ public class AuthorityResource {
     public ResponseEntity<Authority> createAuthority(@Valid @RequestBody Authority authority) throws URISyntaxException {
         log.debug("REST request to save Authority : {}", authority);
         if (authorityRepository.existsById(authority.getName())) {
+            log.warn("Attempt to create an authority that already exists: {}", authority.getName());
             throw new BadRequestAlertException("authority already exists", ENTITY_NAME, "idexists");
         }
         authority = authorityRepository.save(authority);
+        log.info("Authority created successfully: {}", authority.getName());
+
         return ResponseEntity.created(new URI("/api/authorities/" + authority.getName()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, authority.getName()))
             .body(authority);
@@ -68,7 +71,9 @@ public class AuthorityResource {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public List<Authority> getAllAuthorities() {
         log.debug("REST request to get all Authorities");
-        return authorityRepository.findAll();
+        List<Authority> authorities = authorityRepository.findAll();
+        log.info("Retrieved {} authorities", authorities.size());
+        return authorities;
     }
 
     /**
@@ -82,6 +87,13 @@ public class AuthorityResource {
     public ResponseEntity<Authority> getAuthority(@PathVariable("id") String id) {
         log.debug("REST request to get Authority : {}", id);
         Optional<Authority> authority = authorityRepository.findById(id);
+
+        if (authority.isPresent()) {
+            log.info("Authority found: {}", authority.get().getName());
+        } else {
+            log.warn("Authority not found with id: {}", id);
+        }
+
         return ResponseUtil.wrapOrNotFound(authority);
     }
 
@@ -95,7 +107,12 @@ public class AuthorityResource {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAuthority(@PathVariable("id") String id) {
         log.debug("REST request to delete Authority : {}", id);
+        if (!authorityRepository.existsById(id)) {
+            log.warn("Attempt to delete a non-existent authority with id: {}", id);
+            return ResponseEntity.notFound().build();
+        }
         authorityRepository.deleteById(id);
+        log.info("Authority deleted successfully: {}", id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id)).build();
     }
 }

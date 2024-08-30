@@ -42,11 +42,19 @@ public class PublicUserResource {
     public ResponseEntity<List<UserDTO>> getAllPublicUsers(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         log.debug("REST request to get all public User names");
         if (!onlyContainsAllowedProperties(pageable)) {
+            log.warn("Pageable contains properties that are not allowed");
             return ResponseEntity.badRequest().build();
         }
 
         final Page<UserDTO> page = userService.getAllPublicUsers(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
+        if (page.getContent().isEmpty()) {
+            log.info("No public users found");
+        } else {
+            log.info("Found {} public users", page.getContent().size());
+        }
+
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 

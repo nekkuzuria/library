@@ -2,12 +2,15 @@ package com.xtramile.library2024.service.dto;
 
 import com.xtramile.library2024.config.Constants;
 import com.xtramile.library2024.domain.Authority;
+import com.xtramile.library2024.domain.File;
 import com.xtramile.library2024.domain.User;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * A DTO representing a user, with his authorities.
@@ -50,6 +53,8 @@ public class AdminUserDTO implements Serializable {
     private Instant lastModifiedDate;
 
     private Set<String> authorities;
+
+    private File file;
 
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
@@ -192,5 +197,13 @@ public class AdminUserDTO implements Serializable {
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             "}";
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 }

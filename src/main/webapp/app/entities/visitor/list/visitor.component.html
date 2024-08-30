@@ -1,0 +1,153 @@
+<div>
+  <h2 id="page-heading" data-cy="VisitorHeading">
+    <span>Visitors</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-visitor"
+        [routerLink]="['/visitor/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Visitor</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (visitors?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Visitors found</span>
+    </div>
+  }
+
+  @if (visitors && visitors.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="name">
+              <div class="d-flex">
+                <span>Name</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="email">
+              <div class="d-flex">
+                <span>Email</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="phoneNumber">
+              <div class="d-flex">
+                <span>Phone Number</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateOfBirth">
+              <div class="d-flex">
+                <span>Date Of Birth</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="membershipStatus">
+              <div class="d-flex">
+                <span>Membership Status</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="address.id">
+              <div class="d-flex">
+                <span>Address</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="library.id">
+              <div class="d-flex">
+                <span>Library</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (visitor of visitors; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/visitor', visitor.id, 'view']">{{ visitor.id }}</a>
+              </td>
+              <td>{{ visitor.name }}</td>
+              <td>{{ visitor.email }}</td>
+              <td>{{ visitor.phoneNumber }}</td>
+              <td>{{ visitor.dateOfBirth | formatMediumDate }}</td>
+              <td>{{ visitor.membershipStatus }}</td>
+              <td>
+                @if (visitor.address) {
+                  <div>
+                    <a [routerLink]="['/location', visitor.address.id, 'view']">{{ visitor.address.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (visitor.library) {
+                  <div>
+                    <a [routerLink]="['/library', visitor.library.id, 'view']">{{ visitor.library.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                {{ visitor.user?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/visitor', visitor.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/visitor', visitor.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(visitor)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

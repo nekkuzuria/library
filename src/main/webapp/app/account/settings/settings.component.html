@@ -1,117 +1,351 @@
-<div>
+<div class="container p-5">
   <div class="d-flex justify-content-center">
     <div class="col-md-8">
-      @if (settingsForm.value.login) {
-        <h2>
-          User settings for [<strong>{{ settingsForm.value.login }}</strong
-          >]
-        </h2>
-      }
+      <div *ngIf="settingsForm">
+        <div *ngIf="settingsForm.get('login')?.value">
+          <h2>
+            User settings for [<strong>{{ settingsForm.get('login')?.value }}</strong
+            >]
+          </h2>
+        </div>
+      </div>
 
-      @if (success()) {
+      <!-- Display success message -->
+      <div *ngIf="success()">
         <div class="alert alert-success"><strong>Settings saved!</strong></div>
-      }
+      </div>
 
+      <!-- Display error alert -->
       <jhi-alert-error></jhi-alert-error>
 
-      @if (settingsForm.value.login) {
-        <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-          <div class="mb-3">
-            <label class="form-label" for="firstName">First Name</label>
+      <!-- Form for user settings -->
+      <form *ngIf="settingsForm" name="form" (ngSubmit)="save()" [formGroup]="settingsForm">
+        <div class="d-flex align-items-center mb-3">
+          <!-- Profile Picture -->
+          <div class="me-3">
+            <img
+              *ngIf="imagePreview"
+              [src]="imagePreview"
+              alt="Profile picture"
+              class="img-fluid rounded-circle"
+              style="width: 100px; height: 100px; object-fit: cover; cursor: pointer"
+              (click)="openImagePreview()"
+            />
+            <input
+              type="file"
+              class="form-control mt-2"
+              id="imageFile"
+              name="imageFile"
+              (change)="onImageChange($event)"
+              data-cy="image-file"
+              formenctype="multipart/form-data"
+            />
+          </div>
+
+          <!-- Image Preview Modal -->
+          <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" class="img-fluid" />
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Input First Name and Last Name -->
+          <div class="flex-grow-1">
+            <div class="row">
+              <!-- Input First Name -->
+              <div class="mb-3 col-6">
+                <label class="form-label" for="firstName">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="Your first name"
+                  formControlName="firstName"
+                  data-cy="firstname"
+                />
+                <!-- Validation First Name -->
+                <div
+                  *ngIf="
+                    settingsForm.get('firstName')?.invalid &&
+                    (settingsForm.get('firstName')?.dirty || settingsForm.get('firstName')?.touched)
+                  "
+                >
+                  <div *ngIf="settingsForm.get('firstName')?.errors?.required">
+                    <small class="form-text text-danger">Your first name is required.</small>
+                  </div>
+                  <div *ngIf="settingsForm.get('firstName')?.errors?.minlength">
+                    <small class="form-text text-danger">Your first name must be at least 1 character long.</small>
+                  </div>
+                  <div *ngIf="settingsForm.get('firstName')?.errors?.maxlength">
+                    <small class="form-text text-danger">Your first name cannot be longer than 50 characters.</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Last Name -->
+              <div class="mb-3 col-6">
+                <label class="form-label" for="lastName">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Your last name"
+                  formControlName="lastName"
+                  data-cy="lastname"
+                />
+                <!-- Validation Last Name -->
+                <div
+                  *ngIf="
+                    settingsForm.get('lastName')?.invalid && (settingsForm.get('lastName')?.dirty || settingsForm.get('lastName')?.touched)
+                  "
+                >
+                  <div *ngIf="settingsForm.get('lastName')?.errors?.required">
+                    <small class="form-text text-danger">Your last name is required.</small>
+                  </div>
+                  <div *ngIf="settingsForm.get('lastName')?.errors?.minlength">
+                    <small class="form-text text-danger">Your last name must be at least 1 character long.</small>
+                  </div>
+                  <div *ngIf="settingsForm.get('lastName')?.errors?.maxlength">
+                    <small class="form-text text-danger">Your last name cannot be longer than 50 characters.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Email -->
+        <div class="mb-3">
+          <label class="form-label" for="email">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            placeholder="Your email"
+            formControlName="email"
+            data-cy="email"
+          />
+          <!-- Validation Email -->
+          <div *ngIf="settingsForm.get('email')?.invalid && (settingsForm.get('email')?.dirty || settingsForm.get('email')?.touched)">
+            <div *ngIf="settingsForm.get('email')?.errors?.required">
+              <small class="form-text text-danger">Your email is required.</small>
+            </div>
+            <div *ngIf="settingsForm.get('email')?.errors?.email">
+              <small class="form-text text-danger">Your email is invalid.</small>
+            </div>
+            <div *ngIf="settingsForm.get('email')?.errors?.minlength">
+              <small class="form-text text-danger">Your email must be at least 5 characters long.</small>
+            </div>
+            <div *ngIf="settingsForm.get('email')?.errors?.maxlength">
+              <small class="form-text text-danger">Your email cannot be longer than 254 characters.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Date Of Birth -->
+        <div class="mb-3">
+          <label class="form-label" for="dateOfBirth">Date Of Birth</label>
+          <div class="input-group">
+            <input
+              formControlName="dateOfBirth"
+              id="dateOfBirth"
+              data-cy="dateOfBirth"
+              type="text"
+              class="form-control rounded-start-5"
+              name="dateOfBirth"
+              placeholder="Your date of birth"
+              (click)="d.toggle()"
+              readonly
+            />
+            <!-- Invisible Input for DatePicker -->
+            <input #d="ngbDatepicker" ngbDatepicker class="visually-hidden" (dateSelect)="onDateSelect($event)" />
+            <button type="button" class="btn btn-secondary" (click)="d.toggle()">
+              <fa-icon icon="calendar-alt"></fa-icon>
+            </button>
+          </div>
+          @if (
+            settingsForm.get('dateOfBirth')!.invalid && (settingsForm.get('dateOfBirth')!.dirty || settingsForm.get('dateOfBirth')!.touched)
+          ) {
+            <div>
+              @if (settingsForm.get('dateOfBirth')?.errors?.required) {
+                <small class="form-text text-danger">Your date of birth is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Input Phone Number -->
+        <div class="mb-3">
+          <label class="form-label" for="phoneNumber">Phone Number</label>
+          <input
+            type="number"
+            class="form-control rounded-5"
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="Your phone number"
+            formControlName="phoneNumber"
+            data-cy="phoneNumber"
+            (keydown)="restrictNonNumeric($event)"
+          />
+          @if (
+            settingsForm.get('phoneNumber')!.invalid && (settingsForm.get('phoneNumber')!.dirty || settingsForm.get('phoneNumber')!.touched)
+          ) {
+            <div>
+              @if (settingsForm.get('phoneNumber')?.errors?.required) {
+                <small class="form-text text-danger">Your phone number is required.</small>
+              }
+              @if (settingsForm.get('phoneNumber')?.errors?.minlength) {
+                <small class="form-text text-danger">Your phone number must be at least 5 characters long.</small>
+              }
+              @if (settingsForm.get('phoneNumber')?.errors?.maxlength) {
+                <small class="form-text text-danger">Your phone number cannot be longer than 13 characters.</small>
+              }
+              <!-- @if (settingsForm.get('phoneNumber')?.errors?.pattern) {
+                <small class="form-text text-danger">Your phone number is invalid. It should be a valid international phone number.</small>
+              } -->
+            </div>
+          }
+        </div>
+
+        <!-- Input Street Address -->
+        <div class="row mb-3">
+          <div class="col-12 col-md-6 mb-3 mb-md-0">
+            <label class="form-label" for="streetAddress">Street Address</label>
             <input
               type="text"
-              class="form-control"
-              id="firstName"
-              name="firstName"
-              placeholder="Your first name"
-              formControlName="firstName"
-              data-cy="firstname"
+              class="form-control rounded-5"
+              id="streetAddress"
+              name="streetAddress"
+              placeholder="Your street address"
+              formControlName="streetAddress"
+              data-cy="streetAddress"
             />
-
-            @if (
-              settingsForm.get('firstName')!.invalid && (settingsForm.get('firstName')!.dirty || settingsForm.get('firstName')!.touched)
-            ) {
-              <div>
-                @if (settingsForm.get('firstName')?.errors?.required) {
-                  <small class="form-text text-danger">Your first name is required.</small>
-                }
-
-                @if (settingsForm.get('firstName')?.errors?.minlength) {
-                  <small class="form-text text-danger">Your first name is required to be at least 1 character</small>
-                }
-
-                @if (settingsForm.get('firstName')?.errors?.maxlength) {
-                  <small class="form-text text-danger">Your first name cannot be longer than 50 characters</small>
-                }
-              </div>
-            }
+            <div
+              *ngIf="
+                settingsForm.get('streetAddress')!.invalid &&
+                (settingsForm.get('streetAddress')!.dirty || settingsForm.get('streetAddress')!.touched)
+              "
+            >
+              @if (settingsForm.get('streetAddress')?.errors?.required) {
+                <small class="form-text text-danger">Street address is required.</small>
+              }
+              @if (settingsForm.get('streetAddress')?.errors?.minlength) {
+                <small class="form-text text-danger">Street address must be at least 5 characters long.</small>
+              }
+              @if (settingsForm.get('streetAddress')?.errors?.maxlength) {
+                <small class="form-text text-danger">Street address cannot be longer than 100 characters.</small>
+              }
+              @if (settingsForm.get('streetAddress')?.errors?.pattern) {
+                <small class="form-text text-danger">Street address contains invalid characters.</small>
+              }
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="lastName">Last Name</label>
+          <!-- Input Postal Code -->
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="postalCode">Postal Code</label>
+            <input
+              type="number"
+              class="form-control rounded-5"
+              id="postalCode"
+              name="postalCode"
+              placeholder="Your postal code"
+              formControlName="postalCode"
+              data-cy="postalCode"
+            />
+            <div
+              *ngIf="
+                settingsForm.get('postalCode')!.invalid &&
+                (settingsForm.get('postalCode')!.dirty || settingsForm.get('postalCode')!.touched)
+              "
+            >
+              @if (settingsForm.get('postalCode')?.errors?.required) {
+                <small class="form-text text-danger">Postal code is required.</small>
+              }
+              @if (settingsForm.get('postalCode')?.errors?.pattern) {
+                <small class="form-text text-danger">Postal code cannot be longer than 5 characters.</small>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Input City and Province -->
+        <div class="row mb-3">
+          <div class="col-md-6 mb-3 col-6">
+            <label class="form-label" for="city">City</label>
             <input
               type="text"
-              class="form-control"
-              id="lastName"
-              name="lastName"
-              placeholder="Your last name"
-              formControlName="lastName"
-              data-cy="lastname"
+              class="form-control rounded-5"
+              id="city"
+              name="city"
+              placeholder="Your city"
+              formControlName="city"
+              data-cy="city"
             />
-
-            @if (settingsForm.get('lastName')!.invalid && (settingsForm.get('lastName')!.dirty || settingsForm.get('lastName')!.touched)) {
-              <div>
-                @if (settingsForm.get('lastName')?.errors?.required) {
-                  <small class="form-text text-danger">Your last name is required.</small>
-                }
-
-                @if (settingsForm.get('lastName')?.errors?.minlength) {
-                  <small class="form-text text-danger">Your last name is required to be at least 1 character</small>
-                }
-
-                @if (settingsForm.get('lastName')?.errors?.maxlength) {
-                  <small class="form-text text-danger">Your last name cannot be longer than 50 characters</small>
-                }
-              </div>
-            }
+            <div *ngIf="settingsForm.get('city')!.invalid && (settingsForm.get('city')!.dirty || settingsForm.get('city')!.touched)">
+              @if (settingsForm.get('city')?.errors?.required) {
+                <small class="form-text text-danger">City is required.</small>
+              }
+              @if (settingsForm.get('city')?.errors?.minlength) {
+                <small class="form-text text-danger">City must be at least 2 characters long.</small>
+              }
+              @if (settingsForm.get('city')?.errors?.maxlength) {
+                <small class="form-text text-danger">City cannot be longer than 50 characters.</small>
+              }
+              @if (settingsForm.get('city')?.errors?.pattern) {
+                <small class="form-text text-danger">City contains invalid characters.</small>
+              }
+            </div>
           </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="email">Email</label>
+          <div class="col-6 col-md-6 mb-3">
+            <label class="form-label" for="stateProvince">Province</label>
             <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="Your email"
-              formControlName="email"
-              data-cy="email"
+              type="text"
+              class="form-control rounded-5"
+              id="stateProvince"
+              name="stateProvince"
+              placeholder="Your province"
+              formControlName="stateProvince"
+              data-cy="stateProvince"
             />
-
-            @if (settingsForm.get('email')!.invalid && (settingsForm.get('email')!.dirty || settingsForm.get('email')!.touched)) {
-              <div>
-                @if (settingsForm.get('email')?.errors?.required) {
-                  <small class="form-text text-danger">Your email is required.</small>
-                }
-
-                @if (settingsForm.get('email')?.errors?.email) {
-                  <small class="form-text text-danger">Your email is invalid.</small>
-                }
-
-                @if (settingsForm.get('email')?.errors?.minlength) {
-                  <small class="form-text text-danger">Your email is required to be at least 5 characters.</small>
-                }
-
-                @if (settingsForm.get('email')?.errors?.maxlength) {
-                  <small class="form-text text-danger">Your email cannot be longer than 50 characters.</small>
-                }
-              </div>
-            }
+            <div
+              *ngIf="
+                settingsForm.get('stateProvince')!.invalid &&
+                (settingsForm.get('stateProvince')!.dirty || settingsForm.get('stateProvince')!.touched)
+              "
+            >
+              @if (settingsForm.get('stateProvince')?.errors?.required) {
+                <small class="form-text text-danger">Province is required.</small>
+              }
+              @if (settingsForm.get('stateProvince')?.errors?.minlength) {
+                <small class="form-text text-danger">Province must be at least 2 characters long.</small>
+              }
+              @if (settingsForm.get('stateProvince')?.errors?.maxlength) {
+                <small class="form-text text-danger">Province cannot be longer than 50 characters.</small>
+              }
+              @if (settingsForm.get('stateProvince')?.errors?.pattern) {
+                <small class="form-text text-danger">Province contains invalid characters.</small>
+              }
+            </div>
           </div>
+        </div>
 
-          <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" data-cy="submit">Save</button>
-        </form>
-      }
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" data-cy="submit" [disabled]="settingsForm.invalid">Save</button>
+      </form>
     </div>
   </div>
 </div>

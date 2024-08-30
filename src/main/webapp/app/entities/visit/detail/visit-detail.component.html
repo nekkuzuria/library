@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (visit()) {
+      <div>
+        <h2 data-cy="visitDetailsHeading"><span>Visit</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ visit()!.id }}</span>
+          </dd>
+          <dt><span>Date</span></dt>
+          <dd>
+            <span>{{ visit()!.date | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (visit()!.library) {
+              <div>
+                <a [routerLink]="['/library', visit()!.library?.id, 'view']">{{ visit()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Librarian</span></dt>
+          <dd>
+            @if (visit()!.librarian) {
+              <div>
+                <a [routerLink]="['/librarian', visit()!.librarian?.id, 'view']">{{ visit()!.librarian?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Visitor</span></dt>
+          <dd>
+            @if (visit()!.visitor) {
+              <div>
+                <a [routerLink]="['/visitor', visit()!.visitor?.id, 'view']">{{ visit()!.visitor?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Visitor Book Storage</span></dt>
+          <dd>
+            @if (visit()!.visitorBookStorage) {
+              <div>
+                <a [routerLink]="['/visitor-book-storage', visit()!.visitorBookStorage?.id, 'view']">{{
+                  visit()!.visitorBookStorage?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/visit', visit()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

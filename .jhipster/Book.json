@@ -1,0 +1,68 @@
+{
+  "annotations": {
+    "changelogDate": "20240812065714"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "BookType",
+      "fieldValues": "HARDCOVER,PAPERBACK,EBOOK,AUDIOBOOK,MAGAZINE,JOURNAL,COMIC,NEWSPAPER"
+    },
+    {
+      "fieldName": "genre",
+      "fieldType": "Genre",
+      "fieldValues": "FICTION,NONFICTION,SCIENCE_FICTION,FANTASY,BIOGRAPHY,MYSTERY,THRILLER,ROMANCE,HORROR,HISTORY,POETRY,DRAMA,ADVENTURE,CHILDRENS,YOUNG_ADULT,SELF_HELP,RELIGION,COOKING,ART,TRAVEL"
+    },
+    {
+      "fieldName": "year",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "totalPage",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "author",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "cover",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "synopsis",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "Book",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "bookStorage",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "bookStorage",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "id": false,
+      "otherEntityField": "id",
+      "otherEntityName": "file",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "file",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

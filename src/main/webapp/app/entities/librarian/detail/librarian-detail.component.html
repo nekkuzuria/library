@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (librarian()) {
+      <div>
+        <h2 data-cy="librarianDetailsHeading"><span>Librarian</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ librarian()!.id }}</span>
+          </dd>
+          <dt><span>Name</span></dt>
+          <dd>
+            <span>{{ librarian()!.name }}</span>
+          </dd>
+          <dt><span>Email</span></dt>
+          <dd>
+            <span>{{ librarian()!.email }}</span>
+          </dd>
+          <dt><span>Phone Number</span></dt>
+          <dd>
+            <span>{{ librarian()!.phoneNumber }}</span>
+          </dd>
+          <dt><span>Date Of Birth</span></dt>
+          <dd>
+            <span>{{ librarian()!.dateOfBirth | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Library</span></dt>
+          <dd>
+            @if (librarian()!.library) {
+              <div>
+                <a [routerLink]="['/library', librarian()!.library?.id, 'view']">{{ librarian()!.library?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Location</span></dt>
+          <dd>
+            @if (librarian()!.location) {
+              <div>
+                <a [routerLink]="['/location', librarian()!.location?.id, 'view']">{{ librarian()!.location?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ librarian()!.user?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/librarian', librarian()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="container">
+  <h2 class="text-center mb-5 mt-3">My Books</h2>
+
+  <jhi-alert-error></jhi-alert-error>
+  <jhi-alert></jhi-alert>
+
+  @if (visitorBookStorages?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No book is currently borrowed</span>
+    </div>
+  }
+  @if (visitorBookStorages && visitorBookStorages.length > 0) {
+    <div class="table-responsive table-entities" id="personal-storage">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead class="text-center">
+          <tr>
+            <th scope="col">
+              <span>No.</span>
+            </th>
+            <th scope="col">
+              <span>Book</span>
+            </th>
+            <th>
+              <span>Quantity</span>
+            </th>
+            <th scope="col">
+              <span>Borrow Date</span>
+            </th>
+            <th scope="col">
+              <span>Expected Return Date</span>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          @for (vbs of visitorBookStorages; track trackId) {
+            <tr>
+              <td data-label="No.">{{ $index + 1 }}</td>
+              <td data-label="Book">
+                <a [routerLink]="['/book-detail', vbs.bookId]">{{ vbs.title }}</a
+                ><br />
+                by {{ vbs.author }}
+              </td>
+              <td data-label="Quantity">{{ vbs.quantity }}</td>
+              <td data-label="Borrow Date">{{ convertDate(vbs.borrowDate) }}</td>
+              <td data-label="Expected Return Date">{{ getExpectedDate(vbs.borrowDate) }}</td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  (click)="returnSelectedBook(vbs)"
+                  class="btn btn-success btn-sm"
+                  data-cy="returnBookRequestButton"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modal"
+                >
+                  <span>RETURN BOOK</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
